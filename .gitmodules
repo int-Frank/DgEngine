@@ -1,0 +1,9 @@
+[submodule "Vendor/DgLib"]
+	path = Vendor/DgLib
+	url = https://github.com/int-Frank/DgLib.git
+[submodule "Vendor/spdlog"]
+	path = Vendor/spdlog
+	url = https://github.com/gabime/spdlog.git
+[submodule "Vendor/BuildScripts"]
+	path = Vendor/BuildScripts
+	url = https://github.com/int-Frank/BuildScripts.git
