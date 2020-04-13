@@ -97,7 +97,14 @@ group "Depenencies"
     targetdir (projOutput)
     objdir (projOutputInt)
     systemversion "latest"
-    include "Vendor/cppunitlite/premake5_cppunitlite.lua"
+    language "C++"
+    cppdialect "C++17"
+    
+    files 
+    {
+      "Vendor/cppunitlite/src/**.h",
+      "Vendor/cppunitlite/src/**.cpp",
+    }
     
     filter "configurations:Debug"
 		  runtime "Debug"

@@ -7,3 +7,6 @@
 [submodule "Vendor/BuildScripts"]
 	path = Vendor/BuildScripts
 	url = https://github.com/int-Frank/BuildScripts.git
+[submodule "Vendor/cppunitlite"]
+	path = Vendor/cppunitlite
+	url = https://github.com/int-Frank/cppunitlite.git

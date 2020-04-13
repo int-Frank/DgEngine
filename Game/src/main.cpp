@@ -175,8 +175,8 @@ public:
     Engine::Ref<Engine::RendererProgram> refProg;
     refProg = Engine::RendererProgram::Create(
       {
-        { Engine::ShaderDomain::Vertex, Engine::StrType::Path, "D:/dev/projects/BSR/Game/src/vs.glsl" },
-        { Engine::ShaderDomain::Fragment, Engine::StrType::Path, "D:/dev/projects/BSR/Game/src/fs.glsl" }
+        { Engine::ShaderDomain::Vertex, Engine::StrType::Path, "src/vs.glsl" },
+        { Engine::ShaderDomain::Fragment, Engine::StrType::Path, "src/fs.glsl" }
       });
 
     Engine::TextureFlags flags;
