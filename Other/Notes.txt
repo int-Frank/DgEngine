@@ -1,0 +1,274 @@
+Items
+  - 3d Collision detection
+  - AI
+  - Image scaling
+  - Animation editor
+  - Data file reader
+  - Sprite collision mask
+  - Slot map
+   
+GUI
+  - Menus
+  - Check boxes
+  - Sliders
+  - Text input (to assign keys)
+  - mouse and key input
+
+MENU
+  - New mission
+    - mission 1-6
+      - difficulty 1 - 4
+  - Story
+  - Game options
+    - Game
+      - Rotated map
+      - Crosshair
+    - Sound
+      - music volume
+      - sound effects volume
+    - Video
+      - Resolution
+      - Windowed/Fullscreen
+      - Antialiasing level
+      - VSync
+    - Controls
+      - Mouse
+        - invert Y
+        - x sensitivity
+        - y sensitivity
+      - Customise keys
+        - quick load
+        - quick save
+        - load
+        - save
+        - move
+          - forward
+          - back
+          - slide left
+          - slide right
+          - turn left
+          - turn right
+        - fire
+        - alt fire
+        - open
+        - run
+        - auto-run on/off
+        - Weapons 1-5
+  - High scores / End game
+  - load mission
+  - Save mission
+  - Back to demo / Back to game
+  - Log off
+
+
+GAME PLAY, NEW
+  - mouse look
+  - Enemies
+    - critical hits (use sprite mask)
+      - use some sort of sound/visual feedback for crits
+      - sprite mask will have 2 bits per element:
+        - 0: miss
+        - 1: normal hit       (eg arms)
+        - 2: increased damage (eg chest)
+        - 3: critical hit     (eg head)
+    - better AI / pathfinding
+  - Alt-fire weapons
+    - Auto charge pistol: charges to fire a powerful but slow energy projectile
+    - Slow fire protector: double tap, takes time to recharge
+    - Rapid assult weapon: single-shot sniper scope
+    - Dual neutron dispencer: Both barrels fire, shotgun blast
+    - Plasma discharge unit: bouncy grenades
+  - genades use 3D physics
+    - use explosion sprite/particle effect instead of default 'ground hit' sprite
+  - Lighting effects
+    - Lights are tied to objects/actors/animations
+  - transparent sprites for projectiles
+  - Tiles/sprites use fine triangulation for lighting
+  - Particle engine
+    - explosions
+    - blood splatters
+  - Electro spheres fly up and down as well
+  
+GAME PLAY, VANILLA
+  - 1-directional Actors
+  - multi-directional Actors
+  - Goldfire
+  - Bosses
+  - Patrol guards, follow a set of turning points
+  - Doors
+  - 1-way doors
+  - auto door
+    - auto door pointer
+  - Push walls
+  - elevator controls
+  - food unit
+  - collectables
+    - health
+    - ammo
+    - points
+    - keys
+    - guns
+  - barriers
+  - electric barriers
+
+
+
+RENDER
+  - Pixel scaling images
+    - 4xHQX for textures, although floor/ceiling look better with 4xXBR
+    - 4xXBR objects/actors
+  - Anisotropic filtering
+  - Antialiasing
+  - Mip mapping
+  - Lights
+    - point
+    - cone
+    - ambient
+
+LIGHTS
+  - Electric barriers - flicker white/light blue
+  - blue barriers - pulse blue
+  - static objects which have light
+  - Plasma alien - flicker white/light blue
+  - Plasma alien attack - strong flicker white/light blue
+  - Canister alien (unbroken) - Constant green
+  - most actor projectiles
+  - Muzzle flash
+  - Explosions - strong then fade quickly
+  - burning - flicker yellow
+  - Robot on death
+  - turret on destruction
+  - Goldfire on teleport - soft white to blinding flash
+  - barrier switches when on
+  - the little green/red lights on doors
+  - some walls look like they have components that glow
+
+AI
+  - Informants can:
+    - Move to objects and stay for a time:
+      - computer terminal
+      - table and chairs
+      - food/drink dispencer
+    - check on pod aliens, canisters...
+    - confer with each other
+    - run to safety when gun fire heard
+  - rent-a-cops can
+    - Move to objects and stay for a time:
+      - food/drink dispencer
+
+RESTRICTIONS
+  - Limit new textures! Keep true to vanilla
+    - exceptions could be blood splatters for hits
+  - No new objects/actors
+  - No new maps
+  - Try to get away with not editing any maps/sprites/animations
+  - Can have a new data file that links sprites to new effects (lights)
+
+- When the player is hit by a punch, shake the screen and throw the player back a bit
+
+When partitioning the map, be sure not to include areas the player cannot go, outside the outer wall
+for example.
+
+Each vertex in a tile will have a list of corresponding static lights which may light it, accounting for 
+occlusion (creating shadows). This can be a 32-bit bit mask.
+
+PHYSICS:
+
+  Each corporeal object will need the following primitives:
+    - sphere                          - rendering/physics
+    - zCylinder (disk2D + zmin, zmax) - 2D/3D physics, 
+    - zRectangle
+    - mask
+
+  Each non-corporeal will have:
+    - sphere
+
+We need:
+  - line seg 3D                 (bullets)
+  - line seg 2D                 (bullets, walls)
+  - 2D points                   (for joining walls)
+  - 3D points                   (Camera)
+  - z-aligned cyninder          (actors/objects)
+  - z-aligned rectangle         (sprites)
+  - sphere
+
+  - Queries:
+    - CPA disk-Point              (eg player/wall join)
+    - CPA disk-Line               (eg player/wall, grenade/ceiling)
+    - CPA sphere-sphere           (eg grenade/actor)
+    - CPA zCylinder-zCyliner      (eg player/actor)
+    
+    - Capsule-zCyliner            (eg grenade/object)
+    - Capsule-zRectangle          (eg grenade/actor)
+
+    - Seg-zRectangle          (eg bullet/actor)
+    - Seg-sphere              (eg bullet/actor)
+    - Seg-zCylinder           (eg bullet/actor)
+
+    - Seg-Seg                 (eg bullet wall, can be done in 2D)
+    - sphere-plane            (eg grenade ceiling)
+    - seg-plane               (eg bullet floor)
+    
+Actor states
+
+ - Standing, Path, Attack, Pain, Shoot, Die, Dead
+ Troopers: Attack -> Fall down -> ko -> get up -> Attack -> Die 
+
+Component refereneces
+  - ASPECT
+  - Aspect_Default: eg static objects
+  - Aspect_Standing N, NE, E, SE, S, SW, W, NW
+  - Aspect_Walking  N[], NE[], E[], SE[], S[], SW[], W[], NW[]
+  - Aspect_Chase    N[], NE[], E[], SE[], S[], SW[], W[], NW[]
+  - Aspect_Warp in[]: electro aliens, dr goldfire
+  - Aspect_Warp out[]: dr goldfire
+  - Aspect_Falling[]: Star troopers
+  - Aspect_Down: star troopers
+  - Aspect_Pain
+  - Aspect_Shoot
+  - Aspect_Die
+  - Aspect_Dead
+  - Materials
+  
+  - Geometry
+  - Geometry_Default: eg static objects
+  - Geometry_Standing N, NE, E, SE, S, SW, W, NW
+  - Geometry_Walking  N[], NE[], E[], SE[], S[], SW[], W[], NW[]
+  - Geometry_Chase    N[], NE[], E[], SE[], S[], SW[], W[], NW[]
+  - Geometry_Warp in[]: electro aliens, dr goldfire
+  - Geometry_Warp out[]: dr goldfire
+  - Geometry_Falling[]: Star troopers
+  - Geometry_Pain
+  - Geometry_Shoot
+  - Geometry_Die
+
+Possible states:
+  - Default
+  - Standing
+  - Walking
+  - Ambush (does not react to sound)
+  - Chase  
+  - Warp in
+  - Warp out
+  - Falling
+  - Down
+  - Pain
+  - Shoot
+  - Die
+  - Dead
+
+Components:
+  - State
+  - Aspect (sprites)
+  - Position
+    - vec3
+  - Orientation
+    - vec3
+  - Body: Bounding sphere, rectangle, mask
+  - Body: Bounding cylinder
+  - AI
+  - Character (name, material(flesh, metal...))
+  - Motion
+    - vec3
+  - Health
+  - Player
