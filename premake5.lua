@@ -17,7 +17,7 @@ projOutputInt = "%{wks.location}/build/intermediate/%{prj.name}-%{cfg.buildcfg}"
 -- Include directories relative to root folder (solution directory)
 IncludeDir = {}
 IncludeDir["Glad"] = "%{wks.location}/Vendor/GLAD/include"
-IncludeDir["SDL2"] = "%{wks.location}/Vendor/SDL2-2.0.12/include"
+IncludeDir["SDL2"] = "%{wks.location}/Vendor/SDL2/include"
 IncludeDir["spdlog"] = "%{wks.location}/Vendor/spdlog/include"
 IncludeDir["DgLib"] = "%{wks.location}/Vendor/DgLib/src"
 IncludeDir["cppunitlite"] = "%{wks.location}/Vendor/cppunitlite"
@@ -226,8 +226,8 @@ project "Engine"
     "DgLib",
     "Glad",
     "Core",
-    "Vendor/SDL2-2.0.12/lib/x64/SDL2.lib",
-    "Vendor/SDL2-2.0.12/lib/x64/SDL2main.lib"
+    "Vendor/SDL2/lib/x64/SDL2.lib",
+    "Vendor/SDL2/lib/x64/SDL2main.lib"
   }
 
   includedirs
@@ -418,6 +418,10 @@ project "Converter"
       "Engine",
       "DgLib",
       "GameCommon"
+    }
+    
+    postbuildcommands {
+      "{COPY} %{wks.location}/Vendor/SDL2/lib/x64/SDL2.dll %{cfg.targetdir}"
     }
     
     filter "configurations:Debug"
