@@ -38,7 +38,7 @@ RGBA * GenerateBinTexture()
   };
 
   Dg::BinPacker<int> rp;
-  std::map<Dg::BinPkr_ItemID, MyItem> itemMap;
+  std::map<Dg::BinPackerCommon::ItemID, MyItem> itemMap;
 
   for (int i = 0; i < nItems; i++)
   {
@@ -46,8 +46,8 @@ RGBA * GenerateBinTexture()
     item.dim[Dg::Element::width] = rng.GetUintRange(itemMin, itemMax);
     item.dim[Dg::Element::height] = rng.GetUintRange(itemMin, itemMax);
 
-    Dg::BinPkr_ItemID id = rp.RegisterItem(item.dim[Dg::Element::width], item.dim[Dg::Element::height]);
-    itemMap.insert(std::pair<Dg::BinPkr_ItemID, MyItem>(id, item));
+    Dg::BinPackerCommon::ItemID id = rp.RegisterItem(item.dim[Dg::Element::width], item.dim[Dg::Element::height]);
+    itemMap.insert(std::pair<Dg::BinPackerCommon::ItemID, MyItem>(id, item));
   }
 
   Dg::BinPacker<int>::Bin bin;
@@ -66,7 +66,7 @@ RGBA * GenerateBinTexture()
 
   for (auto const & item : bin.items)
   {
-    Dg::BinPkr_ItemID id = item.id;
+    Dg::BinPackerCommon::ItemID id = item.id;
     itemMap.at(id).pos[Dg::Element::x] = item.xy[Dg::Element::x];
     itemMap.at(id).pos[Dg::Element::y] = item.xy[Dg::Element::y];
     items.push_back(itemMap.at(id));

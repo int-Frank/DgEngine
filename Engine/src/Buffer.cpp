@@ -193,6 +193,7 @@ namespace Engine
 
     RENDER_SUBMIT(state, [resID = GetRefID().GetID(), size = a_size, usage = a_usage, data]()
       {
+      //TODO all of these RT_* should be obtained through Framework, or throught GraphicsFramework class.
         ::Engine::RT_VertexBuffer vb;
         vb.Init(data, size, usage);
         ::Engine::RenderThreadData::Instance()->VBOs.insert(resID, vb);
