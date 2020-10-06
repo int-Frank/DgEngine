@@ -21,11 +21,11 @@
 
 #include "Memory.h"
 #include "Buffer.h"
-#include "Resource.h"
+#include "RenderResource.h"
 
 namespace Engine 
 {
-  class VertexArray : public Resource
+  class VertexArray : public RenderResource
   {
     VertexArray();
     void Init();

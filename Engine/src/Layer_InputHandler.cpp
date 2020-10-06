@@ -39,8 +39,8 @@ namespace Engine
   //------------------------------------------------------------------------------------
 
   Layer_InputHandler::Layer_InputHandler()
-    : m_eventPoller(Framework::Instance()->GetEventPoller())
-    , m_mouseController(Framework::Instance()->GetMouseController())
+    : m_pEventPoller(Framework::Instance()->GetEventPoller())
+    , m_pMouseController(Framework::Instance()->GetMouseController())
     , m_xMouseRotRate(1.0f)
     , m_yMouseRotRate(1.0f)
   {
@@ -49,7 +49,8 @@ namespace Engine
 
   Layer_InputHandler::~Layer_InputHandler()
   {
-
+    for (auto const & kv : m_bindings)
+      delete kv.second;
   }
 
   void Layer_InputHandler::HandleBinding(BindingKey a_key, Message const * a_pMsg)
@@ -65,6 +66,8 @@ namespace Engine
 
   void Layer_InputHandler::HandleMessage(Message* a_pMsg)
   {
+    BSR_ASSERT(a_pMsg != nullptr);
+
     if (a_pMsg->GetCategory() != MC_Input)
       return;
 
@@ -136,12 +139,12 @@ namespace Engine
 
   void Layer_InputHandler::GrabMouse()
   {
-    m_mouseController->Grab();
+    m_pMouseController->Grab();
   }
 
   void Layer_InputHandler::ReleaseMouse()
   {
-    m_mouseController->Release();
+    m_pMouseController->Release();
   }
 
   void Layer_InputHandler::SetMouseLookRate(float a_xRate, float a_yRate)
@@ -232,7 +235,7 @@ namespace Engine
   {
     while (true)
     {
-      TRef<Message> pMsg = m_eventPoller->NextEvent();
+      TRef<Message> pMsg = m_pEventPoller->NextEvent();
       if (pMsg.Get() == nullptr)
         break;
 

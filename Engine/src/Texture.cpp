@@ -31,7 +31,7 @@ namespace Engine
     state.Set<RenderState::Attr::Type>(RenderState::Type::Command);
     state.Set<RenderState::Attr::Command>(RenderState::Command::TextureDelete);
 
-    RENDER_SUBMIT(state, [resID = GetRefID().GetID()]()
+    RENDER_SUBMIT(state, [resID = m_id]()
     {
       RT_Texture2D* pTexture =  RenderThreadData::Instance()->textures.at(resID);
       if (pTexture == nullptr)
@@ -51,7 +51,7 @@ namespace Engine
     TextureData data;
     data.Duplicate(m_data);
     
-    RENDER_SUBMIT(state, [resID = GetRefID().GetID(), data = data]() mutable
+    RENDER_SUBMIT(state, [resID = m_id, data = data]() mutable
     {
       RT_Texture2D *pTexture =  RenderThreadData::Instance()->textures.at(resID);
       if (pTexture != nullptr)
@@ -75,7 +75,7 @@ namespace Engine
     state.Set<RenderState::Attr::Type>(RenderState::Type::Command);
     state.Set<RenderState::Attr::Command>(RenderState::Command::TextureBindToSlot);
 
-    RENDER_SUBMIT(state, [resID = GetRefID().GetID(), slot = a_slot]()
+    RENDER_SUBMIT(state, [resID = m_id, slot = a_slot]()
     {
       RT_Texture2D* pTexture =  RenderThreadData::Instance()->textures.at(resID);
       if (pTexture != nullptr)

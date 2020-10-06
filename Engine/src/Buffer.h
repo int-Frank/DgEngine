@@ -25,7 +25,7 @@
 
 #include "Memory.h"
 #include "core_Assert.h"
-#include "Resource.h"
+#include "RenderResource.h"
 #include "ShaderUniform.h"
 #include "ShaderUtils.h"
 
@@ -92,20 +92,18 @@ namespace Engine
   // VertexBuffer
   //------------------------------------------------------------------------------------------------
 
-  class VertexBuffer : public Resource
+  class VertexBuffer : public RenderResource
   {
   private:
-    void Init(void* data, uint32_t size, BufferUsage a_usage = BufferUsage::Static);
-    void Init(uint32_t size, BufferUsage a_usage = BufferUsage::Static);
-
-    VertexBuffer();
+    VertexBuffer(void* data, uint32_t size, BufferUsage a_usage = BufferUsage::Static);
+    VertexBuffer(uint32_t size, BufferUsage a_usage = BufferUsage::Static);
 
     VertexBuffer(VertexBuffer const&) = delete;
     VertexBuffer& operator=(VertexBuffer const&) = delete;
 
   public:
     
-    static Ref<VertexBuffer> Create(void* a_data,
+    static Ref<VertexBuffer> Create(void * a_pData,
                                   uint32_t a_size,
                                   BufferUsage a_usage = BufferUsage::Static);
 
@@ -124,20 +122,18 @@ namespace Engine
   // UniformBuffer
   //------------------------------------------------------------------------------------------------
 
-  class UniformBuffer : public Resource
+  class UniformBuffer : public RenderResource
   {
   private:
-    void Init(void* data, uint32_t size, BufferUsage a_usage = BufferUsage::Static);
-    void Init(uint32_t size, BufferUsage a_usage = BufferUsage::Static);
-
-    UniformBuffer();
+    UniformBuffer(void* data, uint32_t size, BufferUsage a_usage = BufferUsage::Static);
+    UniformBuffer(uint32_t size, BufferUsage a_usage = BufferUsage::Static);
 
     UniformBuffer(UniformBuffer const&) = delete;
     UniformBuffer& operator=(UniformBuffer const&) = delete;
 
   public:
     
-    static Ref<UniformBuffer> Create(void* a_data,
+    static Ref<UniformBuffer> Create(void * a_pData,
                                      uint32_t a_size,
                                      BufferUsage a_usage = BufferUsage::Static);
 
@@ -157,20 +153,18 @@ namespace Engine
   // ShaderStorageBuffer
   //------------------------------------------------------------------------------------------------
 
-  class ShaderStorageBuffer : public Resource
+  class ShaderStorageBuffer : public RenderResource
   {
   private:
-    void Init(void* data, uint32_t size, BufferUsage a_usage = BufferUsage::Static);
-    void Init(uint32_t size, BufferUsage a_usage = BufferUsage::Static);
-
-    ShaderStorageBuffer();
+    ShaderStorageBuffer(void* data, uint32_t size, BufferUsage a_usage = BufferUsage::Static);
+    ShaderStorageBuffer(uint32_t size, BufferUsage a_usage = BufferUsage::Static);
 
     ShaderStorageBuffer(ShaderStorageBuffer const&) = delete;
     ShaderStorageBuffer& operator=(ShaderStorageBuffer const&) = delete;
 
   public:
     
-    static Ref<ShaderStorageBuffer> Create(void* a_data,
+    static Ref<ShaderStorageBuffer> Create(void * a_pData,
                                            uint32_t a_size,
                                            BufferUsage a_usage = BufferUsage::Static);
 
@@ -191,17 +185,16 @@ namespace Engine
   // IndexBuffer
   //------------------------------------------------------------------------------------------------
 
-  class IndexBuffer : public Resource
+  class IndexBuffer : public RenderResource
   {
-    void Init(void* data, uint32_t size);
-    IndexBuffer();
+    IndexBuffer(void* data, uint32_t size);
 
     IndexBuffer(IndexBuffer const&) = delete;
     IndexBuffer& operator=(IndexBuffer const&) = delete;
   public:
     typedef uint16_t intType;
 
-    static Ref<IndexBuffer> Create(void* a_data, uint32_t a_size);
+    static Ref<IndexBuffer> Create(void * a_pData, uint32_t a_size);
 
      ~IndexBuffer();
 

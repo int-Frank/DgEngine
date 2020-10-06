@@ -4,118 +4,94 @@
 #define RESOURCEMANAGER_H
 
 #include <typeinfo>
-#include <mutex>
-#include <atomic>
 #include <stdint.h>
 #include "DgOpenHashMap.h"
-#include "ResourceID.h"
+#include "Resource.h"
+#include "core_Log.h"
 
 namespace Engine
 {
-  namespace impl
+  class ResourceWrapperBase
   {
-    enum IDType : uint16_t
-    {
-      T_UserID    = 1,
-      T_Generated = 2
-    };
+  public:
 
-    class ResourceWrapperBase
-    {
-    public:
+    ResourceWrapperBase(void*, std::type_info const &);
+    virtual ~ResourceWrapperBase();
+    void * GetPointer();
+    std::type_info const& GetType();
+  protected:
+    std::type_info const & m_info;
+    void* m_pObj;
+  };
 
-      ResourceWrapperBase(void*, std::type_info const &);
-      virtual ~ResourceWrapperBase();
-      void * GetPointer();
-      std::type_info const& GetType();
-    protected:
-      std::type_info const & m_info;
-      void* m_pObj;
-    };
+  template<typename T>
+  class ResourceWrapper : public ResourceWrapperBase
+  {
+  public:
 
-    class IDEqualTo
-    {
-    public:
-      bool operator()(impl::ResourceID64 const& a_id0,
-                      impl::ResourceID64 const& a_id1) const
-      {
-        return a_id0.GetID() == a_id1.GetID();
-      }
-    };
+    ResourceWrapper();
+    ResourceWrapper(T *);
+    ~ResourceWrapper();
+  };
 
-    class IDHasher
-    {
-    public:
-      size_t operator()(impl::ResourceID64 const& a_id) const
-      {
-        return static_cast<size_t>(a_id.GetID());
-      }
-    };
+  // Call Update to remove any unused objects. Typically this is done every frame.
+  class ResourceManager
+  {
+    ResourceManager();
+    ~ResourceManager();
 
-    class ResourceManager
-    {
-    public:
+  public:
 
-      struct Data
-      {
-        ResourceWrapperBase *  pResource;
-        uint32_t        counter;
-      };
+    static void Init();
+    static void ShutDown();
+    static ResourceManager* Instance();
 
-      //static ResourceID const NULL_ResourceID = 0;
-
-      ResourceManager();
-
-      static ResourceManager* Instance();
-
-      ResourceWrapperBase* GetResource(ResourceID64, bool registerUser);
-      uint32_t GenerateUnique32();
-
-      void RegisterUser(ResourceID64);
-      void DeregisterUser(ResourceID64);
-
-      void RegisterResource(ResourceID64, ResourceWrapperBase*);
-      void DestroyResource(ResourceID64);
-
-    private:
-
-      static ResourceManager* s_instance;
-
-      std::atomic<uint32_t>               m_currentID;
-      std::mutex                          m_mutex;
-      Dg::OpenHashMap<ResourceID64, Data, IDHasher, IDEqualTo> m_resourceMap;
-    };
+    void Clear();
+    void Erase(ResourceID);
 
     template<typename T>
-    class ResourceWrapper : public ResourceWrapperBase
+    void RegisterResource(ResourceID a_id, T * a_pObj)
     {
-    public:
-
-      ResourceWrapper();
-      ResourceWrapper(T*);
-      ~ResourceWrapper();
-    };
-
-    template<typename T>
-    ResourceWrapper<T>::ResourceWrapper()
-      : ResourceWrapperBase(nullptr)
-    {
-
+      m_resourceMap.insert(a_id, new ResourceWrapper<T>(a_pObj));
     }
 
     template<typename T>
-    ResourceWrapper<T>::ResourceWrapper(T* a_pObj)
-      : ResourceWrapperBase(a_pObj, typeid(T))
+    T* GetResource(ResourceID a_id)
     {
+      ResourceWrapperBase ** ppData = m_resourceMap.at(a_id);
+      if (ppData == nullptr)
+        return nullptr;
 
+      if (typeid(T) != (*ppData)->GetType())
+        LOG_WARN("Attempt to retrieve resource of different type! Casting anyway...");
+      return static_cast<T *>((*ppData)->GetPointer());
     }
 
-    template<typename T>
-    ResourceWrapper<T>::~ResourceWrapper()
-    {
-      delete static_cast<T*>(m_pObj);
-      m_pObj = nullptr;
-    }
+  private:
+
+    static ResourceManager* s_instance;
+    Dg::OpenHashMap<ResourceID, ResourceWrapperBase *> m_resourceMap;
+  };
+
+  template<typename T>
+  ResourceWrapper<T>::ResourceWrapper()
+    : ResourceWrapperBase(nullptr)
+  {
+
+  }
+
+  template<typename T>
+  ResourceWrapper<T>::ResourceWrapper(T* a_pObj)
+    : ResourceWrapperBase(a_pObj, typeid(T))
+  {
+
+  }
+
+  template<typename T>
+  ResourceWrapper<T>::~ResourceWrapper()
+  {
+    delete static_cast<T*>(m_pObj);
+    m_pObj = nullptr;
   }
 }
 

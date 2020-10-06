@@ -177,21 +177,18 @@ namespace Engine
   // VertexBuffer
   //------------------------------------------------------------------------------------------------
   
-  VertexBuffer::VertexBuffer()
+  VertexBuffer::VertexBuffer(void * a_pData, uint32_t a_size, BufferUsage a_usage)
   {
+    BSR_ASSERT(a_pData != nullptr);
 
-  }
-
-  void VertexBuffer::Init(void* a_data, uint32_t a_size, BufferUsage a_usage)
-  {
     uint8_t * data = (uint8_t*)RENDER_ALLOCATE(a_size);
-    memcpy(data, a_data, a_size);
+    memcpy(data, a_pData, a_size);
 
     RenderState state = RenderState::Create();
     state.Set<RenderState::Attr::Type>(RenderState::Type::Command);
     state.Set<RenderState::Attr::Command>(RenderState::Command::BufferCreate);
 
-    RENDER_SUBMIT(state, [resID = GetRefID().GetID(), size = a_size, usage = a_usage, data]()
+    RENDER_SUBMIT(state, [resID = m_id, size = a_size, usage = a_usage, data]()
       {
       //TODO all of these RT_* should be obtained through Framework, or throught GraphicsFramework class.
         ::Engine::RT_VertexBuffer vb;
@@ -200,13 +197,13 @@ namespace Engine
       });
   }
 
-  void VertexBuffer::Init(uint32_t a_size, BufferUsage a_usage)
+  VertexBuffer::VertexBuffer(uint32_t a_size, BufferUsage a_usage)
   {
     RenderState state = RenderState::Create();
     state.Set<RenderState::Attr::Type>(RenderState::Type::Command);
     state.Set<RenderState::Attr::Command>(RenderState::Command::BufferCreate);
 
-    RENDER_SUBMIT(state, [resID = GetRefID().GetID(), size = a_size, usage = a_usage]()
+    RENDER_SUBMIT(state, [resID = m_id, size = a_size, usage = a_usage]()
       {
         ::Engine::RT_VertexBuffer vb;
         vb.Init(size, usage);
@@ -220,7 +217,7 @@ namespace Engine
     state.Set<RenderState::Attr::Type>(RenderState::Type::Command);
     state.Set<RenderState::Attr::Command>(RenderState::Command::BufferDelete);
 
-    RENDER_SUBMIT(state, [resID = GetRefID().GetID()]() mutable
+    RENDER_SUBMIT(state, [resID = m_id]() mutable
       {
         RT_VertexBuffer * pVBO =  RenderThreadData::Instance()->VBOs.at(resID);
         if (pVBO == nullptr)
@@ -233,16 +230,18 @@ namespace Engine
       });
   }
 
-  void VertexBuffer::SetData(void* a_data, uint32_t a_size, uint32_t a_offset)
+  void VertexBuffer::SetData(void * a_pData, uint32_t a_size, uint32_t a_offset)
   {
+    BSR_ASSERT(a_pData != nullptr);
+
     uint8_t* data = (uint8_t*)RENDER_ALLOCATE(a_size);
-    memcpy(data, a_data, a_size);
+    memcpy(data, a_pData, a_size);
 
     RenderState state = RenderState::Create();
     state.Set<RenderState::Attr::Type>(RenderState::Type::Command);
     state.Set<RenderState::Attr::Command>(RenderState::Command::BufferSetData);
 
-    RENDER_SUBMIT(state, [resID = GetRefID().GetID(), offset = a_offset, size = a_size, data]()
+    RENDER_SUBMIT(state, [resID = m_id, offset = a_offset, size = a_size, data]()
       {
         ::Engine::RT_VertexBuffer * pVBO = ::Engine::RenderThreadData::Instance()->VBOs.at(resID);
         if (pVBO == nullptr)
@@ -261,7 +260,7 @@ namespace Engine
     state.Set<RenderState::Attr::Type>(RenderState::Type::Command);
     state.Set<RenderState::Attr::Command>(RenderState::Command::BufferBind);
 
-    RENDER_SUBMIT(state, [resID = GetRefID().GetID()]()
+    RENDER_SUBMIT(state, [resID = m_id]()
       {
         ::Engine::RT_VertexBuffer * pVBO = ::Engine::RenderThreadData::Instance()->VBOs.at(resID);
         if (pVBO == nullptr)
@@ -283,7 +282,7 @@ namespace Engine
     state.Set<RenderState::Attr::Type>(RenderState::Type::Command);
     state.Set<RenderState::Attr::Command>(RenderState::Command::BufferSetLayout);
 
-    RENDER_SUBMIT(state, [resID = GetRefID().GetID(), buffer = buffer]()
+    RENDER_SUBMIT(state, [resID = m_id, buffer = buffer]()
     {
       ::Engine::RT_VertexBuffer* pVBO = ::Engine::RenderThreadData::Instance()->VBOs.at(resID);
       if (pVBO == nullptr)
@@ -297,44 +296,37 @@ namespace Engine
     });
   }
 
-  Ref<VertexBuffer> VertexBuffer::Create(void* a_data,
+  Ref<VertexBuffer> VertexBuffer::Create(void * a_pData,
                                          uint32_t a_size,
                                          BufferUsage a_usage)
   {
-    VertexBuffer* pVBO = new VertexBuffer();
-    Ref<VertexBuffer> ref(pVBO); // Need to do it this way to give the object a resource ID
-    pVBO->Init(a_data, a_size, a_usage);
-    return ref;
+    BSR_ASSERT(a_pData != nullptr);
+
+    return Ref<VertexBuffer>(new VertexBuffer(a_pData, a_size, a_usage));
   }
 
   Ref<VertexBuffer> VertexBuffer::Create(uint32_t a_size,
                                   BufferUsage a_usage)
   {
-    VertexBuffer* pVBO = new VertexBuffer();
-    Ref<VertexBuffer> ref(pVBO); // Need to do it this way to give the object a resource ID
-    pVBO->Init(a_size, a_usage);
-    return ref;
+    return Ref<VertexBuffer>(new VertexBuffer(a_size, a_usage));
   }
 
   //------------------------------------------------------------------------------------------------
   // UniformBuffer
   //------------------------------------------------------------------------------------------------
 
-  UniformBuffer::UniformBuffer()
+  UniformBuffer::UniformBuffer(void * a_pData, uint32_t a_size, BufferUsage a_usage)
   {
+    BSR_ASSERT(a_pData != nullptr);
 
-  }
-
-  void UniformBuffer::Init(void* a_data, uint32_t a_size, BufferUsage a_usage)
-  {
     uint8_t* data = (uint8_t*)RENDER_ALLOCATE(a_size);
-    memcpy(data, a_data, a_size);
+    memcpy(data, a_pData, a_size);
 
     RenderState state = RenderState::Create();
     state.Set<RenderState::Attr::Type>(RenderState::Type::Command);
     state.Set<RenderState::Attr::Command>(RenderState::Command::BufferCreate);
 
-    RENDER_SUBMIT(state, [resID = GetRefID().GetID(), size = a_size, usage = a_usage, data]()
+    RENDER_SUBMIT(state, [resID = m_id, size = a_size, usage = a_usage, data]()
     {
       ::Engine::RT_UniformBuffer ub;
       ub.Init(data, size, usage);
@@ -342,13 +334,13 @@ namespace Engine
     });
   }
 
-  void UniformBuffer::Init(uint32_t a_size, BufferUsage a_usage)
+  UniformBuffer::UniformBuffer(uint32_t a_size, BufferUsage a_usage)
   {
     RenderState state = RenderState::Create();
     state.Set<RenderState::Attr::Type>(RenderState::Type::Command);
     state.Set<RenderState::Attr::Command>(RenderState::Command::BufferCreate);
 
-    RENDER_SUBMIT(state, [resID = GetRefID().GetID(), size = a_size, usage = a_usage]()
+    RENDER_SUBMIT(state, [resID = m_id, size = a_size, usage = a_usage]()
     {
       ::Engine::RT_UniformBuffer ub;
       ub.Init(size, usage);
@@ -362,7 +354,7 @@ namespace Engine
     state.Set<RenderState::Attr::Type>(RenderState::Type::Command);
     state.Set<RenderState::Attr::Command>(RenderState::Command::BufferDelete);
 
-    RENDER_SUBMIT(state, [resID = GetRefID().GetID()]() mutable
+    RENDER_SUBMIT(state, [resID = m_id]() mutable
     {
       RT_UniformBuffer* pUBO =  RenderThreadData::Instance()->UBOs.at(resID);
       if (pUBO == nullptr)
@@ -375,16 +367,16 @@ namespace Engine
     });
   }
 
-  void UniformBuffer::SetData(void* a_data, uint32_t a_size, uint32_t a_offset)
+  void UniformBuffer::SetData(void * a_pData, uint32_t a_size, uint32_t a_offset)
   {
     uint8_t* data = (uint8_t*)RENDER_ALLOCATE(a_size);
-    memcpy(data, a_data, a_size);
+    memcpy(data, a_pData, a_size);
 
     RenderState state = RenderState::Create();
     state.Set<RenderState::Attr::Type>(RenderState::Type::Command);
     state.Set<RenderState::Attr::Command>(RenderState::Command::BufferSetData);
 
-    RENDER_SUBMIT(state, [resID = GetRefID().GetID(), offset = a_offset, size = a_size, data]()
+    RENDER_SUBMIT(state, [resID = m_id, offset = a_offset, size = a_size, data]()
     {
       ::Engine::RT_UniformBuffer* pUBO = ::Engine::RenderThreadData::Instance()->UBOs.at(resID);
       if (pUBO == nullptr)
@@ -403,7 +395,7 @@ namespace Engine
     state.Set<RenderState::Attr::Type>(RenderState::Type::Command);
     state.Set<RenderState::Attr::Command>(RenderState::Command::BufferBind);
 
-    RENDER_SUBMIT(state, [resID = GetRefID().GetID()]()
+    RENDER_SUBMIT(state, [resID = m_id]()
     {
       ::Engine::RT_UniformBuffer* pUBO = ::Engine::RenderThreadData::Instance()->UBOs.at(resID);
       if (pUBO == nullptr)
@@ -425,7 +417,7 @@ namespace Engine
     state.Set<RenderState::Attr::Type>(RenderState::Type::Command);
     state.Set<RenderState::Attr::Command>(RenderState::Command::BufferSetLayout);
 
-    RENDER_SUBMIT(state, [resID = GetRefID().GetID(), buffer = buffer]()
+    RENDER_SUBMIT(state, [resID = m_id, buffer = buffer]()
     {
       ::Engine::RT_UniformBuffer* pUBO = ::Engine::RenderThreadData::Instance()->UBOs.at(resID);
       if (pUBO == nullptr)
@@ -439,23 +431,19 @@ namespace Engine
     });
   }
 
-  Ref<UniformBuffer> UniformBuffer::Create(void* a_data,
+  Ref<UniformBuffer> UniformBuffer::Create(void * a_pData,
                                            uint32_t a_size,
                                            BufferUsage a_usage)
   {
-    UniformBuffer* pUBO = new UniformBuffer();
-    Ref<UniformBuffer> ref(pUBO); // Need to do it this way to give the object a resource ID
-    pUBO->Init(a_data, a_size, a_usage);
-    return ref;
+    BSR_ASSERT(a_pData != nullptr);
+
+    return Ref<UniformBuffer>(new UniformBuffer(a_pData, a_size, a_usage));
   }
 
   Ref<UniformBuffer> UniformBuffer::Create(uint32_t a_size,
                                            BufferUsage a_usage)
   {
-    UniformBuffer* pUBO = new UniformBuffer();
-    Ref<UniformBuffer> ref(pUBO); // Need to do it this way to give the object a resource ID
-    pUBO->Init(a_size, a_usage);
-    return ref;
+    return Ref<UniformBuffer>(new UniformBuffer(a_size, a_usage));
   }
 
   void UniformBuffer::Bind(Ref<BindingPoint> const& a_bp)
@@ -464,7 +452,7 @@ namespace Engine
     state.Set<RenderState::Attr::Type>(RenderState::Type::Command);
     state.Set<RenderState::Attr::Command>(RenderState::Command::IndexedBufferBind);
 
-    RENDER_SUBMIT(state, [uboID = GetRefID().GetID(), bpID = a_bp->GetRefID().GetID()]()
+    RENDER_SUBMIT(state, [uboID = m_id, bpID = a_bp->GetID()]()
     {
       ::Engine::RT_UniformBuffer* pUBO = ::Engine::RenderThreadData::Instance()->UBOs.at(uboID);
       if (pUBO == nullptr)
@@ -487,21 +475,19 @@ namespace Engine
   //------------------------------------------------------------------------------------------------
   // ShaderStorageBuffer
   //------------------------------------------------------------------------------------------------
-  ShaderStorageBuffer::ShaderStorageBuffer()
+  
+  ShaderStorageBuffer::ShaderStorageBuffer(void * a_pData, uint32_t a_size, BufferUsage a_usage)
   {
+    BSR_ASSERT(a_pData != nullptr);
 
-  }
-
-  void ShaderStorageBuffer::Init(void* a_data, uint32_t a_size, BufferUsage a_usage)
-  {
     uint8_t* data = (uint8_t*)RENDER_ALLOCATE(a_size);
-    memcpy(data, a_data, a_size);
+    memcpy(data, a_pData, a_size);
 
     RenderState state = RenderState::Create();
     state.Set<RenderState::Attr::Type>(RenderState::Type::Command);
     state.Set<RenderState::Attr::Command>(RenderState::Command::BufferCreate);
 
-    RENDER_SUBMIT(state, [resID = GetRefID().GetID(), size = a_size, usage = a_usage, data]()
+    RENDER_SUBMIT(state, [resID = m_id, size = a_size, usage = a_usage, data]()
     {
       ::Engine::RT_ShaderStorageBuffer ssb;
       ssb.Init(data, size, usage);
@@ -509,13 +495,13 @@ namespace Engine
     });
   }
 
-  void ShaderStorageBuffer::Init(uint32_t a_size, BufferUsage a_usage)
+  ShaderStorageBuffer::ShaderStorageBuffer(uint32_t a_size, BufferUsage a_usage)
   {
     RenderState state = RenderState::Create();
     state.Set<RenderState::Attr::Type>(RenderState::Type::Command);
     state.Set<RenderState::Attr::Command>(RenderState::Command::BufferCreate);
 
-    RENDER_SUBMIT(state, [resID = GetRefID().GetID(), size = a_size, usage = a_usage]()
+    RENDER_SUBMIT(state, [resID = m_id, size = a_size, usage = a_usage]()
     {
       ::Engine::RT_ShaderStorageBuffer ssb;
       ssb.Init(size, usage);
@@ -529,7 +515,7 @@ namespace Engine
     state.Set<RenderState::Attr::Type>(RenderState::Type::Command);
     state.Set<RenderState::Attr::Command>(RenderState::Command::BufferDelete);
 
-    RENDER_SUBMIT(state, [resID = GetRefID().GetID()]() mutable
+    RENDER_SUBMIT(state, [resID = m_id]() mutable
     {
       RT_ShaderStorageBuffer* pSSBO =  RenderThreadData::Instance()->SSBOs.at(resID);
       if (pSSBO == nullptr)
@@ -542,16 +528,18 @@ namespace Engine
     });
   }
 
-  void ShaderStorageBuffer::SetData(void* a_data, uint32_t a_size, uint32_t a_offset)
+  void ShaderStorageBuffer::SetData(void * a_pData, uint32_t a_size, uint32_t a_offset)
   {
+    BSR_ASSERT(a_pData != nullptr);
+
     uint8_t* data = (uint8_t*)RENDER_ALLOCATE(a_size);
-    memcpy(data, a_data, a_size);
+    memcpy(data, a_pData, a_size);
 
     RenderState state = RenderState::Create();
     state.Set<RenderState::Attr::Type>(RenderState::Type::Command);
     state.Set<RenderState::Attr::Command>(RenderState::Command::BufferSetData);
 
-    RENDER_SUBMIT(state, [resID = GetRefID().GetID(), offset = a_offset, size = a_size, data]()
+    RENDER_SUBMIT(state, [resID = m_id, offset = a_offset, size = a_size, data]()
     {
       ::Engine::RT_ShaderStorageBuffer* pSSBO = ::Engine::RenderThreadData::Instance()->SSBOs.at(resID);
       if (pSSBO == nullptr)
@@ -570,7 +558,7 @@ namespace Engine
     state.Set<RenderState::Attr::Type>(RenderState::Type::Command);
     state.Set<RenderState::Attr::Command>(RenderState::Command::BufferBind);
 
-    RENDER_SUBMIT(state, [resID = GetRefID().GetID()]()
+    RENDER_SUBMIT(state, [resID = m_id]()
     {
       ::Engine::RT_ShaderStorageBuffer* pSSBO = ::Engine::RenderThreadData::Instance()->SSBOs.at(resID);
       if (pSSBO == nullptr)
@@ -592,7 +580,7 @@ namespace Engine
     state.Set<RenderState::Attr::Type>(RenderState::Type::Command);
     state.Set<RenderState::Attr::Command>(RenderState::Command::BufferSetLayout);
 
-    RENDER_SUBMIT(state, [resID = GetRefID().GetID(), buffer = buffer]()
+    RENDER_SUBMIT(state, [resID = m_id, buffer = buffer]()
     {
       ::Engine::RT_ShaderStorageBuffer* pSSBO = ::Engine::RenderThreadData::Instance()->SSBOs.at(resID);
       if (pSSBO == nullptr)
@@ -606,23 +594,19 @@ namespace Engine
     });
   }
 
-  Ref<ShaderStorageBuffer> ShaderStorageBuffer::Create(void* a_data,
+  Ref<ShaderStorageBuffer> ShaderStorageBuffer::Create(void * a_pData,
                                            uint32_t a_size,
                                            BufferUsage a_usage)
   {
-    ShaderStorageBuffer* pSSBO = new ShaderStorageBuffer();
-    Ref<ShaderStorageBuffer> ref(pSSBO); // Need to do it this way to give the object a resource ID
-    pSSBO->Init(a_data, a_size, a_usage);
-    return ref;
+    BSR_ASSERT(a_pData != nullptr);
+
+    return Ref<ShaderStorageBuffer>(new ShaderStorageBuffer(a_pData, a_size, a_usage));
   }
 
   Ref<ShaderStorageBuffer> ShaderStorageBuffer::Create(uint32_t a_size,
                                            BufferUsage a_usage)
   {
-    ShaderStorageBuffer* pSSBO = new ShaderStorageBuffer();
-    Ref<ShaderStorageBuffer> ref(pSSBO); // Need to do it this way to give the object a resource ID
-    pSSBO->Init(a_size, a_usage);
-    return ref;
+    return Ref<ShaderStorageBuffer>(new ShaderStorageBuffer(a_size, a_usage));
   }
 
   void ShaderStorageBuffer::Bind(Ref<BindingPoint> const& a_bp)
@@ -631,7 +615,7 @@ namespace Engine
     state.Set<RenderState::Attr::Type>(RenderState::Type::Command);
     state.Set<RenderState::Attr::Command>(RenderState::Command::IndexedBufferBind);
 
-    RENDER_SUBMIT(state, [uboID = GetRefID().GetID(), bpID = a_bp->GetRefID().GetID()]()
+    RENDER_SUBMIT(state, [uboID = m_id, bpID = a_bp->GetID()]()
     {
       ::Engine::RT_ShaderStorageBuffer* pSSBO = ::Engine::RenderThreadData::Instance()->SSBOs.at(uboID);
       if (pSSBO == nullptr)
@@ -655,21 +639,18 @@ namespace Engine
   // IndexBuffer
   //------------------------------------------------------------------------------------------------
 
-  IndexBuffer::IndexBuffer()
+  IndexBuffer::IndexBuffer(void * a_pData, uint32_t a_size)
   {
+    BSR_ASSERT(a_pData != nullptr);
 
-  }
-
-  void IndexBuffer::Init(void* a_data, uint32_t a_size)
-  {
     uint8_t* data = (uint8_t*)RENDER_ALLOCATE(a_size);
-    memcpy(data, a_data, a_size);
+    memcpy(data, a_pData, a_size);
 
     RenderState state = RenderState::Create();
     state.Set<RenderState::Attr::Type>(RenderState::Type::Command);
     state.Set<RenderState::Attr::Command>(RenderState::Command::BufferCreate);
 
-    RENDER_SUBMIT(state, [resID = GetRefID().GetID(), size = a_size, data]()
+    RENDER_SUBMIT(state, [resID = m_id, size = a_size, data]()
       {
         ::Engine::RT_IndexBuffer ib;
         ib.Init(data, size);
@@ -677,12 +658,11 @@ namespace Engine
       });
   }
 
-  Ref<IndexBuffer> IndexBuffer::Create(void* a_data, uint32_t a_size)
+  Ref<IndexBuffer> IndexBuffer::Create(void * a_pData, uint32_t a_size)
   {
-    IndexBuffer* pIBO = new IndexBuffer();
-    Ref<IndexBuffer> ref(pIBO); // Need to do it this way to give the object a resource ID
-    pIBO->Init(a_data, a_size);
-    return ref;
+    BSR_ASSERT(a_pData != nullptr);
+
+    return Ref<IndexBuffer>(new IndexBuffer(a_pData, a_size));
   }
 
   IndexBuffer::~IndexBuffer()
@@ -691,7 +671,7 @@ namespace Engine
     state.Set<RenderState::Attr::Type>(RenderState::Type::Command);
     state.Set<RenderState::Attr::Command>(RenderState::Command::BufferDelete);
 
-    RENDER_SUBMIT(state, [resID = GetRefID().GetID()]() mutable
+    RENDER_SUBMIT(state, [resID = m_id]() mutable
       {
         RT_IndexBuffer * pIB =  RenderThreadData::Instance()->IBOs.at(resID);
         if (pIB == nullptr)
@@ -704,16 +684,18 @@ namespace Engine
       });
   }
 
-  void IndexBuffer::SetData(void* a_data, uint32_t a_size, uint32_t a_offset)
+  void IndexBuffer::SetData(void * a_pData, uint32_t a_size, uint32_t a_offset)
   {
+    BSR_ASSERT(a_pData != nullptr);
+
     uint8_t* data = (uint8_t*)RENDER_ALLOCATE(a_size);
-    memcpy(data, a_data, a_size);
+    memcpy(data, a_pData, a_size);
 
     RenderState state = RenderState::Create();
     state.Set<RenderState::Attr::Type>(RenderState::Type::Command);
     state.Set<RenderState::Attr::Command>(RenderState::Command::BufferSetData);
 
-    RENDER_SUBMIT(state, [resID = GetRefID().GetID(), offset = a_offset, size = a_size, data]()
+    RENDER_SUBMIT(state, [resID = m_id, offset = a_offset, size = a_size, data]()
       {
         ::Engine::RT_IndexBuffer * pIBO = ::Engine::RenderThreadData::Instance()->IBOs.at(resID);
         if (pIBO == nullptr)
@@ -732,7 +714,7 @@ namespace Engine
     state.Set<RenderState::Attr::Type>(RenderState::Type::Command);
     state.Set<RenderState::Attr::Command>(RenderState::Command::BufferBind);
 
-    RENDER_SUBMIT(state, [resID = GetRefID().GetID()]()
+    RENDER_SUBMIT(state, [resID = m_id]()
       {
         ::Engine::RT_IndexBuffer * pIBO = ::Engine::RenderThreadData::Instance()->IBOs.at(resID);
         if (pIBO == nullptr)

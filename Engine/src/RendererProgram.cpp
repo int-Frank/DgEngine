@@ -6,18 +6,19 @@
 #include  "core_Log.h"
 #include "Serialize.h"
 #include "RenderThreadData.h"
+#include "ResourceManager.h"
 
 namespace Engine
 {
   void RendererProgram::Init(std::initializer_list<ShaderSourceElement> const& a_src)
   {
-    m_shaderData = ShaderData::Create(a_src);
+    m_shaderDataID = ShaderData::CreateAsResource(a_src);
 
     RenderState state = RenderState::Create();
     state.Set<RenderState::Attr::Type>(RenderState::Type::Command);
     state.Set<RenderState::Attr::Command>(RenderState::Command::RendererProgramCreate);
 
-    RENDER_SUBMIT(state, [resID = GetRefID().GetID(), shaderDataID = m_shaderData->GetRefID()]()
+    RENDER_SUBMIT(state, [resID = m_id, shaderDataID = m_shaderDataID]()
     {
       RT_RendererProgram rp(shaderDataID);
       RenderThreadData::Instance()->rendererPrograms.insert(resID, rp);
@@ -43,7 +44,7 @@ namespace Engine
     state.Set<RenderState::Attr::Type>(RenderState::Type::Command);
     state.Set<RenderState::Attr::Command>(RenderState::Command::RendererProgramDelete);
 
-    RENDER_SUBMIT(state, [resID = GetRefID().GetID()]()
+    RENDER_SUBMIT(state, [resID = m_id]()
     {
       RT_RendererProgram* pRP = RenderThreadData::Instance()->rendererPrograms.at(resID);
       if (pRP == nullptr)
@@ -58,7 +59,10 @@ namespace Engine
 
   uint32_t RendererProgram::UniformBufferSize() const
   {
-    return m_shaderData->GetUniformDataSize();
+    ShaderData * ptr = ResourceManager::Instance()->GetResource<ShaderData>(m_shaderDataID);
+    BSR_ASSERT(ptr != nullptr);
+
+    return ptr->GetUniformDataSize();
   }
 
   /*void RendererProgram::Init(ShaderSource const & a_src)
@@ -68,7 +72,7 @@ namespace Engine
     state.Set<RenderState::Attr::Command>(RenderState::Command::RendererProgramInit);
     ShaderSource * ptr = new ShaderSource(a_src);
 
-    RENDER_SUBMIT(state, [resID = GetRefID().GetID(), ptr = ptr]()
+    RENDER_SUBMIT(state, [resID = m_id, ptr = ptr]()
     {
       RT_RendererProgram* pRP = RenderThreadData::Instance()->rendererPrograms.at(resID);
       if (pRP == nullptr)
@@ -88,7 +92,7 @@ namespace Engine
     state.Set<RenderState::Attr::Type>(RenderState::Type::Command);
     state.Set<RenderState::Attr::Command>(RenderState::Command::RendererProgramDestroy);
 
-    RENDER_SUBMIT(state, [resID = GetRefID().GetID()]()
+    RENDER_SUBMIT(state, [resID = m_id]()
     {
       RT_RendererProgram* pRP = RenderThreadData::Instance()->rendererPrograms.at(resID);
       if (pRP == nullptr)
@@ -106,7 +110,7 @@ namespace Engine
     state.Set<RenderState::Attr::Type>(RenderState::Type::Command);
     state.Set<RenderState::Attr::Command>(RenderState::Command::RendererProgramBind);
 
-    RENDER_SUBMIT(state, [resID = GetRefID().GetID()]()
+    RENDER_SUBMIT(state, [resID = m_id]()
     {
       RT_RendererProgram* pRP = RenderThreadData::Instance()->rendererPrograms.at(resID);
       if (pRP == nullptr)
@@ -124,7 +128,7 @@ namespace Engine
     state.Set<RenderState::Attr::Type>(RenderState::Type::Command);
     state.Set<RenderState::Attr::Command>(RenderState::Command::RendererProgramUnbind);
 
-    RENDER_SUBMIT(state, [resID = GetRefID().GetID()]()
+    RENDER_SUBMIT(state, [resID = m_id]()
     {
       RT_RendererProgram* pRP = RenderThreadData::Instance()->rendererPrograms.at(resID);
       if (pRP == nullptr)
@@ -138,14 +142,18 @@ namespace Engine
 
   void RendererProgram::UploadUniformBuffer(byte const * a_buf)
   {
+    //TODO Store pointer to avoid look-up each call to UploadUniformBuffer()
+    ShaderData * pShaderData = ResourceManager::Instance()->GetResource<ShaderData>(m_shaderDataID);
+    BSR_ASSERT(pShaderData != nullptr);
+
     RenderState state = RenderState::Create();
     state.Set<RenderState::Attr::Type>(RenderState::Type::Command);
     state.Set<RenderState::Attr::Command>(RenderState::Command::RendererProgramUploadUniform);
 
-    byte * buf_data = (byte*)RENDER_ALLOCATE(m_shaderData->GetUniformDataSize());
-    memcpy(buf_data, a_buf, m_shaderData->GetUniformDataSize());
+    byte * buf_data = (byte*)RENDER_ALLOCATE(pShaderData->GetUniformDataSize());
+    memcpy(buf_data, a_buf, pShaderData->GetUniformDataSize());
 
-    RENDER_SUBMIT(state, [resID = GetRefID().GetID(), buf = buf_data]()
+    RENDER_SUBMIT(state, [resID = m_id, buf = buf_data]()
     {
       RT_RendererProgram* pRP = RenderThreadData::Instance()->rendererPrograms.at(resID);
       if (pRP == nullptr)
@@ -159,9 +167,12 @@ namespace Engine
 
   ShaderUniformDeclaration const* RendererProgram::FindUniformDeclaration(std::string const& a_name) const
   {
-    for (size_t i = 0; i < m_shaderData->GetUniforms().size(); i++)
+    ShaderData * pShaderData = ResourceManager::Instance()->GetResource<ShaderData>(m_shaderDataID);
+    BSR_ASSERT(pShaderData != nullptr);
+
+    for (size_t i = 0; i < pShaderData->GetUniforms().size(); i++)
     {
-      ShaderUniformDeclaration const * pdecl = &m_shaderData->GetUniforms()[i];
+      ShaderUniformDeclaration const * pdecl = &pShaderData->GetUniforms()[i];
       if (pdecl->GetName() == a_name)
         return pdecl;
     }
@@ -181,7 +192,7 @@ namespace Engine
     void* buf_data = RENDER_ALLOCATE(a_size);
     memcpy(buf_data, a_buf, a_size);
 
-    RENDER_SUBMIT(state, [resID = GetRefID().GetID(), size = a_size, buf_name = buf_name, buf_data = buf_data]()
+    RENDER_SUBMIT(state, [resID = m_id, size = a_size, buf_name = buf_name, buf_data = buf_data]()
     {
       RT_RendererProgram* pRP = RenderThreadData::Instance()->rendererPrograms.at(resID);
       if (pRP == nullptr)
@@ -206,7 +217,7 @@ namespace Engine
     void* buf_name = RENDER_ALLOCATE(sze_name);
     Core::Serialize(buf_name, &a_name);
 
-    RENDER_SUBMIT(state, [resID = GetRefID().GetID(), size = a_size, buf_name = buf_name, buf_data = a_buf]()
+    RENDER_SUBMIT(state, [resID = m_id, size = a_size, buf_name = buf_name, buf_data = a_buf]()
     {
       RT_RendererProgram* pRP = RenderThreadData::Instance()->rendererPrograms.at(resID);
       if (pRP == nullptr)

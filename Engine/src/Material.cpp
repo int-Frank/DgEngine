@@ -52,8 +52,8 @@ namespace Engine
       , m_bufSize(0)
       , m_materialData(a_materialData)
     {
-      BSR_ASSERT(!m_materialData.IsNull());
-      BSR_ASSERT(!m_materialData->m_prog.IsNull());
+      BSR_ASSERT(m_materialData != nullptr);
+      BSR_ASSERT(m_materialData->m_prog != nullptr);
 
       m_bufSize = m_materialData->m_prog->UniformBufferSize();
       m_pBuf = new byte[m_bufSize]{};
@@ -61,25 +61,19 @@ namespace Engine
 
     MaterialBase::~MaterialBase()
     {
-       delete[] m_pBuf;
+      delete[] m_pBuf;
     }
 
     void MaterialBase::Bind()
     {
-      BSR_ASSERT(!m_materialData.IsNull());
-      BSR_ASSERT(!m_materialData->m_prog.IsNull());
-
       m_materialData->m_prog->Bind();
       m_materialData->m_prog->UploadUniformBuffer(m_pBuf);
     }
 
     ShaderUniformDeclaration const* MaterialBase::FindUniform(std::string const& a_name)
     {
-      BSR_ASSERT(!m_materialData.IsNull());
-      BSR_ASSERT(!m_materialData->m_prog.IsNull());
-
       ShaderUniformDeclaration const* pdecl = m_materialData->m_prog->FindUniformDeclaration(a_name);
-      BSR_ASSERT(pdecl);
+      BSR_ASSERT(pdecl != nullptr);
       
       return pdecl;
     }
@@ -119,15 +113,13 @@ namespace Engine
 
   Ref<Material> Material::Create(Ref<RendererProgram> a_prog)
   {
-    BSR_ASSERT(!a_prog.IsNull());
+    BSR_ASSERT(a_prog != nullptr);
+
     return Ref<Material>(new Material(impl::MaterialData::Create(a_prog)));
   }
 
   Ref<MaterialInstance> Material::SpawnInstance()
   {
-    BSR_ASSERT(!m_materialData.IsNull());
-    BSR_ASSERT(!m_materialData->m_prog.IsNull());
-
     Ref<MaterialInstance> inst(new MaterialInstance(m_materialData));
     inst->InitBuffer(m_pBuf);
     m_materialInstances.push_back(inst);
@@ -149,14 +141,14 @@ namespace Engine
   void Material::SetTexture(std::string const & a_name, Ref<Texture2D> const & a_texture)
   {
     ShaderUniformDeclaration const * pdecl = FindUniform(a_name);
-    UniformBufferElementHeader header = CreateHeader(pdecl, sizeof(RefID));
+    UniformBufferElementHeader header = CreateHeader(pdecl, sizeof(RenderResourceID));
 
     uint32_t offset = pdecl->GetDataOffset();
-    RefID id = a_texture->GetRefID().GetID();
+    RenderResourceID id = a_texture->GetID();
     WriteToBuffer(offset, header, &id);
 
     for (auto pInst : m_materialInstances)
-      pInst->SetUniform(offset, &id, sizeof(RefID));
+      pInst->SetUniform(offset, &id, sizeof(RenderResourceID));
   }
 
   //-----------------------------------------------------------------------------------------------
@@ -192,11 +184,11 @@ namespace Engine
   void MaterialInstance::SetTexture(std::string const & a_name, Ref<Texture2D> const & a_texture)
   {
     ShaderUniformDeclaration const * pdecl = FindUniform(a_name);
-    UniformBufferElementHeader header = CreateHeader(pdecl, sizeof(RefID));
+    UniformBufferElementHeader header = CreateHeader(pdecl, sizeof(RenderResourceID));
     header.SetFlag(UniformBufferElementHeader::ElementLocked, true);
 
     uint32_t offset = pdecl->GetDataOffset();
-    RefID id = a_texture->GetRefID().GetID();
+    RenderResourceID id = a_texture->GetID();
     WriteToBuffer(offset, header, &id);
   }
 

@@ -16,23 +16,29 @@ namespace Engine
   public:
 
     PIMPL()
-      : window(nullptr)
-      , eventPoller(nullptr)
-      , mouseController(nullptr)
-      , graphicsContext(nullptr)
+      : pWindow(nullptr)
+      , pEventPoller(nullptr)
+      , pMouseController(nullptr)
+      , pGraphicsContext(nullptr)
+      , pFontAtlas(nullptr)
     {
 
     }
 
     ~PIMPL()
     {
-
+      delete pFontAtlas;
+      delete pEventPoller;
+      delete pMouseController;
+      delete pGraphicsContext;
+      delete pWindow;
     }
 
-    Ref<IWindow>          window;
-    Ref<IEventPoller>     eventPoller;
-    Ref<IMouseController> mouseController;
-    Ref<IGraphicsContext> graphicsContext;
+    IWindow *          pWindow;
+    IEventPoller *     pEventPoller;
+    IMouseController * pMouseController;
+    IGraphicsContext * pGraphicsContext;
+    IFontAtlas *       pFontAtlas;
   };
 
   Framework * Framework::s_instance(nullptr);
@@ -80,6 +86,7 @@ namespace Engine
       s_instance->InitEventPoller();
       s_instance->InitMouseController();
       s_instance->InitGraphicsContext();
+      s_instance->InitFontAtlas();
 
     } while (false);
     return result;
@@ -101,47 +108,58 @@ namespace Engine
     return result;
   }
 
-  Ref<IWindow> Framework::GetWindow()
+  IWindow * Framework::GetWindow()
   {
-    return m_pimpl->window;
+    return m_pimpl->pWindow;
   }
 
-  Ref<IEventPoller> Framework::GetEventPoller()
+  IEventPoller * Framework::GetEventPoller()
   {
-    return m_pimpl->eventPoller;
+    return m_pimpl->pEventPoller;
   }
 
-  Ref<IMouseController> Framework::GetMouseController()
+  IMouseController * Framework::GetMouseController()
   {
-    return m_pimpl->mouseController;
+    return m_pimpl->pMouseController;
   }
 
-  Ref<IGraphicsContext> Framework::GetGraphicsContext()
+  IGraphicsContext * Framework::GetGraphicsContext()
   {
-    return m_pimpl->graphicsContext;
+    return m_pimpl->pGraphicsContext;
   }
 
-  void Framework::SetWindow(IWindow * a_window)
+  IFontAtlas * Framework::GetFontAtlas()
   {
-    BSR_ASSERT(m_pimpl->window.IsNull(), "Window already exists!");
-    m_pimpl->window = Ref<IWindow>(a_window);
+    return m_pimpl->pFontAtlas;
   }
 
-  void Framework::SetEventPoller(IEventPoller * a_ep)
+  void Framework::SetWindow(IWindow * a_ptr)
   {
-    BSR_ASSERT(m_pimpl->eventPoller.IsNull(), "EventPoller already exists!");
-    m_pimpl->eventPoller = Ref<IEventPoller>(a_ep);
+    BSR_ASSERT(m_pimpl->pWindow == nullptr, "Window already exists!");
+    m_pimpl->pWindow = a_ptr;
   }
 
-  void Framework::SetMouseController(IMouseController* a_mc)
+  void Framework::SetEventPoller(IEventPoller * a_ptr)
   {
-    BSR_ASSERT(m_pimpl->mouseController.IsNull(), "MouseController already exists!");
-    m_pimpl->mouseController = Ref<IMouseController>(a_mc);
+    BSR_ASSERT(m_pimpl->pEventPoller == nullptr, "EventPoller already exists!");
+    m_pimpl->pEventPoller = a_ptr;
   }
 
-  void Framework::SetGraphicsContext(IGraphicsContext* a_gc)
+  void Framework::SetMouseController(IMouseController* a_ptr)
   {
-    BSR_ASSERT(m_pimpl->graphicsContext.IsNull(), "GraphicsContext already exists!");
-    m_pimpl->graphicsContext = Ref<IGraphicsContext>(a_gc);
+    BSR_ASSERT(m_pimpl->pMouseController == nullptr, "MouseController already exists!");
+    m_pimpl->pMouseController = a_ptr;
+  }
+
+  void Framework::SetGraphicsContext(IGraphicsContext * a_ptr)
+  {
+    BSR_ASSERT(m_pimpl->pGraphicsContext == nullptr, "GraphicsContext already exists!");
+    m_pimpl->pGraphicsContext = a_ptr;
+  }
+
+  void Framework::SetFontAtlas(IFontAtlas * a_ptr)
+  {
+    BSR_ASSERT(m_pimpl->pFontAtlas == nullptr, "FontAtlas already exists!");
+    m_pimpl->pFontAtlas = a_ptr;
   }
 }

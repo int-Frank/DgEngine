@@ -68,7 +68,7 @@ namespace Engine
     {ShaderDataType::MAT3x4,    ShaderDataClass::Matrix,   ShaderDataBaseType::Float,    "mat3x4",       GL_FLOAT_MAT3x4,      12, ShaderDataType::VEC3,   ShaderDataType::VEC4,   V4,  V4,  CR(V4 * 4, V4 * 4),   CR(V4 * 4, V4 * 4)},
     {ShaderDataType::MAT4x2,    ShaderDataClass::Matrix,   ShaderDataBaseType::Float,    "mat4x2",       GL_FLOAT_MAT4x2,      8,  ShaderDataType::VEC4,   ShaderDataType::VEC2,   V4,  V4,  CR(V4 * 4, V4 * 2),   CR(V4 * 4, V4 * 2)},
     {ShaderDataType::MAT4x3,    ShaderDataClass::Matrix,   ShaderDataBaseType::Float,    "mat4x3",       GL_FLOAT_MAT4x3,      12, ShaderDataType::VEC4,   ShaderDataType::VEC3,   V4,  V4,  CR(V4 * 4, V4 * 3),   CR(V4 * 4, V4 * 3)},
-    {ShaderDataType::TEXTURE2D, ShaderDataClass::Texture,  ShaderDataBaseType::UInt64,   "sampler2D",    GL_TEXTURE_2D,        1,  ShaderDataType::NONE,   ShaderDataType::NONE,   0,   0,   0,                    0},
+    {ShaderDataType::TEXTURE2D, ShaderDataClass::Texture,  ShaderDataBaseType::UInt,     "sampler2D",    GL_TEXTURE_2D,        1,  ShaderDataType::NONE,   ShaderDataType::NONE,   0,   0,   0,                    0},
     {ShaderDataType::STRUCT,    ShaderDataClass::Struct,   ShaderDataBaseType::None,     "struct",       GL_INVALID_ENUM,      0,  ShaderDataType::NONE,   ShaderDataType::NONE,   0,   0,   0,                    0},
   };
 

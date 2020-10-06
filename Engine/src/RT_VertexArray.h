@@ -22,7 +22,7 @@
 #include <stdint.h>
 #include "DgDynamicArray.h"
 #include "RT_RendererAPI.h"
-#include "ResourceID.h"
+#include "RenderResource.h"
 
 namespace Engine
 {
@@ -39,17 +39,17 @@ namespace Engine
     void Bind() const;
     void Unbind() const;
 
-    void AddVertexBuffer(RefID id);
-    void SetIndexBuffer(RefID id);
+    void AddVertexBuffer(RenderResourceID id);
+    void SetIndexBuffer(RenderResourceID id);
 
-    Dg::DynamicArray<RefID> const & GetVertexBuffers() const;
-    RefID GetIndexBuffer() const;
+    Dg::DynamicArray<RenderResourceID> const & GetVertexBuffers() const;
+    RenderResourceID GetIndexBuffer() const;
 
   private:
 
     RendererID m_rendererID;
-    Dg::DynamicArray<RefID> m_vertexBuffers; //TODO is this even needed?
-    RefID m_indexBuffer; //TODO is this even needed?
+    Dg::DynamicArray<RenderResourceID> m_vertexBuffers; //TODO is this even needed?
+    RenderResourceID m_indexBuffer; //TODO is this even needed?
     uint32_t m_vertexAttribIndex;
   };
 }

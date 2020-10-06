@@ -25,6 +25,7 @@
 #include "core_Assert.h"
 #include "Memory.h"
 #include "Resource.h"
+#include "RenderResource.h"
 #include "ShaderUtils.h"
 #include "ShaderSource.h"
 
@@ -169,20 +170,21 @@ namespace Engine
 
   typedef Dg::DynamicArray<ShaderUniformDeclaration> ShaderUniformList;
 
-  class ShaderData : public Resource
+  class ShaderData : public RenderResource
   {
+    ShaderData();
+    ShaderData(std::initializer_list<ShaderSourceElement> const &);
+
   public:
 
-    ShaderData();
-    ShaderData(std::initializer_list<ShaderSourceElement> const&);
-
-    static Ref<ShaderData> Create(std::initializer_list<ShaderSourceElement> const&);
+    static ResourceID CreateAsResource(std::initializer_list<ShaderSourceElement> const &);
+    static Ref<ShaderData> Create(std::initializer_list<ShaderSourceElement> const &);
 
     void Init(std::initializer_list<ShaderSourceElement> const&);
 
     void Clear();
     ShaderUniformDeclaration* FindUniform(std::string const&);
-    uint32_t FindUniformIndex(std::string const&);
+    uint32_t FindUniformIndex(std::string const&) const;
 
     uint32_t GetUniformDataSize() const;
     ShaderSource const & GetShaderSource() const;
@@ -212,7 +214,7 @@ namespace Engine
     ShaderUniformList   m_textures;
   };
 
-  class BindingPoint : public Resource
+  class BindingPoint : public RenderResource
   {
     void Init(StorageBlockType, ShaderDomain);
     BindingPoint();

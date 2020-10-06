@@ -16,6 +16,7 @@
 #include "Message.h"
 #include "Memory.h"
 #include "Renderer.h"
+#include "ResourceManager.h"
 
 #include "Layer_Console.h"
 #include "Layer_InputHandler.h"
@@ -36,10 +37,9 @@ namespace Engine
     
     }
 
-    bool          shouldQuit;
-    Ref<IWindow>  pWindow;
-
-    LayerStack    layerStack;
+    bool        shouldQuit;
+    IWindow *   pWindow;
+    LayerStack  layerStack;
   };
 
   //------------------------------------------------------------------------------------
@@ -50,7 +50,7 @@ namespace Engine
   void Application::InitWindow()
   {
     m_pimpl->pWindow = Framework::Instance()->GetWindow();
-    if (m_pimpl->pWindow.IsNull())
+    if (m_pimpl->pWindow == nullptr)
       throw std::runtime_error("GetWindow() has returned a null pointer!");
 
     if (m_pimpl->pWindow->Init() != Core::EC_None)
@@ -78,6 +78,7 @@ namespace Engine
     BSR_ASSERT(s_instance == nullptr, "Error, Application already created!");
     s_instance = this;
 
+    ResourceManager::Init();
     MessageBus::Init(m_pimpl->layerStack);
 
     if (a_opts.loggerType == E_UseFileLogger)
@@ -121,6 +122,7 @@ namespace Engine
 
     s_instance = nullptr;
     MessageBus::ShutDown();
+    ResourceManager::ShutDown();
 
     LOG_TRACE("Shutdown complete!");
   }
@@ -181,7 +183,7 @@ namespace Engine
 
   bool Application::NormalizeWindowCoords(int a_x, int a_y, float& a_x_out, float& a_y_out)
   {
-    if (m_pimpl->pWindow.IsNull())
+    if (m_pimpl->pWindow == nullptr)
       return false;
     int w(0), h(0);
     m_pimpl->pWindow->GetDimensions(w, h);

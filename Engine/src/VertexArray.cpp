@@ -43,7 +43,7 @@ namespace Engine
     state.Set<RenderState::Attr::Type>(RenderState::Type::Command);
     state.Set<RenderState::Attr::Command>(RenderState::Command::VertexArrayCreate);
 
-    RENDER_SUBMIT(state, [resID = GetRefID().GetID()]() mutable
+    RENDER_SUBMIT(state, [resID = m_id]() mutable
       {
         ::Engine::RT_VertexArray va;
         va.Init();
@@ -65,7 +65,7 @@ namespace Engine
     state.Set<RenderState::Attr::Type>(RenderState::Type::Command);
     state.Set<RenderState::Attr::Command>(RenderState::Command::VertexArrayDelete);
 
-    RENDER_SUBMIT(state, [resID = GetRefID().GetID()]() mutable
+    RENDER_SUBMIT(state, [resID = m_id]() mutable
       {
         RT_VertexArray * pVA =  RenderThreadData::Instance()->VAOs.at(resID);
         if (pVA == nullptr)
@@ -84,7 +84,7 @@ namespace Engine
     state.Set<RenderState::Attr::Type>(RenderState::Type::Command);
     state.Set<RenderState::Attr::Command>(RenderState::Command::VertexArrayBind);
 
-    RENDER_SUBMIT(state, [resID = GetRefID().GetID()]() mutable
+    RENDER_SUBMIT(state, [resID = m_id]() mutable
       {
         RT_VertexArray * pID =  RenderThreadData::Instance()->VAOs.at(resID);
         if (pID == nullptr)
@@ -102,7 +102,7 @@ namespace Engine
     state.Set<RenderState::Attr::Type>(RenderState::Type::Command);
     state.Set<RenderState::Attr::Command>(RenderState::Command::VertexArrayUnbind);
 
-    RENDER_SUBMIT(state, [resID = GetRefID().GetID()]()
+    RENDER_SUBMIT(state, [resID = m_id]()
       {
         RT_VertexArray* pID =  RenderThreadData::Instance()->VAOs.at(resID);
         if (pID == nullptr)
@@ -120,7 +120,7 @@ namespace Engine
     state.Set<RenderState::Attr::Type>(RenderState::Type::Command);
     state.Set<RenderState::Attr::Command>(RenderState::Command::VertexArrayAddVertexBuffer);
 
-    RENDER_SUBMIT(state, [vbID = a_vertexBuffer->GetRefID().GetID(), vaoID = GetRefID().GetID()]() mutable
+    RENDER_SUBMIT(state, [vbID = a_vertexBuffer->GetID(), vaoID = m_id]() mutable
       {
         RT_VertexArray* pID =  RenderThreadData::Instance()->VAOs.at(vaoID);
         if (pID == nullptr)
@@ -138,7 +138,7 @@ namespace Engine
     state.Set<RenderState::Attr::Type>(RenderState::Type::Command);
     state.Set<RenderState::Attr::Command>(RenderState::Command::VertexArraySetIndexBuffer);
 
-    RENDER_SUBMIT(state, [iboID = a_indexBuffer->GetRefID().GetID(), vaoID = GetRefID().GetID()]()
+    RENDER_SUBMIT(state, [iboID = a_indexBuffer->GetID(), vaoID = m_id]()
     {
       RT_VertexArray* pID =  RenderThreadData::Instance()->VAOs.at(vaoID);
       if (pID == nullptr)

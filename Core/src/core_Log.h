@@ -6,6 +6,7 @@
 #include "spdlog/spdlog.h"
 #include "core_LogLevel.h"
 
+// TODO do not use spdlog. Write your own
 namespace Core
 {
   namespace impl

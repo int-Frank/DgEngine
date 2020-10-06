@@ -11,8 +11,18 @@
 #include "IEventPoller.h"
 #include "IMouseController.h"
 #include "IGraphicsContext.h"
+#include "IFontAtlas.h"
 #include "Buffer.h"
-#include "Memory.h"
+
+#undef ITEM
+#define ITEM(x) public: I ## x * Get ## x(); void Set ## x(I ## x *); private: void Init ## x();
+
+#define UNROLL_FRAMEWORK_CLASSES \
+ ITEM(Window)\
+ ITEM(EventPoller)\
+ ITEM(MouseController)\
+ ITEM(GraphicsContext)\
+ ITEM(FontAtlas)
 
 namespace Engine
 {
@@ -35,29 +45,7 @@ namespace Engine
     static Core::ErrorCode Init();
     static Core::ErrorCode ShutDown();
 
-    //There can only be one of these objects...
-    Ref<IWindow>          GetWindow();
-    Ref<IEventPoller>     GetEventPoller();
-    Ref<IMouseController> GetMouseController();
-    Ref<IGraphicsContext> GetGraphicsContext();
-
-    //Audio
-    //IAudio *       GetAudio();
-
-  private:
-
-    //These are implemented in the relevent cpp files
-    void InitWindow();
-    void InitEventPoller();
-    void InitMouseController();
-    void InitGraphicsContext();
-
-  public:
-
-    void SetWindow(IWindow *);
-    void SetEventPoller(IEventPoller *);
-    void SetMouseController(IMouseController*);
-    void SetGraphicsContext(IGraphicsContext*);
+    UNROLL_FRAMEWORK_CLASSES
 
   private:
 

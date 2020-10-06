@@ -9,7 +9,7 @@
 
 namespace Engine
 {
-  Layer_Window::Layer_Window(Ref<IWindow> a_pWindow)
+  Layer_Window::Layer_Window(IWindow * a_pWindow)
     : m_pWindow(a_pWindow)
   {
 

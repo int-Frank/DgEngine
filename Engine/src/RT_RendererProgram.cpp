@@ -28,6 +28,7 @@
 #include "core_Assert.h"
 #include "DgStringFunctions.h"
 #include "Serialize.h"
+#include "ResourceManager.h"
 
 //TODO Parse uniform blocks, shader storage blocks
 
@@ -44,7 +45,7 @@ namespace Engine
 
   }
 
-  RT_RendererProgram::RT_RendererProgram(impl::ResourceID64 a_id)
+  RT_RendererProgram::RT_RendererProgram(ResourceID a_id)
     : m_rendererID(0)
     , m_loaded(false)
   {
@@ -62,10 +63,7 @@ namespace Engine
     {
       glDeleteProgram(m_rendererID);
       m_rendererID = 0;
-
-      m_shaderData = Ref<ShaderData>();
       m_uniformLocations.clear();
-
       m_loaded = false;
     }
   }
@@ -81,11 +79,11 @@ namespace Engine
     glUseProgram(0);
   }
 
-  bool RT_RendererProgram::Init(impl::ResourceID64 a_id)
+  bool RT_RendererProgram::Init(ResourceID a_shaderDataID)
   {
     Destroy();
-    m_shaderData = Ref<ShaderData>(a_id);
-    if (m_shaderData.IsNull())
+    m_pShaderData = ResourceManager::Instance()->GetResource<ShaderData>(a_shaderDataID);
+    if (m_pShaderData == nullptr)
     {
       LOG_WARN("RT_RendererProgram failed to find shader data resource!");
       return false;
@@ -102,7 +100,7 @@ namespace Engine
 
   bool RT_RendererProgram::CompileAndUploadShader()
   {
-    if (m_shaderData.IsNull())
+    if (m_pShaderData == nullptr)
       return false;
 
     bool result = true;
@@ -113,7 +111,7 @@ namespace Engine
     {
       GLenum type = ShaderDomainToOpenGLType(ShaderDomain(i));
       ShaderDomain domain = static_cast<ShaderDomain>(i);
-      std::string const & source = m_shaderData->GetShaderSource().Get(domain);
+      std::string const & source = m_pShaderData->GetShaderSource().Get(domain);
 
       if (source.empty())
         continue;
@@ -185,30 +183,31 @@ namespace Engine
 
   void RT_RendererProgram::ResolveUniforms()
   {
-    if (m_shaderData.IsNull())
+    if (m_pShaderData == nullptr)
       return;
 
     glUseProgram(m_rendererID);
 
     uint32_t sampler = 0;
     Index ind = 0;
-    for (ShaderUniformDeclaration & uniform : m_shaderData->GetUniforms())
+    ShaderUniformList const & rUniforms(m_pShaderData->GetUniforms());
+    for (ShaderUniformList::const_iterator it = rUniforms.cbegin(); it != rUniforms.cend(); it++)
     {
-      if (uniform.GetType() == ShaderDataType::TEXTURE2D)
+      if (it->GetType() == ShaderDataType::TEXTURE2D)
       {
-        int32_t location = GetUniformLocation(uniform.GetName());
+        int32_t location = GetUniformLocation(it->GetName());
         m_textureBindingPoints.insert(ind, sampler);
 
-        if (uniform.GetCount() == 1)
+        if (it->GetCount() == 1)
         {
           if (location != -1)
             UploadUniformSingle(location, ShaderDataType::INT, &sampler);
 
           sampler++;
         }
-        else if (uniform.GetCount() > 1)
+        else if (it->GetCount() > 1)
         {
-          uint32_t count = uniform.GetCount();
+          uint32_t count = it->GetCount();
           int * samplers = new int[count];
           for (uint32_t s = 0; s < count; s++, sampler++)
             samplers[s] = sampler;
@@ -218,7 +217,7 @@ namespace Engine
       }
       else
       {
-        m_uniformLocations.push_back(GetUniformLocation(uniform.GetName()));
+        m_uniformLocations.push_back(GetUniformLocation(it->GetName()));
       }
       ind++;
     }
@@ -232,12 +231,12 @@ namespace Engine
     return result;
   }
 
-  void RT_RendererProgram::UploadTexture(TextureUnit a_textureUnit, RefID const * a_textureIDs, uint32_t a_count)
+  void RT_RendererProgram::UploadTexture(TextureUnit a_textureUnit, RenderResourceID const * a_textureIDs, uint32_t a_count)
   {
     uint32_t textureUnit = a_textureUnit;
     for (uint32_t i = 0; i < a_count; i++)
     {
-      RefID id = a_textureIDs[i];
+      RenderResourceID id = a_textureIDs[i];
 
       RT_Texture2D *pTexture = RenderThreadData::Instance()->textures.at(id);
       
@@ -249,14 +248,14 @@ namespace Engine
 
   void RT_RendererProgram::UploadUniformBuffer(byte const* a_pbuf)
   {
-    if (m_shaderData.IsNull() || a_pbuf == nullptr)
+    if (m_pShaderData == nullptr || a_pbuf == nullptr)
       return;
 
     Bind();
 
-    for (uint32_t i = 0; i < (uint32_t)m_shaderData->GetUniforms().size(); i++)
+    for (uint32_t i = 0; i < (uint32_t)m_pShaderData->GetUniforms().size(); i++)
     {
-      ShaderUniformDeclaration const * pdecl = &m_shaderData->GetUniforms()[i];
+      ShaderUniformDeclaration const * pdecl = &m_pShaderData->GetUniforms()[i];
       uint32_t offset = pdecl->GetDataOffset();
       UniformBufferElementHeader header;
       void const * buf = header.Deserialize(a_pbuf);
@@ -268,7 +267,7 @@ namespace Engine
       {
         TextureUnit const * pUnit = m_textureBindingPoints.at(i);
         if (pUnit != nullptr)
-          UploadTexture(*pUnit, (RefID*)buf, count);
+          UploadTexture(*pUnit, (RenderResourceID *)buf, count);
       }
       else
       {
@@ -316,7 +315,7 @@ namespace Engine
 
   void RT_RendererProgram::UploadUniform(uint32_t a_index, void const * a_pbuf, uint32_t a_count)
   {
-    ShaderUniformDeclaration const * pdecl = &m_shaderData->GetUniforms()[a_index];
+    ShaderUniformDeclaration const * pdecl = &m_pShaderData->GetUniforms()[a_index];
     BSR_ASSERT(a_count <= pdecl->GetCount());
 
     if (pdecl->IsArray())
@@ -327,17 +326,17 @@ namespace Engine
 
   void RT_RendererProgram::UploadUniform(std::string const& a_name, void const* a_pbuf, uint32_t a_size)
   {
-    if (m_shaderData.IsNull() || a_pbuf == nullptr)
+    if (m_pShaderData == nullptr || a_pbuf == nullptr)
       return;
 
-    uint32_t index = m_shaderData->FindUniformIndex(a_name);
+    uint32_t index = m_pShaderData->FindUniformIndex(a_name);
     if (index == INVALID_INDEX)
     {
       LOG_WARN("Failed to find Uniform '{}'", a_name.c_str());
       return;
     }
 
-    ShaderUniformDeclaration * pdecl = &m_shaderData->GetUniforms()[index];
+    ShaderUniformDeclaration const * pdecl = &m_pShaderData->GetUniforms()[index];
     uint32_t elementSize = SizeOfShaderDataType(pdecl->GetType());
     uint32_t count = a_size / elementSize;
 

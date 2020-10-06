@@ -20,7 +20,7 @@ namespace Engine
 
     ASSIGN_ID(static_cast<ID>(DefaultLayer::Window))
 
-    Layer_Window(Ref<IWindow>);
+    Layer_Window(IWindow *);
     ~Layer_Window();
 
     void OnAttach();
@@ -47,7 +47,7 @@ namespace Engine
 
   private:
 
-    Ref<IWindow> m_pWindow;
+    IWindow * m_pWindow;
   };
 }
 

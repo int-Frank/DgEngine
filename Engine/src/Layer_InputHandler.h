@@ -57,6 +57,7 @@ namespace Engine
     void HandleMessage(Message_Input_MouseWheelDown *);
     void HandleMessage(Message_Input_MouseMove *);
 
+    // LayerHandler will own the input Message *
     void SetBindings(std::initializer_list<InputBinding> const &);
 
   private:
@@ -67,12 +68,12 @@ namespace Engine
 
     BindingKey PackKey(InputCode, InputEvent);
 
-    Ref<IEventPoller>                   m_eventPoller;
-    Ref<IMouseController>               m_mouseController;
+    IEventPoller     * m_pEventPoller;
+    IMouseController * m_pMouseController;
 
-    float                                           m_xMouseRotRate;
-    float                                           m_yMouseRotRate;
-    Dg::Map_AVL<uint64_t, Ref<Message>> m_bindings;
+    float              m_xMouseRotRate;
+    float              m_yMouseRotRate;
+    Dg::Map_AVL<uint64_t, Message *> m_bindings;
 
   };
 }

@@ -24,6 +24,7 @@
 #include "Renderer.h"
 #include "RT_BindingPoint.h"
 #include "RenderThreadData.h"
+#include "ResourceManager.h"
 
 #include "core_Log.h"
 #include "DgMath.h"
@@ -426,7 +427,7 @@ namespace Engine
     state.Set<RenderState::Attr::Type>(RenderState::Type::Command);
     state.Set<RenderState::Attr::Command>(RenderState::Command::BindingPointCreate);
 
-    RENDER_SUBMIT(state, [resID = GetRefID().GetID(), sbtype = a_type, domain = a_domain]()
+    RENDER_SUBMIT(state, [resID = m_id, sbtype = a_type, domain = a_domain]()
     {
       ::Engine::RT_BindingPoint bp;
       if (!bp.Capture(sbtype, domain))
@@ -441,7 +442,7 @@ namespace Engine
     state.Set<RenderState::Attr::Type>(RenderState::Type::Command);
     state.Set<RenderState::Attr::Command>(RenderState::Command::BindingPointDelete);
 
-    RENDER_SUBMIT(state, [resID = GetRefID().GetID()]()
+    RENDER_SUBMIT(state, [resID = m_id]()
     {
       ::Engine::RT_BindingPoint * pbp = ::Engine::RenderThreadData::Instance()->bindingPoints.at(resID);
       if (pbp == nullptr)
@@ -512,12 +513,19 @@ namespace Engine
   //---------------------------------------------------------------------------------------------------
   // ShaderData
   //---------------------------------------------------------------------------------------------------
-  
-  Ref<ShaderData> ShaderData::Create(std::initializer_list<ShaderSourceElement> const& a_src)
+
+  ResourceID ShaderData::CreateAsResource(std::initializer_list<ShaderSourceElement> const & a_src)
+  {
+    ResourceID id = impl::GetNextID();
+    ResourceManager::Instance()->RegisterResource<ShaderData>(id, new ShaderData(a_src));
+    return id;
+  }
+
+  Ref<ShaderData> ShaderData::Create(std::initializer_list<ShaderSourceElement> const & a_src)
   {
     return Ref<ShaderData>(new ShaderData(a_src));
   }
-  
+
   ShaderData::ShaderData()
     : m_dataSize(0)
   {
@@ -679,7 +687,7 @@ namespace Engine
     return nullptr;
   }
 
-  uint32_t ShaderData::FindUniformIndex(std::string const& a_name)
+  uint32_t ShaderData::FindUniformIndex(std::string const& a_name) const
   {
     for (uint32_t i = 0; i < uint32_t(m_uniforms.size()); i++)
     {

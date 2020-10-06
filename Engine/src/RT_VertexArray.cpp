@@ -27,7 +27,7 @@ namespace Engine
 {
   RT_VertexArray::RT_VertexArray()
     : m_rendererID(0)
-    , m_indexBuffer(INVALID_REFID)
+    , m_indexBuffer(INVALID_RENDER_RESOURE_ID)
     , m_vertexAttribIndex(0)
   {
 
@@ -61,7 +61,7 @@ namespace Engine
     glBindVertexArray(0);
   }
 
-  void RT_VertexArray::AddVertexBuffer(RefID a_id)
+  void RT_VertexArray::AddVertexBuffer(RenderResourceID a_id)
   {
     RT_VertexBuffer* pVB = RenderThreadData::Instance()->VBOs.at(a_id);
     if (pVB == nullptr)
@@ -101,7 +101,7 @@ namespace Engine
     m_vertexBuffers.push_back(a_id);
   }
 
-  void RT_VertexArray::SetIndexBuffer(RefID a_id)
+  void RT_VertexArray::SetIndexBuffer(RenderResourceID a_id)
   {
     RT_IndexBuffer * pIB = RenderThreadData::Instance()->IBOs.at(a_id);
     if (pIB == nullptr)
@@ -115,12 +115,12 @@ namespace Engine
     m_indexBuffer = a_id;
   }
 
-  Dg::DynamicArray<RefID> const & RT_VertexArray::GetVertexBuffers() const
+  Dg::DynamicArray<RenderResourceID> const & RT_VertexArray::GetVertexBuffers() const
   {
     return m_vertexBuffers;
   }
 
-  RefID RT_VertexArray::GetIndexBuffer() const
+  RenderResourceID RT_VertexArray::GetIndexBuffer() const
   {
     return m_indexBuffer;
   }

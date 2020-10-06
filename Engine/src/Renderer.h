@@ -16,8 +16,8 @@
   Copyright 2017-2019 Frank Hart <frankhart010@gmail.com>
 */
 
-#ifndef RENDERTEMP_H
-#define RENDERTEMP_H
+#ifndef RENDERER_H
+#define RENDERER_H
 
 #include <stdint.h>
 

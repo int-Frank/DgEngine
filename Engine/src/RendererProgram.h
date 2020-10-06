@@ -3,14 +3,14 @@
 #ifndef RENDERERPROGRAM_H
 #define RENDERERPROGRAM_H
 
-#include "Resource.h"
+#include "RenderResource.h"
 #include "ShaderUniform.h"
 #include "Memory.h"
 #include "core_utils.h"
 
 namespace Engine
 {
-  class RendererProgram : public Resource
+  class RendererProgram : public RenderResource
   {
     void Init(std::initializer_list<ShaderSourceElement> const&);
     RendererProgram();
@@ -43,7 +43,7 @@ namespace Engine
     //TODO this needs to be Ref<ShaderData const>
     // Now that we have access to the uniform data, we can create a buffer to transform
     // uniforms over to the render thread
-    Ref<ShaderData> m_shaderData;
+    ResourceID m_shaderDataID;
   };
 }
 

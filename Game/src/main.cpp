@@ -192,10 +192,8 @@ public:
     m_material->SetTexture("texture1", m_texture);
     m_material->Bind();
 
-    Engine::UIGroup* pg0 = new Engine::UIGroup("g0", vec3(0.25f, 0.25f, 0.0f), vec3(0.5f, 0.5f, 0.0f));
-    Engine::UIButton* btn0 = new Engine::UIButton("btn0", vec3(0.0f, 0.0f, 0.0f), vec3(1.0f, 0.5f, 0.0f));
-    pg0->Add(btn0);
-    m_canvas.Add(pg0);
+    //Engine::UIButton* btn0 = Engine::UIButton::Create("btn0", vec3(0.0f, 0.0f, 0.0f), vec3(1.0f, 0.5f, 0.0f));
+    //m_canvas.Add(btn0);
 
   }
 
@@ -210,7 +208,7 @@ public:
     float x, y;
     if (Engine::Application::Instance()->NormalizeWindowCoords(a_pMsg->x, a_pMsg->y, x, y))
     {
-      m_canvas.HandleNewCursonPostion(x, y);
+      //m_canvas.HandleNewCursonPostion(x, y);
     }
   }
 
@@ -222,8 +220,8 @@ public:
     float x, y;
     if (Engine::Application::Instance()->NormalizeWindowCoords(a_pMsg->x, a_pMsg->y, x, y))
     {
-      m_canvas.HandleNewCursonPostion(x, y);
-      m_canvas.Activate();
+      //m_canvas.HandleNewCursonPostion(x, y);
+      //m_canvas.Activate();
     }
   }
 
@@ -256,7 +254,7 @@ private:
   Engine::Ref<Engine::VertexArray>      m_va;
   Engine::Ref<Engine::Texture2D>        m_texture;
   Engine::Ref<Engine::Material>         m_material;
-  Engine::UICanvas                      m_canvas;
+  //Engine::UICanvas                      m_canvas;
 };
 
 class Game : public Engine::Application

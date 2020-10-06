@@ -31,13 +31,15 @@ namespace Engine
     Clear();
   }
 
-  bool LayerStack::PushLayer(Layer * a_layer, Layer::ID a_ID)
+  bool LayerStack::PushLayer(Layer * a_pLayer, Layer::ID a_ID)
   {
+    BSR_ASSERT(a_pLayer != nullptr);
+
     if (m_layerStack.find(a_ID) != m_layerStack.end())
       return false;
 
-    m_layerStack.insert(a_ID, a_layer);
-    a_layer->OnAttach();
+    m_layerStack.insert(a_ID, a_pLayer);
+    a_pLayer->OnAttach();
     return true;
   }
 

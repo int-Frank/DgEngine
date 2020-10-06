@@ -22,7 +22,7 @@
 #include <stdint.h>
 #include "TextureData.h"
 #include "core_utils.h"
-#include "Resource.h"
+#include "RenderResource.h"
 #include "Memory.h"
 
 namespace Engine
@@ -33,7 +33,7 @@ namespace Engine
     BRz
   };
 
-  class Texture2D : public Resource
+  class Texture2D : public RenderResource
   {
     Texture2D();
   public:

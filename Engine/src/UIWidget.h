@@ -1,105 +1,103 @@
 //@group UI
-
-#ifndef UIWIDGET_H
-#define UIWIDGET_H
-
-#include "core_utils.h"
-#include <string>
-
-namespace Engine
-{
-  struct UIData
-  {
-    union
-    {
-      bool bVal;
-      int iVal;
-      float fVal;
-      char* pcVal;
-    };
-  };
-
-  typedef void (*fnUICallback)(UIData const &);
-
-  enum class UICallback
-  {
-    GainFocus,
-    LoseFocus,
-    Activate,   //Button
-    NewValue,   //Slider, Lists
-    Toggle,     //Checkbox
-    COUNT
-  };
-
-  class UIWidget
-  {
-  public:
-
-    //TODO add rotation to widgets
-    UIWidget(std::string const& name,
-             vec3 trans, vec3 scale,
-             bool isInteractive, int depth = 0
-    );
-    virtual ~UIWidget();
-
-    virtual bool IsInside(float x, float y);
-
-    //return: handled
-    virtual bool HandleNewCursonPostion(float x, float y);
-    
-    virtual void DoEventGainFocus() {}
-    virtual void DoEventLoseFocus() {}
-    virtual void DoEventMouseDown() {}
-    virtual void DoEventMouseUp() {}
-    virtual void DoEventScroll(float val) {}
-    virtual void DoEventText(char text[32]) {}
-    virtual void DoEventActivate() {}
-
-    void SetFocus(bool);
-    bool HasFocus() const;
-
-    virtual void Render(){}
-
-    void Translate(float xMin, float yMin);
-    void Scale(float sx, float sy);
-
-    void SetGlobalTranslation(float xMin, float yMin);
-    void SetGlobalScale(float sx, float sy);
-
-    void SetTranslation(float xMin, float yMin);
-    void SetScale(float sx, float sy);
-    void SetDepth(int);
-
-    vec3 GetTranslation() const;
-    vec3 GetScale() const;
-    int GetDepth() const;
-
-    virtual void DepthHasChanged(UIWidget* child){}
-
-    void SetGlobalToLocal();
-    mat3 GetGlobalToLocal() const;
-    mat3 GetLocalToParent() const;
-    bool IsInteractive() const;
-    void SetIsInteractive(bool);
-    void SetParent(UIWidget*);
-
-    virtual void NewTransform()
-    {
-    }
-
-  protected:
-    std::string m_name;
-    fnUICallback m_bindings[static_cast<size_t>(UICallback::COUNT)];
-    bool m_isInteractive;
-    UIWidget* m_pParent;
-    vec3 m_translation;
-    vec3 m_scale;
-    mat3 m_T_Global_to_Local;
-    bool m_hasFocus;
-    int m_depth;
-  };
-
-
-}
-
-#endif
+//
+//#ifndef UIWIDGET_H
+//#define UIWIDGET_H
+//
+//#include "core_utils.h"
+//#include "InputCodes.h"
+//#include <string>
+//
+///*
+//  - Button
+//  - Check box
+//  - Radio button
+//  - Slider
+//  - Drop down list
+//  - Scroll list
+//  - Image
+//    - Text (maybe derives from image)
+//  - Text Input
+//  - Text display
+//  - Text window (logging window)
+//*/
+//
+//namespace Engine
+//{
+//  struct UIData
+//  {
+//    union
+//    {
+//      bool bVal;
+//      int iVal;
+//      float fVal;
+//      char* pcVal;
+//    };
+//  };
+//
+//  typedef void (*fnUICallback)(UIData const &);
+//
+//  enum class UICallback
+//  {
+//    HoverOn,
+//    HoverOff,
+//    GainFocus,
+//    LoseFocus,
+//    Activate,   //Button
+//    NewValue,   //Slider, Lists
+//    Toggle,     //Checkbox
+//    COUNT
+//  };
+//
+//  enum class UIState
+//  {
+//    None,
+//    HoverOn,
+//    Active // Eg text inputs in focus and waiting for input
+//  };
+//
+//  class UIWidget
+//  {
+//  public:
+//
+//    UIWidget(mat3 const & Global_to_Local, int depth);
+//
+//    virtual ~UIWidget();
+//    
+//    void SetTransform(mat3 const & trans);
+//    void SetDepth(int);
+//
+//    int GetDepth() const;
+//
+//    virtual void Draw() {}
+//
+//    virtual bool IsInside(vec2 const &point);
+//
+//    virtual UIState HoverOn() {}
+//    virtual UIState HoverOff() {}
+//    virtual UIState FocusOn() {}
+//    virtual UIState FocusOff() {}
+//    virtual UIState DoKeyDown(InputCode) {}
+//    virtual UIState DoKeyUp(InputCode) {}
+//    virtual UIState DoMouseDown() {}
+//    virtual UIState DoMouseUp() {}
+//    virtual UIState DoScroll(float val) {}
+//    virtual UIState DoText(char text[32]) {}
+//    virtual UIState Activate() {} // Enter key, most widgets won't have this
+//    UIState QueryState() {} 
+//
+//    void SetCallback(UICallback, fnUICallback);
+//
+//  protected:
+//
+//    virtual void NewTransform() {}
+//
+//  protected:
+//
+//    fnUICallback m_bindings[static_cast<size_t>(UICallback::COUNT)];
+//    mat3 m_T_Global_to_Local;
+//    int m_depth;
+//    UIState m_state;
+//  };
+//}
+//
+//#endif

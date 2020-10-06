@@ -21,12 +21,12 @@
 
 #include <stdint.h>
 #include "MemBuffer.h"
-#include "Memory.h"
 #include "core_utils.h"
 #include "ShaderUniform.h"
 #include "RT_RendererAPI.h"
 #include "ShaderSource.h"
 #include "DgOpenHashMap.h"
+#include "Resource.h"
 
 namespace Engine
 {
@@ -40,10 +40,10 @@ namespace Engine
   public:
 
     RT_RendererProgram();
-    RT_RendererProgram(impl::ResourceID64);
+    RT_RendererProgram(ResourceID shaderSourceID);
     ~RT_RendererProgram();
 
-    bool Init(impl::ResourceID64);
+    bool Init(ResourceID shaderDataID);
     void Destroy();
 
     void Bind() const;
@@ -66,7 +66,7 @@ namespace Engine
 
     int32_t GetUniformLocation(std::string const& name) const;
     void UploadUniform(uint32_t index, void const * buf, uint32_t count);
-    void UploadTexture(TextureUnit textureUnit, RefID const * textureIDs, uint32_t count);
+    void UploadTexture(TextureUnit textureUnit, RenderResourceID const * textureIDs, uint32_t count);
     void UploadUniformSingle(int location, ShaderDataType, void const* buf);
     void UploadUniformArray(int location, ShaderDataType, void const* buf, uint32_t count);
 
@@ -76,7 +76,7 @@ namespace Engine
     bool m_loaded;
 
     std::string m_name;
-    Ref<ShaderData> m_shaderData; //TODO this needs to be const
+    ShaderData const * m_pShaderData;
     Dg::DynamicArray<int32_t> m_uniformLocations;
     Dg::OpenHashMap<Index, TextureUnit> m_textureBindingPoints;
   };

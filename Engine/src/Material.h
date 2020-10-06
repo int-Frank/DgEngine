@@ -23,6 +23,7 @@
 #include <string>
 
 #include "Memory.h"
+#include "Resource.h"
 #include "MemBuffer.h"
 #include "RendererProgram.h"
 #include "core_Assert.h"
@@ -34,7 +35,7 @@ namespace Engine
 {
   namespace impl
   {
-    class MaterialData : public Resource
+    class MaterialData
     {
       MaterialData(Ref<RendererProgram>);
     public:
@@ -62,9 +63,9 @@ namespace Engine
       
     protected:
 
-      Ref<impl::MaterialData>               m_materialData;
-      uint32_t                              m_bufSize;
-      byte*                                 m_pBuf;
+      Ref<impl::MaterialData> m_materialData;
+      uint32_t                m_bufSize;
+      byte*                   m_pBuf;
     };
   }
 
@@ -91,9 +92,11 @@ namespace Engine
   {
     Material(Ref<impl::MaterialData>);
   public:
-    ~Material();
 
     static Ref<Material> Create(Ref<RendererProgram>);
+
+    ~Material();
+
     Ref<MaterialInstance> SpawnInstance();
     void SetUniform(std::string const& name, void const* data, uint32_t size);
     void SetTexture(std::string const& name, Ref<Texture2D> const&);

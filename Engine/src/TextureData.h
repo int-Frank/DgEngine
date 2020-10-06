@@ -84,7 +84,7 @@ namespace Engine
     TextureFlags  flags;
     uint32_t      width;
     uint32_t      height;
-    RGBA *        pPixels;
+    RGBA *        pPixels; // TODO should be uint8_t. The format can change
   };
 }
 
