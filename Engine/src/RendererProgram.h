@@ -4,6 +4,7 @@
 #define RENDERERPROGRAM_H
 
 #include "RenderResource.h"
+#include "ResourceManager.h"
 #include "ShaderUniform.h"
 #include "Memory.h"
 #include "core_utils.h"
@@ -12,14 +13,14 @@ namespace Engine
 {
   class RendererProgram : public RenderResource
   {
-    void Init(std::initializer_list<ShaderSourceElement> const&);
+    void Init(ResourceID shaderSourceID);
     RendererProgram();
 
     RendererProgram(RendererProgram const&) = delete;
     RendererProgram& operator=(RendererProgram const&) = delete;
   public:
 
-    static Ref<RendererProgram> Create(std::initializer_list<ShaderSourceElement> const&);
+    static Ref<RendererProgram> Create(ResourceID shaderSourceID);
 
     ~RendererProgram();
 

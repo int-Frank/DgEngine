@@ -6,11 +6,13 @@
 #include <typeinfo>
 #include <stdint.h>
 #include "DgOpenHashMap.h"
-#include "Resource.h"
 #include "core_Log.h"
 
 namespace Engine
 {
+  typedef uint32_t ResourceID;
+#define INVALID_RESOURCE_ID 0xFFFFFFFF
+
   class ResourceWrapperBase
   {
   public:

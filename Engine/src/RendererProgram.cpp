@@ -10,9 +10,9 @@
 
 namespace Engine
 {
-  void RendererProgram::Init(std::initializer_list<ShaderSourceElement> const& a_src)
+  void RendererProgram::Init(ResourceID a_shaderSourceID)
   {
-    m_shaderDataID = ShaderData::CreateAsResource(a_src);
+    m_shaderDataID = a_shaderSourceID;
 
     RenderState state = RenderState::Create();
     state.Set<RenderState::Attr::Type>(RenderState::Type::Command);
@@ -30,11 +30,11 @@ namespace Engine
   
   }
 
-  Ref<RendererProgram> RendererProgram::Create(std::initializer_list<ShaderSourceElement> const& a_src)
+  Ref<RendererProgram> RendererProgram::Create(ResourceID a_shaderSourceID)
   {
     RendererProgram* pRP = new RendererProgram();
     Ref<RendererProgram> ref(pRP);
-    pRP->Init(a_src);
+    pRP->Init(a_shaderSourceID);
     return ref;
   }
 

@@ -21,10 +21,10 @@
 
 #include <string>
 #include <stdint.h>
+
 #include "DgDynamicArray.h"
 #include "core_Assert.h"
 #include "Memory.h"
-#include "Resource.h"
 #include "RenderResource.h"
 #include "ShaderUtils.h"
 #include "ShaderSource.h"
@@ -173,11 +173,10 @@ namespace Engine
   class ShaderData : public RenderResource
   {
     ShaderData();
-    ShaderData(std::initializer_list<ShaderSourceElement> const &);
 
   public:
 
-    static ResourceID CreateAsResource(std::initializer_list<ShaderSourceElement> const &);
+    ShaderData(std::initializer_list<ShaderSourceElement> const &);
     static Ref<ShaderData> Create(std::initializer_list<ShaderSourceElement> const &);
 
     void Init(std::initializer_list<ShaderSourceElement> const&);

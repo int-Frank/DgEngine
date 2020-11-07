@@ -23,7 +23,6 @@
 #include <string>
 
 #include "Memory.h"
-#include "Resource.h"
 #include "MemBuffer.h"
 #include "RendererProgram.h"
 #include "core_Assert.h"
@@ -102,7 +101,7 @@ namespace Engine
     void SetTexture(std::string const& name, Ref<Texture2D> const&);
 
   private:
-    Dg::Map_AVL<std::string, ResourceID>  m_textureBindings;
+    //Dg::Map_AVL<std::string, ResourceID>  m_textureBindings;
     Dg::DynamicArray<Ref<MaterialInstance>> m_materialInstances;
     uint32_t m_renderFlags;
   };

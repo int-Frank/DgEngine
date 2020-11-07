@@ -514,13 +514,6 @@ namespace Engine
   // ShaderData
   //---------------------------------------------------------------------------------------------------
 
-  ResourceID ShaderData::CreateAsResource(std::initializer_list<ShaderSourceElement> const & a_src)
-  {
-    ResourceID id = impl::GetNextID();
-    ResourceManager::Instance()->RegisterResource<ShaderData>(id, new ShaderData(a_src));
-    return id;
-  }
-
   Ref<ShaderData> ShaderData::Create(std::initializer_list<ShaderSourceElement> const & a_src)
   {
     return Ref<ShaderData>(new ShaderData(a_src));

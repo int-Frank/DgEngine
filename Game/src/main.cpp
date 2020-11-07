@@ -171,12 +171,16 @@ public:
     m_va->AddVertexBuffer(m_vb);
     m_va->SetIndexBuffer(m_ib);
 
-    Engine::Ref<Engine::RendererProgram> refProg;
-    refProg = Engine::RendererProgram::Create(
-      {
+    Engine::ShaderData *pSD = new Engine::ShaderData({
         { Engine::ShaderDomain::Vertex, Engine::StrType::Path, "src/vs.glsl" },
         { Engine::ShaderDomain::Fragment, Engine::StrType::Path, "src/fs.glsl" }
       });
+
+    Engine::ResourceID sdID = 12345;
+    Engine::ResourceManager::Instance()->RegisterResource(sdID, pSD);
+
+    Engine::Ref<Engine::RendererProgram> refProg;
+    refProg = Engine::RendererProgram::Create(sdID);
 
     Engine::TextureFlags flags;
     flags.SetFilter(Engine::TextureFilter::Linear);

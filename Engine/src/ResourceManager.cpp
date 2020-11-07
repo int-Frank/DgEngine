@@ -1,7 +1,6 @@
 //@group Memory
 
 #include "ResourceManager.h"
-#include "Resource.h"
 #include "core_Assert.h"
 
 namespace Engine

@@ -26,7 +26,7 @@
 #include "RT_RendererAPI.h"
 #include "ShaderSource.h"
 #include "DgOpenHashMap.h"
-#include "Resource.h"
+#include "ResourceManager.h"
 
 namespace Engine
 {
