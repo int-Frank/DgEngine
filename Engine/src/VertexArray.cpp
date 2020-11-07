@@ -23,7 +23,6 @@
 #include "VertexArray.h"
 #include "core_Assert.h"
 #include "Memory.h"
-#include "Resource.h"
 #include "Message.h"
 #include "MessageBus.h"
 #include "RenderThreadData.h"

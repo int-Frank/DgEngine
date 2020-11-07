@@ -1,19 +1,25 @@
 //@group Messages
 
 #include <cstring>
-#include <mutex>
 #include <new>
 #include <sstream>
 
 #include "EngineMessages.h"
 #include "MessageHandler.h"
+#include "MessageBus.h"
 #include "DgMap_AVL.h"
 #include "core_utils.h"
 
 #define ID_SHIFT 20
 
+// This marco needs to be somehwere the client can access
 #undef ITEM
 #define ITEM(TYPE, CLASS) uint32_t Message_##TYPE::s_ID(0);\
+static_assert(std::is_trivially_destructible<Message_##TYPE>::value, #TYPE " must be trivially destructible");\
+Message_##TYPE * Message_##TYPE::CreateOnBus()\
+{\
+  return (Message_##TYPE *)MessageBus::Instance()->ReserveAndRegister(sizeof(Message_##TYPE));\
+}\
 uint32_t Message_##TYPE::GetStaticID()\
 {\
   if (s_ID == 0)\
@@ -45,17 +51,30 @@ void Message_##TYPE::Clone(void * a_buf) const\
 
 namespace Engine
 {
-  namespace impl
-  {
-    static std::mutex s_mutex;
-    static uint32_t s_counter = 0;
-  }
-
   uint32_t Message::GetNewID(uint32_t a_group)
   {
-    std::lock_guard<std::mutex> lock(impl::s_mutex);
-    impl::s_counter++;
-    return (a_group << ID_SHIFT) | impl::s_counter;
+    static uint32_t s_counter = 0;
+    uint32_t idTail = ++s_counter;
+    return (a_group << ID_SHIFT) | idTail;
+  }
+
+  Message::Message() 
+    : m_flags(0)
+  {
+
+  }
+
+  bool Message::QueryFlag(Flag a_flag) const
+  {
+    return (m_flags & static_cast<uint32_t>(a_flag)) != 0;
+  }
+
+  void Message::SetFlag(Flag a_flag, bool a_on)
+  {
+    if (a_on)
+      m_flags = (m_flags | static_cast<uint32_t>(a_flag));
+    else
+      m_flags = (m_flags & ~static_cast<uint32_t>(a_flag));
   }
 
   uint32_t Message::GetCategory() const
@@ -67,8 +86,6 @@ namespace Engine
 
   MESSAGE_TO_STRING(None)
   MESSAGE_TO_STRING(GoBack)
-  MESSAGE_TO_STRING(GUI_MouseWheelUp)
-  MESSAGE_TO_STRING(GUI_MouseWheelDown)
   MESSAGE_TO_STRING(Window_Shown)
   MESSAGE_TO_STRING(Window_Hidden)
   MESSAGE_TO_STRING(Window_Exposed)
@@ -84,48 +101,6 @@ namespace Engine
   MESSAGE_TO_STRING(Input_MouseWheelUp)
   MESSAGE_TO_STRING(Input_MouseWheelDown)
   
-  std::string Message_GUI_MouseMove::ToString() const
-  {
-    std::stringstream ss;
-    ss << "GUI_MouseMove [x: " << x << ", y: " << y << "]";
-    return ss.str();
-  }
-
-  std::string Message_GUI_MouseButtonUp::ToString() const
-  {
-    std::stringstream ss;
-    ss << "GUI_MouseButtonUp [button: " << button << ", x: " << x << ", y: " << y << "]";
-    return ss.str();
-  }
-
-  std::string Message_GUI_MouseButtonDown::ToString() const
-  {
-    std::stringstream ss;
-    ss << "GUI_MouseButtonDown [button: " << button << ", x: " << x << ", y: " << y << "]";
-    return ss.str();
-  }
-
-  std::string Message_GUI_KeyUp::ToString() const
-  {
-    std::stringstream ss;
-    ss << "GUI_KeyUp [keycode: " << keyCode << ", mod state " << modState << "]";
-    return ss.str();
-  }
-
-  std::string Message_GUI_KeyDown::ToString() const
-  {
-    std::stringstream ss;
-    ss << "GUI_KeyDown [keycode: " << keyCode << ", mod state " << modState << "]";
-    return ss.str();
-  }
-
-  std::string Message_GUI_Text::ToString() const
-  {
-    std::stringstream ss;
-    ss << "GUI_Text [text: PLACEHOLDER]";
-    return ss.str();
-  }
-
   std::string Message_Window_Moved::ToString() const
   {
     std::stringstream ss;
@@ -258,118 +233,5 @@ namespace Engine
     _ptr = Core::AdvancePtr(_ptr, sizeof(MessageCommandFn));
 
     function(_ptr);
-  }
-
-  namespace MessageTranslator
-  {
-    static Dg::Map_AVL<uint64_t, MessageTranslatorFn> g_msgTrnsMap;
-
-    static void Translate_GUI_MouseMove__Input_MouseMove(Message * a_pDest, Message const * a_pSrc)
-    {
-      Message_GUI_MouseMove * pDest 
-        = static_cast<Message_GUI_MouseMove *> (a_pDest);
-      Message_Input_MouseMove const* pSrc 
-        = static_cast<Message_Input_MouseMove const *> (a_pSrc);
-
-      pDest->x = pSrc->x;
-      pDest->y = pSrc->y;
-    }
-
-    static void Translate_GUI_Text__Input_Text(Message * a_pDest, Message const * a_pSrc)
-    {
-      Message_GUI_Text * pDest 
-        = static_cast<Message_GUI_Text *> (a_pDest);
-      Message_Input_Text const* pSrc 
-        = static_cast<Message_Input_Text const *> (a_pSrc);
-
-      strncpy_s(pDest->text, TEXT_INPUT_TEXT_SIZE, pSrc->text, TEXT_INPUT_TEXT_SIZE);
-    }
-
-    static void Translate_GUI_KeyDown__Input_KeyDown(Message * a_pDest, Message const * a_pSrc)
-    {
-      Message_GUI_KeyDown * pDest 
-        = static_cast<Message_GUI_KeyDown *> (a_pDest);
-      Message_Input_KeyDown const* pSrc 
-        = static_cast<Message_Input_KeyDown const *> (a_pSrc);
-
-      pDest->keyCode = pSrc->keyCode;
-      pDest->modState = pSrc->modState;
-    }
-
-    static void Translate_GUI_KeyUp__Input_KeyUp(Message * a_pDest, Message const * a_pSrc)
-    {
-      Message_GUI_KeyUp * pDest 
-        = static_cast<Message_GUI_KeyUp *> (a_pDest);
-      Message_Input_KeyUp const* pSrc 
-        = static_cast<Message_Input_KeyUp const *> (a_pSrc);
-
-      pDest->keyCode = pSrc->keyCode;
-      pDest->modState = pSrc->modState;
-    }
-
-    static void Translate_GUI_MouseButtonDown__Input_MouseButtonDown(Message * a_pDest, Message const * a_pSrc)
-    {
-      Message_GUI_MouseButtonDown * pDest 
-        = static_cast<Message_GUI_MouseButtonDown *> (a_pDest);
-      Message_Input_MouseButtonDown const* pSrc 
-        = static_cast<Message_Input_MouseButtonDown const *> (a_pSrc);
-
-      pDest->button = pSrc->button;
-      pDest->x = pSrc->x;
-      pDest->y = pSrc->y;
-    }
-
-    static void Translate_GUI_MouseButtonUp__Input_MouseButtonUp(Message * a_pDest, Message const * a_pSrc)
-    {
-      Message_GUI_MouseButtonUp * pDest 
-        = static_cast<Message_GUI_MouseButtonUp *> (a_pDest);
-      Message_Input_MouseButtonUp const* pSrc 
-        = static_cast<Message_Input_MouseButtonUp const *> (a_pSrc);
-
-      pDest->button = pSrc->button;
-      pDest->x = pSrc->x;
-      pDest->y = pSrc->y;
-    }
-
-    static uint64_t PackKey(uint32_t a_dest, uint32_t a_src)
-    {
-      return (uint64_t(a_dest) << 32) | a_src;
-    }
-
-    void Clear()
-    {
-      g_msgTrnsMap.clear();
-    }
-
-    bool Exists(uint32_t a_dest, uint32_t a_src)
-    {
-      uint64_t key = PackKey(a_dest, a_src);
-      return g_msgTrnsMap.find(key) != g_msgTrnsMap.end();
-    }
-
-    void Translate(Message * a_dest, Message const * a_src)
-    {
-      uint64_t key = PackKey(a_dest->GetID(), a_src->GetID());
-      auto it = g_msgTrnsMap.find(key);
-      if (it != g_msgTrnsMap.end())
-        it->second(a_dest, a_src);
-    }
-
-    void AddTranslator(uint32_t a_dest, uint32_t a_src,
-                       MessageTranslatorFn a_fn)
-    {
-      uint64_t key = PackKey(a_dest, a_src);
-      g_msgTrnsMap[key] = a_fn;
-    }
-
-    void AddDefaultTranslators()
-    {
-      AddTranslator(Message_GUI_MouseMove::GetStaticID(), Message_Input_MouseMove::GetStaticID(), Translate_GUI_MouseMove__Input_MouseMove);
-      AddTranslator(Message_GUI_Text::GetStaticID(), Message_Input_Text::GetStaticID(), Translate_GUI_Text__Input_Text);
-      AddTranslator(Message_GUI_KeyDown::GetStaticID(), Message_Input_KeyDown::GetStaticID(), Translate_GUI_KeyDown__Input_KeyDown);
-      AddTranslator(Message_GUI_KeyUp::GetStaticID(), Message_Input_KeyUp::GetStaticID(), Translate_GUI_KeyUp__Input_KeyUp);
-      AddTranslator(Message_GUI_MouseButtonDown::GetStaticID(), Message_Input_MouseButtonDown::GetStaticID(), Translate_GUI_MouseButtonDown__Input_MouseButtonDown);
-      AddTranslator(Message_GUI_MouseButtonUp::GetStaticID(), Message_Input_MouseButtonUp::GetStaticID(), Translate_GUI_MouseButtonUp__Input_MouseButtonUp);
-    }
   }
 }

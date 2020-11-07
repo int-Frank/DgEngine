@@ -125,7 +125,7 @@ namespace Engine
   void Layer_Window::HandleMessage(Message_Window_Close * a_pMsg)
   {
     Application::Instance()->RequestQuit();
-    a_pMsg->SetFlag(Message::Flag::Handled);
+    a_pMsg->SetFlag(Message::Flag::Handled, true);
   }
 
   void Layer_Window::HandleMessage(Message_Window_Take_Focus *)

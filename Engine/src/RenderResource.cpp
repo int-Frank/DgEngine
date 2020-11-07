@@ -1,3 +1,5 @@
+//@group Renderer
+
 #include "RenderResource.h"
 
 namespace Engine
@@ -5,7 +7,7 @@ namespace Engine
   RenderResourceID RenderResource::s_nextID = 0;
 
   RenderResource::RenderResource()
-    : m_id(s_nextID++)
+    : m_id(++s_nextID)
   {
   
   }

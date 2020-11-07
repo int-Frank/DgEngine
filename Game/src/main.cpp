@@ -12,7 +12,6 @@
 #include "Material.h"
 #include "Texture.h"
 
-#include "UICanvas.h"
 #include "UIGroup.h"
 #include "UIButton.h"
 #include "EngineMessages.h"
@@ -192,38 +191,52 @@ public:
     m_material->SetTexture("texture1", m_texture);
     m_material->Bind();
 
-    //Engine::UIButton* btn0 = Engine::UIButton::Create("btn0", vec3(0.0f, 0.0f, 0.0f), vec3(1.0f, 0.5f, 0.0f));
-    //m_canvas.Add(btn0);
+    /*Engine::UIButton * btn0 = Engine::UIButton::Create("btn0", mat1);
+    Engine::UIButton * btn1 = Engine::UIButton::Create("btn1", mat2);
+    btn0->AddBinding(Engine::UIEvent::HoverOn, [](UIWidget * pWidget, UIData const & a_data)
+      {
+        UIHoverMessage * ptr = RESERVE_AND_POST(sizeof(UIHoverMessage));
+        ptr->uiID = 1;
+      }); 
+    btn1->AddBinding(Engine::UIEvent::Activate, [](UIWidget * pWidget, UIData const & a_data)
+      {
+        UIActivateMessage * ptr = RESERVE_AND_POST(sizeof(UIActivateMessage));
+        ptr->uiID = 2;
+        AnotherMessage * ptr = RESERVE_AND_POST(sizeof(AnotherMessage));
+        ptr->someData = someValue;
+      });
+    m_form.Add(btn0);
+    m_form.Add(btn1);*/
 
   }
 
   void HandleMessage(Engine::Message* a_pMsg) override
   {
-    DISPATCH_MESSAGE(Engine::Message_GUI_MouseMove);
-    DISPATCH_MESSAGE(Engine::Message_GUI_MouseButtonDown);
+    //DISPATCH_MESSAGE(Engine::Message_GUI_MouseMove);
+    //DISPATCH_MESSAGE(Engine::Message_GUI_MouseButtonDown);
   }
 
-  void HandleMessage(Engine::Message_GUI_MouseMove* a_pMsg)
-  {
-    float x, y;
-    if (Engine::Application::Instance()->NormalizeWindowCoords(a_pMsg->x, a_pMsg->y, x, y))
-    {
-      //m_canvas.HandleNewCursonPostion(x, y);
-    }
-  }
+  //void HandleMessage(Engine::Message_GUI_MouseMove* a_pMsg)
+  //{
+  //  float x, y;
+  //  if (Engine::Application::Instance()->NormalizeWindowCoords(a_pMsg->x, a_pMsg->y, x, y))
+  //  {
+  //    //m_canvas.HandleNewCursonPostion(x, y);
+  //  }
+  //}
 
-  void HandleMessage(Engine::Message_GUI_MouseButtonDown* a_pMsg)
-  {
-    if (a_pMsg->button != Engine::InputCode::IC_MOUSE_BUTTON_LEFT)
-      return;
+  //void HandleMessage(Engine::Message_GUI_MouseButtonDown* a_pMsg)
+  //{
+  //  if (a_pMsg->button != Engine::InputCode::IC_MOUSE_BUTTON_LEFT)
+  //    return;
 
-    float x, y;
-    if (Engine::Application::Instance()->NormalizeWindowCoords(a_pMsg->x, a_pMsg->y, x, y))
-    {
-      //m_canvas.HandleNewCursonPostion(x, y);
-      //m_canvas.Activate();
-    }
-  }
+  //  float x, y;
+  //  if (Engine::Application::Instance()->NormalizeWindowCoords(a_pMsg->x, a_pMsg->y, x, y))
+  //  {
+  //    //m_canvas.HandleNewCursonPostion(x, y);
+  //    //m_canvas.Activate();
+  //  }
+  //}
 
   void OnDetach() override
   {
@@ -254,7 +267,7 @@ private:
   Engine::Ref<Engine::VertexArray>      m_va;
   Engine::Ref<Engine::Texture2D>        m_texture;
   Engine::Ref<Engine::Material>         m_material;
-  //Engine::UICanvas                      m_canvas;
+  //Engine::UIForm                        m_form;
 };
 
 class Game : public Engine::Application
@@ -270,7 +283,13 @@ public:
       LOG_ERROR("Couldn't find input layer!");
     else
     {
-      layer->SetBindings(
+      layer->AddBinding(Engine::Message_Input_MouseButtonDown::GetStaticID(), 
+        [](Engine::TRef<Engine::Message> msg)
+        {
+          POST(msg);
+        });
+
+      /*layer->SetBindings(
         {
           {Engine::IC_MOUSE_BUTTON_LEFT,  Engine::IE_BUTTON_UP,   new Engine::Message_GUI_MouseButtonUp()},
           {Engine::IC_MOUSE_BUTTON_LEFT,  Engine::IE_BUTTON_DOWN, new Engine::Message_GUI_MouseButtonDown()},
@@ -280,7 +299,7 @@ public:
           {Engine::IC_MOUSE_WHEEL_UP,                             new Engine::Message_GUI_MouseWheelUp()},
           {Engine::IC_MOUSE_WHEEL_DOWN,                           new Engine::Message_GUI_MouseWheelDown()},
           {Engine::IC_TEXT,                                       new Engine::Message_GUI_Text()}
-        });
+        });*/
     }
 
     LOG_TRACE("Game initialised!");

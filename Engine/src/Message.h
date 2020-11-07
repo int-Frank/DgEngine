@@ -35,19 +35,24 @@ namespace Engine
     };
 
   public:
-    Message(): m_flags(0){}
-    bool Is(Flag a_flag) const {return (m_flags & static_cast<uint32_t>(a_flag)) != 0;}
-    void SetFlag(Flag a_flag) {m_flags = (m_flags | static_cast<uint32_t>(a_flag));}
-    virtual uint32_t GetID() const = 0;
+
+    Message();
+
+    bool QueryFlag(Flag a_flag) const;
+    void SetFlag(Flag a_flag, bool);
     uint32_t GetCategory() const;
+
+    // All these defined in the macro (user do NOT implement)
+    virtual uint32_t GetID() const = 0;
     virtual size_t Size() const = 0;
-    virtual TRef<Message> CloneAsTRef() const = 0; //Clone at a memory location
+    virtual TRef<Message> CloneAsTRef() const = 0;
     virtual void Clone(void *) const = 0; //Clone at a memory location
+
+    // User defined
     virtual std::string ToString() const = 0;
 
   protected:
     uint32_t m_flags;
-  protected:
     static uint32_t GetNewID(uint32_t a_class);
   };
   static_assert(std::is_trivially_destructible<Message>::value, "Message must be trivially destructible");
@@ -56,6 +61,7 @@ namespace Engine
   {\
     static uint32_t s_ID;\
   public:\
+    static  Message_##MESSAGE_TYPE * CreateOnBus();\
     static uint32_t GetStaticID();\
     uint32_t GetID() const override;\
     size_t Size() const override;\
@@ -97,20 +103,5 @@ namespace Engine
 
     void* ptr;
   };
-
-  //-----------------------------------------------------------------------------------
-  // Message translators
-  //-----------------------------------------------------------------------------------
-  
-  namespace MessageTranslator
-  {
-    typedef void (*MessageTranslatorFn)(Message * dest, Message const * src);
-
-    void Clear();
-    bool Exists(uint32_t, uint32_t);
-    void AddTranslator(uint32_t, uint32_t, MessageTranslatorFn); //Will override
-    void Translate(Message * dest, Message const * src);
-    void AddDefaultTranslators();
-  }
 }
 #endif

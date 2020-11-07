@@ -17,19 +17,8 @@
 namespace Engine
 {
   class IEventPoller;
-  class IMouseController;
 
-  class InputBinding
-  {
-  public:
-
-    InputCode code;
-    InputEvent evnt;
-    Message * pMsg;
-
-    InputBinding(InputCode, InputEvent, Message*);
-    InputBinding(InputCode, Message*);
-  };
+  typedef void (*InputMessageTranslator)(TRef<Message>);
 
   class Layer_InputHandler : public Layer
   {
@@ -43,37 +32,15 @@ namespace Engine
     void ClearBindings();
     void Update(float);
 
-    void GrabMouse();
-    void ReleaseMouse();
-    void SetMouseLookRate(float xRate, float yRate);
-
     void HandleMessage(Message*) override;
-    void HandleMessage(Message_Input_Text*);
-    void HandleMessage(Message_Input_KeyUp *);
-    void HandleMessage(Message_Input_KeyDown *);
-    void HandleMessage(Message_Input_MouseButtonUp *);
-    void HandleMessage(Message_Input_MouseButtonDown *);
-    void HandleMessage(Message_Input_MouseWheelUp *);
-    void HandleMessage(Message_Input_MouseWheelDown *);
-    void HandleMessage(Message_Input_MouseMove *);
 
     // LayerHandler will own the input Message *
-    void SetBindings(std::initializer_list<InputBinding> const &);
+    void AddBinding(uint32_t inputMessageID, InputMessageTranslator);
 
   private:
 
-    typedef uint32_t BindingKey;
-
-    void HandleBinding(BindingKey key, Message const * source);
-
-    BindingKey PackKey(InputCode, InputEvent);
-
     IEventPoller     * m_pEventPoller;
-    IMouseController * m_pMouseController;
-
-    float              m_xMouseRotRate;
-    float              m_yMouseRotRate;
-    Dg::Map_AVL<uint64_t, Message *> m_bindings;
+    Dg::Map_AVL<uint32_t, InputMessageTranslator> m_bindings;
 
   };
 }

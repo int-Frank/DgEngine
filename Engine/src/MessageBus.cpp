@@ -43,15 +43,24 @@ namespace Engine
     m_producerIndex = (m_producerIndex + 1) % 2;
   }
 
+  void * MessageBus::ReserveAndRegister(size_t a_msgSize)
+  {
+    m_mutex.lock();
+    void * buf = m_buf[m_producerIndex].Allocate(a_msgSize);
+    m_messageQueue[m_producerIndex].push_back(static_cast<Message *>(buf));
+    m_mutex.unlock();
+    return buf;
+  }
+
   void MessageBus::Register(TRef<Message> const & a_message)
   {
     size_t sze = a_message->Size();
     m_mutex.lock();
     void * buf = m_buf[m_producerIndex].Allocate(sze);
-    m_messageQueue[m_producerIndex].push_back(static_cast<Message*>(buf));
+    m_messageQueue[m_producerIndex].push_back(static_cast<Message *>(buf));
     m_mutex.unlock();
     a_message->Clone(buf);
-  } 
+  }
 
   void MessageBus::DispatchMessages()
   {
@@ -63,7 +72,7 @@ namespace Engine
       for (; it != m_layerStack.end(); it++)
       {
         it->second->HandleMessage(pMsg);
-        if (pMsg->Is(Message::Flag::Handled))
+        if (pMsg->QueryFlag(Message::Flag::Handled))
           break;
       }
     }

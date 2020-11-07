@@ -86,8 +86,6 @@ namespace Engine
     else
       Core::impl::Logger::Init_stdout(a_opts.loggerName.c_str());
 
-    MessageTranslator::AddDefaultTranslators();
-
     if (Framework::Init() != Core::EC_None)
       throw std::runtime_error("Failed to initialise framework!");
 

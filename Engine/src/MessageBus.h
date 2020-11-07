@@ -12,6 +12,7 @@
 #include "Memory.h"
 
 #define POST(msg) ::Engine::MessageBus::Instance()->Register(msg)
+#define RESERVE_POST(size) ::Engine::MessageBus::Instance()->ReserveAndRegister(size)
 
 namespace Engine
 {
@@ -31,15 +32,15 @@ namespace Engine
     static void ShutDown();
     static MessageBus * Instance();
 
-    //TODO maybe have an 'Emplace' method, so we can construct messages
-    //     directly on the MessageBus memory heap.
+    // Allocate a message directly on the MessageBus memory heap.
+    void * ReserveAndRegister(size_t MsgSize);
 
-    //Add message to the queue to be processed at a later time.
-    //Can be used from any thread.
+    // Add message to the queue to be processed at a later time.
+    // Can be used from any thread.
     void Register(TRef<Message> const &);
 
-    //SwapBuffers needs to be called before DispatchMessages, at a time no
-    //Messages are being registered.
+    // SwapBuffers needs to be called before DispatchMessages, at a time no
+    // Messages are being registered.
     void SwapBuffers();
     void DispatchMessages();
 

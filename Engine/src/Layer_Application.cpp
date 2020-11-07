@@ -38,6 +38,6 @@ namespace Engine
   void Layer_Application::HandleMessage(Message_Command* a_pMsg)
   {
     a_pMsg->Run();
-    a_pMsg->SetFlag(Message::Flag::Handled);
+    a_pMsg->SetFlag(Message::Flag::Handled, true);
   }
 }

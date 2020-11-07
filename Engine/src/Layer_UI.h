@@ -18,14 +18,14 @@ namespace Engine
     ~Layer_UI();
 
     void HandleMessage(Message *) override;
-    void HandleMessage(Message_GUI_MouseMove*);
+    /*void HandleMessage(Message_GUI_MouseMove*);
     void HandleMessage(Message_GUI_MouseButtonDown *);
     void HandleMessage(Message_GUI_MouseButtonUp *);
     void HandleMessage(Message_GUI_KeyDown *);
     void HandleMessage(Message_GUI_KeyUp *);
     void HandleMessage(Message_GUI_MouseWheelDown *);
     void HandleMessage(Message_GUI_MouseWheelUp *);
-    void HandleMessage(Message_GUI_Text *);
+    void HandleMessage(Message_GUI_Text *);*/
 
     void Update(float);
     void Render();
