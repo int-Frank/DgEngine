@@ -43,7 +43,7 @@ namespace Engine
     m_producerIndex = (m_producerIndex + 1) % 2;
   }
 
-  void * MessageBus::ReserveAndRegister(size_t a_msgSize)
+  void * MessageBus::_ReserveAndRegister(size_t a_msgSize)
   {
     m_mutex.lock();
     void * buf = m_buf[m_producerIndex].Allocate(a_msgSize);

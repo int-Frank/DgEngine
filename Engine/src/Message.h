@@ -61,7 +61,6 @@ namespace Engine
   {\
     static uint32_t s_ID;\
   public:\
-    static  Message_##MESSAGE_TYPE * CreateOnBus();\
     static uint32_t GetStaticID();\
     uint32_t GetID() const override;\
     size_t Size() const override;\

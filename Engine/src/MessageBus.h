@@ -12,7 +12,7 @@
 #include "Memory.h"
 
 #define POST(msg) ::Engine::MessageBus::Instance()->Register(msg)
-#define RESERVE_POST(size) ::Engine::MessageBus::Instance()->ReserveAndRegister(size)
+#define ALLOC_NEW_MESSAGE(msgType, ptr) ptr = static_cast<msgType*>(::Engine::MessageBus::Instance()->_ReserveAndRegister(sizeof(msgType))); new (ptr) msgType()
 
 namespace Engine
 {
@@ -32,8 +32,8 @@ namespace Engine
     static void ShutDown();
     static MessageBus * Instance();
 
-    // Allocate a message directly on the MessageBus memory heap.
-    void * ReserveAndRegister(size_t MsgSize);
+    // Allocate a message directly on the MessageBus memory heap. Access through macro above
+    void * _ReserveAndRegister(size_t MsgSize);
 
     // Add message to the queue to be processed at a later time.
     // Can be used from any thread.

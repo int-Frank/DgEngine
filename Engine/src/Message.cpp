@@ -5,10 +5,6 @@
 #include <sstream>
 
 #include "EngineMessages.h"
-#include "MessageHandler.h"
-#include "MessageBus.h"
-#include "DgMap_AVL.h"
-#include "core_utils.h"
 
 #define ID_SHIFT 20
 
@@ -16,10 +12,6 @@
 #undef ITEM
 #define ITEM(TYPE, CLASS) uint32_t Message_##TYPE::s_ID(0);\
 static_assert(std::is_trivially_destructible<Message_##TYPE>::value, #TYPE " must be trivially destructible");\
-Message_##TYPE * Message_##TYPE::CreateOnBus()\
-{\
-  return (Message_##TYPE *)MessageBus::Instance()->ReserveAndRegister(sizeof(Message_##TYPE));\
-}\
 uint32_t Message_##TYPE::GetStaticID()\
 {\
   if (s_ID == 0)\
