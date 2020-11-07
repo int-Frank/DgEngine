@@ -98,7 +98,7 @@ namespace Engine
 
   }
 
-  TextureData::TextureData(uint32_t a_width, uint32_t a_height, RGBA* a_pPixels, TextureFlags a_flags)
+  TextureData::TextureData(uint32_t a_width, uint32_t a_height, Colour* a_pPixels, TextureFlags a_flags)
     : flags(a_flags)
     , width(a_width)
     , height(a_height)
@@ -149,7 +149,7 @@ namespace Engine
     return *this;
   }
 
-  void TextureData::Set(uint32_t a_width, uint32_t a_height, RGBA * a_pixels, TextureFlags a_flags)
+  void TextureData::Set(uint32_t a_width, uint32_t a_height, Colour * a_pixels, TextureFlags a_flags)
   {
     Clear();
     width = a_width;
@@ -188,8 +188,8 @@ namespace Engine
     flags = a_other.flags;
     width = a_other.width;
     height = a_other.height;
-    pPixels = new RGBA[width * height];
-    memcpy(pPixels, a_other.pPixels, sizeof(RGBA) * (size_t)width * height);
+    pPixels = new Colour[width * height];
+    memcpy(pPixels, a_other.pPixels, sizeof(Colour) * (size_t)width * height);
   }
 
   void TextureData::Clear()
@@ -207,7 +207,7 @@ namespace Engine
     result += Core::SerializedSize(flags.GetData());
     result += Core::SerializedSize(width);
     result += Core::SerializedSize(height);
-    result += (sizeof(RGBA::DataType) * width * height);
+    result += (sizeof(Colour::DataType) * width * height);
     return result;
   }
 }

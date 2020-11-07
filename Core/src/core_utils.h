@@ -21,14 +21,14 @@ typedef Dg::R3::Vector<float>           vec4;
 typedef Dg::R2::Matrix<float>           mat3;
 typedef Dg::R3::Matrix<float>           mat4;
 
-class RGBA
+class Colour
 {
 public:
   
   typedef uint32_t DataType;
 
-  RGBA() :data(0xFF) {}
-  RGBA(uint32_t val) :data(val) {}
+  Colour() :data(0xFF) {}
+  Colour(uint32_t val) :data(val) {}
 
   uint32_t r() const {return Dg::GetSubInt<uint32_t, 0,  8>(data);}
   uint32_t g() const {return Dg::GetSubInt<uint32_t, 8,  8>(data);}

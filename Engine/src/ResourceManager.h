@@ -36,7 +36,6 @@ namespace Engine
     ~ResourceWrapper();
   };
 
-  // Call Update to remove any unused objects. Typically this is done every frame.
   class ResourceManager
   {
     ResourceManager();

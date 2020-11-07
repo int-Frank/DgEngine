@@ -42,8 +42,8 @@ namespace Engine
     {
       uint32_t  fontID;
       float     size;
-      RGBA      textColor;
-      RGBA      backgroundColor;
+      Colour      textColor;
+      Colour      backgroundColor;
     };
 
   public:
@@ -57,10 +57,10 @@ namespace Engine
     void Clear();
     void Bind(uint32_t slot = 0) const;
 
-    void Set(uint32_t width, uint32_t height, RGBA * pixels, TextureFlags flags);
+    void Set(uint32_t width, uint32_t height, Colour * pixels, TextureFlags flags);
 
     //Loading...
-    //bool LoadFromRawData(uint32_t width, uint32_t height, TextureWrap wrap, RGBA* pixels, TextureFlags flags);
+    //bool LoadFromRawData(uint32_t width, uint32_t height, TextureWrap wrap, Colour* pixels, TextureFlags flags);
     //bool LoadFromDataFile(void const*);
     //bool LoadFromImageFile(std::string const & path);
     //bool LoadFromText(TextData const &);
@@ -71,8 +71,8 @@ namespace Engine
     //void Resize(uint32_t width, uint32_t height);
     //void Resize(ResizeMethod, int factor);
 
-    //RGBA& GetPixel(uint32_t width, uint32_t height);
-    //void SetPixel(uint32_t width, uint32_t height, RGBA value);
+    //Colour& GetPixel(uint32_t width, uint32_t height);
+    //void SetPixel(uint32_t width, uint32_t height, Colour value);
 
     //void Set(uint32_t x, uint32_t y,
     //         uint32_t width, uint32_t height,

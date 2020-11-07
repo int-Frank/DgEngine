@@ -31,7 +31,7 @@
 #include "MemBuffer.h"
 #include "IWindow.h"
 
-#define RENDER_SUBMIT(...) ::Engine::Renderer::Instance()->Submit(__VA_ARGS__)
+#define RENDER_SUBMIT(state, ...) ::Engine::Renderer::Instance()->Submit(state, __VA_ARGS__)
 #define RENDER_ALLOCATE(size) ::Engine::Renderer::Instance()->Allocate(size)
 
 namespace Engine

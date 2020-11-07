@@ -62,7 +62,7 @@ namespace Engine
     TextureData();
 
     //Takes ownership of a_pixels
-    TextureData(uint32_t a_width, uint32_t a_height, RGBA * a_pixels, TextureFlags a_flags);
+    TextureData(uint32_t a_width, uint32_t a_height, Colour * a_pixels, TextureFlags a_flags);
 
     TextureData(TextureData const &);
     TextureData & operator=(TextureData const &);
@@ -71,7 +71,7 @@ namespace Engine
     TextureData & operator=(TextureData &&) noexcept;
 
     //Takes ownership of a_pixels
-    void Set(uint32_t a_width, uint32_t a_height, RGBA * a_pixels, TextureFlags a_flags);
+    void Set(uint32_t a_width, uint32_t a_height, Colour * a_pixels, TextureFlags a_flags);
 
     void Duplicate(TextureData const &);
     size_t Size() const;
@@ -84,7 +84,7 @@ namespace Engine
     TextureFlags  flags;
     uint32_t      width;
     uint32_t      height;
-    RGBA *        pPixels; // TODO should be uint8_t. The format can change
+    Colour *        pPixels; // TODO should be uint8_t. The format can change
   };
 }
 
