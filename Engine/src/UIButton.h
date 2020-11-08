@@ -29,8 +29,9 @@ namespace Engine
     //void _SetHoverOn() override;
     //void _SetHoverOff() override;
     
-    void HandleMessage(Message_GUI_PointerSelect *) override;
-    void HandleMessage(Message_GUI_PointerMove *) override;
+    void HandleMessage(Message *) override;
+    void HandleMessage(Message_GUI_PointerSelect *);
+    void HandleMessage(Message_GUI_PointerMove *);
 
     void _Draw() override;
 

@@ -25,6 +25,17 @@
 
 namespace Engine
 {
+  struct UIData
+  {
+    union
+    {
+      struct PointerSelect
+      {
+        float x, y;
+      } pointerSelect;
+    };
+  };
+
   enum class UIEvent
   {
     HoverOn,
@@ -52,7 +63,7 @@ namespace Engine
     virtual ~UIWidget();
 
     void ClearBindings();
-    void AddBinding(UIEvent, std::function<void(Message *)>);
+    void AddBinding(UIEvent, std::function<void(UIData const *)>);
 
     //---------------------------------------------------------------------------
     // Internal
@@ -63,16 +74,7 @@ namespace Engine
     //virtual void _SetFocusOn() = 0;
     //virtual void _SetFocusOff() = 0;
 
-    void HandleMessage(Message *);
-    virtual void HandleMessage(Message_GUI_GoBack *)         {}
-    virtual void HandleMessage(Message_GUI_Up *)             {}
-    virtual void HandleMessage(Message_GUI_Down *)           {}
-    virtual void HandleMessage(Message_GUI_Left *)           {}
-    virtual void HandleMessage(Message_GUI_Right *)          {}
-    virtual void HandleMessage(Message_GUI_Select *)         {}
-    virtual void HandleMessage(Message_GUI_PointerSelect *)  {}
-    virtual void HandleMessage(Message_GUI_PointerMove *)    {}
-    virtual void HandleMessage(Message_GUI_Text *)           {}
+    virtual void HandleMessage(Message *) {};
 
     UIState _QueryState() const;
 
@@ -83,7 +85,7 @@ namespace Engine
   protected:
 
     UIWidget * m_pParent;
-    std::function<void(Message *)> m_callbacks[(size_t)UIEvent::COUNT];
+    std::function<void(UIData const *)> m_callbacks[(size_t)UIEvent::COUNT];
     UIState m_state;
   };
 }

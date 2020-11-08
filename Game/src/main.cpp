@@ -11,6 +11,7 @@
 #include "RendererProgram.h"
 #include "Material.h"
 #include "Texture.h"
+#include "InputCodes.h"
 
 #include "UIGroup.h"
 #include "UIButton.h"
@@ -195,7 +196,13 @@ public:
     m_material->SetTexture("texture1", m_texture);
     m_material->Bind();
 
-    m_pButton = new Engine::UIButton(nullptr, "", 0, {20.f, 20.f}, {200.f, 200.f});
+    m_pButton = new Engine::UIButton(nullptr, "Hello", 0, {20.f, 20.f}, {200.f, 200.f});
+    m_pButton->AddBinding(Engine::UIEvent::Activate, [](Engine::UIData const * a_pData)
+      {
+        LOG_WARN("PRESSED: [{}, {}]", a_pData->pointerSelect.x, a_pData->pointerSelect.y);
+      });
+    m_pButton->AddBinding(Engine::UIEvent::HoverOn, [](Engine::UIData const *){LOG_DEBUG("HOVER ON");});
+    m_pButton->AddBinding(Engine::UIEvent::HoverOff, [](Engine::UIData const *){LOG_DEBUG("HOVER OFF");});
 
     /*Engine::UIButton * btn0 = Engine::UIButton::Create("btn0", mat1);
     Engine::UIButton * btn1 = Engine::UIButton::Create("btn1", mat2);
@@ -218,27 +225,8 @@ public:
 
   void HandleMessage(Engine::Message* a_pMsg) override
   {
-    DISPATCH_MESSAGE(Engine::Message_GUI_PointerMove);
-    //DISPATCH_MESSAGE(Engine::Message_GUI_MouseButtonDown);
-  }
-
-  void HandleMessage(Engine::Message_GUI_PointerMove * a_pMsg)
-  {
     m_pButton->HandleMessage(a_pMsg);
   }
-
-  //void HandleMessage(Engine::Message_GUI_MouseButtonDown* a_pMsg)
-  //{
-  //  if (a_pMsg->button != Engine::InputCode::IC_MOUSE_BUTTON_LEFT)
-  //    return;
-
-  //  float x, y;
-  //  if (Engine::Application::Instance()->NormalizeWindowCoords(a_pMsg->x, a_pMsg->y, x, y))
-  //  {
-  //    //m_canvas.HandleNewCursonPostion(x, y);
-  //    //m_canvas.Activate();
-  //  }
-  //}
 
   void OnDetach() override
   {
@@ -286,12 +274,25 @@ public:
       LOG_ERROR("Couldn't find input layer!");
     else
     {
-      layer->AddBinding(Engine::Message_Input_MouseMove::GetStaticID(), 
+      layer->AddBinding(Engine::Message_Input_MouseMove::GetStaticID(),
         [](Engine::Message const * pMsg)
         {
-          Engine::Message_Input_MouseMove * pIn = (Engine::Message_Input_MouseMove*)pMsg;
+          Engine::Message_Input_MouseMove * pIn = (Engine::Message_Input_MouseMove *)pMsg;
           Engine::Message_GUI_PointerMove * pOut = nullptr;
           ALLOC_NEW_MESSAGE(Engine::Message_GUI_PointerMove, pOut);
+          pOut->x = pIn->x;
+          pOut->y = pIn->y;
+        });
+
+      layer->AddBinding(Engine::Message_Input_MouseButtonDown::GetStaticID(),
+        [](Engine::Message const * pMsg)
+        {
+          Engine::Message_Input_MouseButtonDown * pIn = (Engine::Message_Input_MouseButtonDown *)pMsg;
+          if (pIn->button != Engine::IC_MOUSE_BUTTON_LEFT)
+            return;
+
+          Engine::Message_GUI_PointerSelect * pOut = nullptr;
+          ALLOC_NEW_MESSAGE(Engine::Message_GUI_PointerSelect, pOut);
           pOut->x = pIn->x;
           pOut->y = pIn->y;
         });

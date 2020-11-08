@@ -1,6 +1,7 @@
 //@group UI
 
 #include "UIButton.h"
+#include "MessageHandler.h"
 
 namespace Engine
 {
@@ -19,12 +20,24 @@ namespace Engine
 
   }
 
+  void UIButton::HandleMessage(Message * a_pMsg)
+  {
+    if (a_pMsg->GetCategory() != MC_GUI)
+      return;
+
+    DISPATCH_MESSAGE(Message_GUI_PointerMove);
+    DISPATCH_MESSAGE(Message_GUI_PointerSelect);
+  }
+
   void UIButton::HandleMessage(Message_GUI_PointerSelect * a_pMsg)
   {
     if (IsInside(vec2((float)a_pMsg->x, (float)a_pMsg->y)) 
       && m_callbacks[static_cast<int>(UIEvent::Activate)] != nullptr)
     {
-      m_callbacks[static_cast<int>(UIEvent::Activate)](a_pMsg);
+      UIData data;
+      data.pointerSelect.x = (float)a_pMsg->x;
+      data.pointerSelect.y = (float)a_pMsg->y;
+      m_callbacks[static_cast<int>(UIEvent::Activate)](&data);
     }
   }
 
@@ -34,16 +47,14 @@ namespace Engine
     if (isInside && m_state == UIState::None)
     {
       m_state = UIState::HoverOn;
-      LOG_DEBUG("HOVER ON");
       if (m_callbacks[static_cast<int>(UIEvent::HoverOn)] != nullptr)
-        m_callbacks[static_cast<int>(UIEvent::HoverOn)](a_pMsg);
+        m_callbacks[static_cast<int>(UIEvent::HoverOn)](nullptr);
     }
     if (!isInside && m_state == UIState::HoverOn)
     {
       m_state = UIState::None;
-      LOG_DEBUG("HOVER OFF");
       if (m_callbacks[static_cast<int>(UIEvent::HoverOff)] != nullptr)
-        m_callbacks[static_cast<int>(UIEvent::HoverOff)](a_pMsg);
+        m_callbacks[static_cast<int>(UIEvent::HoverOff)](nullptr);
     }
   }
 

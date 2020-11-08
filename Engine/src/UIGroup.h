@@ -1,47 +1,55 @@
 //@group UI
-//
-//#ifndef UIGROUPS_H
-//#define UIGROUPS_H
-//
-//#include "core_utils.h"
-//#include "UIWidget.h"
-//#include "DgDoublyLinkedList.h"
-//
-//namespace Engine
-//{
-//  class UIGroup : public UIWidget
-//  {
-//  public:
-//
-//    UIGroup(std::string const& name,
-//            float x, float y, int depth,
-//            float scale_x, float scale_y,
-//            float rotation,
-//            float anchor_x, float anchor_y); //top left = [0, 0], bottom right = [1, 1] 
-//    ~UIGroup();
-//
-//    bool HandleNewCursonPostion(float x, float y) override;
-//    bool IsInside(float x, float y) override;
-//    virtual void Render();
-//
-//    void DoEventActivate() override;
-//
-//    void Clear();
-//    void Add(UIWidget*);
-//    bool Remove(UIWidget*);
-//
-//    void DepthHasChanged(UIWidget*);
-//
-//  private:
-//
-//    void SetInteractiveSpace();
-//    void NewTransform();
-//
-//  private:
-//    mat3 m_T_Global_to_Interactive;
-//    Dg::DoublyLinkedList<UIWidget*> m_children;
-//    UIWidget* m_pFocus;
-//  };
-//}
-//
-//#endif
+
+#ifndef UIGROUPS_H
+#define UIGROUPS_H
+
+#include "core_utils.h"
+#include "UIWidget.h"
+#include "DgDoublyLinkedList.h"
+
+namespace Engine
+{
+  class UIGroup : public UIWidget
+  {
+  public:
+
+    UIGroup(UIWidget * pParent, vec2 const position, vec2 const & size);
+    ~UIGroup();
+
+    //void SetPosition(vec2 const &);
+    //void SetSize(vec2 const &);
+    //
+    //void SetFont(uint32_t fontID);
+    //void SetText(std::string const &);
+    //void SetTextColour(Colour);
+    //void SetHoverOnTextColour(Colour);
+    //void SetBackgroundColour(Colour);
+    //void SetHoverOnBackgroundColour(Colour);
+
+    //void _SetHoverOn() override;
+    //void _SetHoverOff() override;
+
+    void Clear();
+    void Add(UIWidget *);
+    bool Remove(UIWidget *);
+
+    void HandleMessage(Message_GUI_PointerSelect *);
+    void HandleMessage(Message_GUI_PointerMove *);
+    void HandleMessage(Message_GUI_Select *);
+
+    void _Draw() override;
+
+  private:
+
+    bool IsInside(vec2 const &) const;
+
+  private:
+
+    vec2 m_position;
+    vec2 m_size;
+    Dg::DoublyLinkedList<UIWidget *> m_children;
+    UIWidget * m_pFocus;
+  };
+}
+
+#endif
