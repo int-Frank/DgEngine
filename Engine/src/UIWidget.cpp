@@ -24,7 +24,7 @@ namespace Engine
       m_callbacks[i] = nullptr;
   }
 
-  void UIWidget::AddBinding(UIEvent a_event, std::function<void(UIData const *)> a_fn)
+  void UIWidget::AddBinding(UIEvent a_event, std::function<void(UICallbackData const *)> a_fn)
   {
     m_callbacks[static_cast<int>(a_event)] = a_fn;
   }

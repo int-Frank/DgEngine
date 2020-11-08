@@ -197,21 +197,21 @@ public:
     m_material->Bind();
 
     m_pButton = new Engine::UIButton(nullptr, "Hello", 0, {20.f, 20.f}, {200.f, 200.f});
-    m_pButton->AddBinding(Engine::UIEvent::Activate, [](Engine::UIData const * a_pData)
+    m_pButton->AddBinding(Engine::UIEvent::Activate, [](Engine::UICallbackData const * a_pData)
       {
         LOG_WARN("PRESSED: [{}, {}]", a_pData->pointerSelect.x, a_pData->pointerSelect.y);
       });
-    m_pButton->AddBinding(Engine::UIEvent::HoverOn, [](Engine::UIData const *){LOG_DEBUG("HOVER ON");});
-    m_pButton->AddBinding(Engine::UIEvent::HoverOff, [](Engine::UIData const *){LOG_DEBUG("HOVER OFF");});
+    m_pButton->AddBinding(Engine::UIEvent::HoverOn, [](Engine::UICallbackData const *){LOG_DEBUG("HOVER ON");});
+    m_pButton->AddBinding(Engine::UIEvent::HoverOff, [](Engine::UICallbackData const *){LOG_DEBUG("HOVER OFF");});
 
     /*Engine::UIButton * btn0 = Engine::UIButton::Create("btn0", mat1);
     Engine::UIButton * btn1 = Engine::UIButton::Create("btn1", mat2);
-    btn0->AddBinding(Engine::UIEvent::HoverOn, [](UIWidget * pWidget, UIData const & a_data)
+    btn0->AddBinding(Engine::UIEvent::HoverOn, [](UIWidget * pWidget, UICallbackData const & a_data)
       {
         UIHoverMessage * ptr = RESERVE_AND_POST(sizeof(UIHoverMessage));
         ptr->uiID = 1;
       }); 
-    btn1->AddBinding(Engine::UIEvent::Activate, [](UIWidget * pWidget, UIData const & a_data)
+    btn1->AddBinding(Engine::UIEvent::Activate, [](UIWidget * pWidget, UICallbackData const & a_data)
       {
         UIActivateMessage * ptr = RESERVE_AND_POST(sizeof(UIActivateMessage));
         ptr->uiID = 2;

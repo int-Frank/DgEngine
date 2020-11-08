@@ -34,7 +34,7 @@ namespace Engine
     if (IsInside(vec2((float)a_pMsg->x, (float)a_pMsg->y)) 
       && m_callbacks[static_cast<int>(UIEvent::Activate)] != nullptr)
     {
-      UIData data;
+      UICallbackData data;
       data.pointerSelect.x = (float)a_pMsg->x;
       data.pointerSelect.y = (float)a_pMsg->y;
       m_callbacks[static_cast<int>(UIEvent::Activate)](&data);

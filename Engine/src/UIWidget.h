@@ -25,7 +25,7 @@
 
 namespace Engine
 {
-  struct UIData
+  struct UICallbackData
   {
     union
     {
@@ -63,7 +63,7 @@ namespace Engine
     virtual ~UIWidget();
 
     void ClearBindings();
-    void AddBinding(UIEvent, std::function<void(UIData const *)>);
+    void AddBinding(UIEvent, std::function<void(UICallbackData const *)>);
 
     //---------------------------------------------------------------------------
     // Internal
@@ -85,7 +85,7 @@ namespace Engine
   protected:
 
     UIWidget * m_pParent;
-    std::function<void(UIData const *)> m_callbacks[(size_t)UIEvent::COUNT];
+    std::function<void(UICallbackData const *)> m_callbacks[(size_t)UIEvent::COUNT];
     UIState m_state;
   };
 }
