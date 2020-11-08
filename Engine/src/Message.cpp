@@ -77,7 +77,13 @@ namespace Engine
   MESSAGE_LIST
 
   MESSAGE_TO_STRING(None)
-  MESSAGE_TO_STRING(GoBack)
+  MESSAGE_TO_STRING(GUI_GoBack)
+  MESSAGE_TO_STRING(GUI_Up)
+  MESSAGE_TO_STRING(GUI_Down)
+  MESSAGE_TO_STRING(GUI_Left)
+  MESSAGE_TO_STRING(GUI_Right)
+  MESSAGE_TO_STRING(GUI_Select)
+  MESSAGE_TO_STRING(GUI_Text)
   MESSAGE_TO_STRING(Window_Shown)
   MESSAGE_TO_STRING(Window_Hidden)
   MESSAGE_TO_STRING(Window_Exposed)
@@ -93,6 +99,20 @@ namespace Engine
   MESSAGE_TO_STRING(Input_MouseWheelUp)
   MESSAGE_TO_STRING(Input_MouseWheelDown)
   
+  std::string Message_GUI_PointerSelect::ToString() const
+  {
+    std::stringstream ss;
+    ss << "GUI_PointerSelect [context: " << context << ", x: " << x << ", y: " << y << "]";
+    return ss.str();
+  }
+
+  std::string Message_GUI_PointerMove::ToString() const
+  {
+    std::stringstream ss;
+    ss << "GUI_PointerMov [x: " << x << ", y: " << y << "]";
+    return ss.str();
+  }
+
   std::string Message_Window_Moved::ToString() const
   {
     std::stringstream ss;

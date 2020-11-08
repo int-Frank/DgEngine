@@ -5,12 +5,8 @@
 
 #include <stdint.h>
 
-#include "DgMatrix.h"
-
 namespace Engine
 {
-  typedef Dg::Matrix<2, 1, int> vec2i;
-
   typedef uint64_t SubBlockID;
 #define INVALID_UI_TEXTURE 0xFFFF'FFFF'FFFF'FFFF
 

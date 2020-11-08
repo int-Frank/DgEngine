@@ -116,10 +116,13 @@ namespace Engine
 
       auto it = m_bindings.find(pMsg->GetID());
       if (it != m_bindings.end())
-        it->second(pMsg);
-      else
-        POST(pMsg); // TODO Remove this! Event message should not leave this scope!
-      // I need this to forward the window exit message
+      {
+        it->second(pMsg.Get());
+      }
+      else if (pMsg->GetID() == Message_Window_Close::GetStaticID())
+      {
+        POST(pMsg);
+      }
     }
   }
 }

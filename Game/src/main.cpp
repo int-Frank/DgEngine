@@ -20,7 +20,7 @@
 
 #define TEXTURE_XY 512
 
-RGBA * GenerateBinTexture()
+Colour * GenerateBinTexture()
 {
   int itemMin = 8;
   int itemMax = 64;
@@ -73,7 +73,7 @@ RGBA * GenerateBinTexture()
 
   LOG_INFO("Item count: {}", items.size());
 
-  RGBA * pPixels = new RGBA[TEXTURE_XY * TEXTURE_XY];
+  Colour * pPixels = new Colour[TEXTURE_XY * TEXTURE_XY];
 
   for (int i = 0; i < TEXTURE_XY * TEXTURE_XY; i++)
   {
@@ -115,9 +115,9 @@ RGBA * GenerateBinTexture()
   return pPixels;
 }
 
-RGBA * GenerateTexture(uint32_t a_width, uint32_t a_height)
+Colour * GenerateTexture(uint32_t a_width, uint32_t a_height)
 {
-  RGBA * pixels = new RGBA[a_width * a_height];
+  Colour * pixels = new Colour[a_width * a_height];
 
   for (uint32_t y = 0; y < a_height; y++)
   {
@@ -195,6 +195,8 @@ public:
     m_material->SetTexture("texture1", m_texture);
     m_material->Bind();
 
+    m_pButton = new Engine::UIButton(nullptr, "", 0, {20.f, 20.f}, {200.f, 200.f});
+
     /*Engine::UIButton * btn0 = Engine::UIButton::Create("btn0", mat1);
     Engine::UIButton * btn1 = Engine::UIButton::Create("btn1", mat2);
     btn0->AddBinding(Engine::UIEvent::HoverOn, [](UIWidget * pWidget, UIData const & a_data)
@@ -216,18 +218,14 @@ public:
 
   void HandleMessage(Engine::Message* a_pMsg) override
   {
-    //DISPATCH_MESSAGE(Engine::Message_GUI_MouseMove);
+    DISPATCH_MESSAGE(Engine::Message_GUI_PointerMove);
     //DISPATCH_MESSAGE(Engine::Message_GUI_MouseButtonDown);
   }
 
-  //void HandleMessage(Engine::Message_GUI_MouseMove* a_pMsg)
-  //{
-  //  float x, y;
-  //  if (Engine::Application::Instance()->NormalizeWindowCoords(a_pMsg->x, a_pMsg->y, x, y))
-  //  {
-  //    //m_canvas.HandleNewCursonPostion(x, y);
-  //  }
-  //}
+  void HandleMessage(Engine::Message_GUI_PointerMove * a_pMsg)
+  {
+    m_pButton->HandleMessage(a_pMsg);
+  }
 
   //void HandleMessage(Engine::Message_GUI_MouseButtonDown* a_pMsg)
   //{
@@ -271,6 +269,7 @@ private:
   Engine::Ref<Engine::VertexArray>      m_va;
   Engine::Ref<Engine::Texture2D>        m_texture;
   Engine::Ref<Engine::Material>         m_material;
+  Engine::UIButton *                    m_pButton;
   //Engine::UIForm                        m_form;
 };
 
@@ -287,10 +286,14 @@ public:
       LOG_ERROR("Couldn't find input layer!");
     else
     {
-      layer->AddBinding(Engine::Message_Input_MouseButtonDown::GetStaticID(), 
-        [](Engine::TRef<Engine::Message> msg)
+      layer->AddBinding(Engine::Message_Input_MouseMove::GetStaticID(), 
+        [](Engine::Message const * pMsg)
         {
-          POST(msg);
+          Engine::Message_Input_MouseMove * pIn = (Engine::Message_Input_MouseMove*)pMsg;
+          Engine::Message_GUI_PointerMove * pOut = nullptr;
+          ALLOC_NEW_MESSAGE(Engine::Message_GUI_PointerMove, pOut);
+          pOut->x = pIn->x;
+          pOut->y = pIn->y;
         });
 
       /*layer->SetBindings(

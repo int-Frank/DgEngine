@@ -1,15 +1,14 @@
 //@group UI
 
-#include "UIForm.h"
 #include "UIWidget.h"
 #include "Message.h"
+#include "MessageHandler.h"
 
 namespace Engine
 {
-  UIWidget::UIWidget(mat3 const & a_Global_to_Local, int a_depth)
-    : m_callbacks{}
-    , m_T_Global_to_Local(a_Global_to_Local)
-    , m_depth(a_depth)
+  UIWidget::UIWidget(UIWidget * a_pParent)
+    : m_pParent(a_pParent)
+    , m_callbacks{}
     , m_state(UIState::None)
   {
 
@@ -20,31 +19,35 @@ namespace Engine
 
   }
 
-  bool UIWidget::Intersection(vec2 const &a_point)
+  void UIWidget::HandleMessage(Message * a_pMsg)
   {
-    vec3 point(a_point.x(), a_point.y(), 1.0f);
-    point = point * m_T_Global_to_Local;
+    if (a_pMsg->GetCategory() != MC_GUI)
+      return;
 
-    bool result = point.x() > -1.0f;
-    result = result && point.x() < 1.0f;
-    result = result && point.y() > -1.0f;
-    result = result && point.y() < 1.0f;
-
-    return result;
+    DISPATCH_MESSAGE(Message_GUI_GoBack);
+    DISPATCH_MESSAGE(Message_GUI_Up);
+    DISPATCH_MESSAGE(Message_GUI_Down);
+    DISPATCH_MESSAGE(Message_GUI_Left);
+    DISPATCH_MESSAGE(Message_GUI_Right);
+    DISPATCH_MESSAGE(Message_GUI_Select);
+    DISPATCH_MESSAGE(Message_GUI_PointerSelect);
+    DISPATCH_MESSAGE(Message_GUI_PointerMove);
+    DISPATCH_MESSAGE(Message_GUI_Text);
   }
 
-  void UIWidget::SetTransform(mat3 const & a_trans)
+  void UIWidget::ClearBindings()
   {
-    m_T_Global_to_Local = a_trans;
+    for (int i = 0; i < static_cast<int>(UIEvent::COUNT); i++)
+      m_callbacks[i] = nullptr;
   }
 
-  void UIWidget::SetDepth(int a_val)
+  void UIWidget::AddBinding(UIEvent a_event, std::function<void(Message *)> a_fn)
   {
-    m_depth = a_val;
+    m_callbacks[static_cast<int>(a_event)] = a_fn;
   }
 
-  int UIWidget::GetDepth() const
+  UIState UIWidget::_QueryState() const
   {
-    return m_depth;
+    return m_state;
   }
 }

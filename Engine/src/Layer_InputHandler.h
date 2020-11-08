@@ -18,7 +18,7 @@ namespace Engine
 {
   class IEventPoller;
 
-  typedef void (*InputMessageTranslator)(TRef<Message>);
+  typedef void (*InputMessageTranslator)(Message const *);
 
   class Layer_InputHandler : public Layer
   {

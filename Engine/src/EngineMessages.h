@@ -7,11 +7,20 @@
 
 #define TEXT_INPUT_TEXT_SIZE 32
 
-//Smart list reduces the amount of code we have to write
+// Smart list reduces the amount of code we have to write.
+// Input messages never make it out of Layer_InputHandler. This is where you convert them.
 #undef ITEM
 #define MESSAGE_LIST \
   ITEM(None, None) \
-  ITEM(GoBack, None) \
+  ITEM(GUI_GoBack, GUI) \
+  ITEM(GUI_Up, GUI) \
+  ITEM(GUI_Down, GUI) \
+  ITEM(GUI_Left, GUI) \
+  ITEM(GUI_Right, GUI) \
+  ITEM(GUI_Select, GUI) \
+  ITEM(GUI_PointerSelect, GUI) \
+  ITEM(GUI_PointerMove, GUI) \
+  ITEM(GUI_Text, GUI) \
   ITEM(Window_Shown, Window) \
   ITEM(Window_Hidden, Window) \
   ITEM(Window_Exposed, Window) \
@@ -43,7 +52,29 @@ namespace Engine
   //-----------------------------------------------------------------------------------
 
   MESSAGE_CLASS_HEADER(None) };
-  MESSAGE_CLASS_HEADER(GoBack) };
+
+  MESSAGE_CLASS_HEADER(GUI_GoBack) }; // eg Esc...
+  MESSAGE_CLASS_HEADER(GUI_Up) };     // eg arrow keys, numpad arrows, joystick controls...
+  MESSAGE_CLASS_HEADER(GUI_Down) };
+  MESSAGE_CLASS_HEADER(GUI_Left) };
+  MESSAGE_CLASS_HEADER(GUI_Right) };
+  MESSAGE_CLASS_HEADER(GUI_Select) }; // eg Enter, xBox controller 'A'
+  
+  // eg mouse click, joystick pointer...
+  MESSAGE_CLASS_HEADER(GUI_PointerSelect)
+    uint32_t context; // eg main select, secondary select (left click, right click)
+    int32_t x;
+    int32_t y;
+  };
+
+  MESSAGE_CLASS_HEADER(GUI_PointerMove)
+    int32_t x;
+    int32_t y;
+  };
+
+  MESSAGE_CLASS_HEADER(GUI_Text)
+    char text[TEXT_INPUT_TEXT_SIZE];
+  };
 
   MESSAGE_CLASS_HEADER(Window_Shown) };
   MESSAGE_CLASS_HEADER(Window_Hidden) };

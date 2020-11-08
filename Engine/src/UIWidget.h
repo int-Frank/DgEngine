@@ -7,7 +7,7 @@
 #include <functional>
 
 #include "core_utils.h"
-#include "InputCodes.h"
+#include "EngineMessages.h"
 
 /*
   - Button
@@ -25,19 +25,6 @@
 
 namespace Engine
 {
-  struct UIData
-  {
-    union
-    {
-      uint32_t ui32;
-      bool b;
-      int32_t i32;
-      float f32;
-      double f64;
-      char* pChar;
-    };
-  };
-
   enum class UIEvent
   {
     HoverOn,
@@ -56,40 +43,38 @@ namespace Engine
     HasFocus // Eg text inputs in focus and waiting for input
   };
 
-  //typedef void (*UICallback)(UIWidget *);
-
   class UIWidget
   {
   public:
 
-    UIWidget(mat3 const & Global_to_Local, int depth);
+    UIWidget(UIWidget * pParent);
 
     virtual ~UIWidget();
-    
-    void SetTransform(mat3 const & trans);
-    void SetDepth(int);
-
-    int GetDepth() const;
-
-    virtual void Draw() {}
-
-    virtual bool Intersection(vec2 const &point);
-
-    virtual UIState SetHoverOn() = 0;
-    virtual UIState SetHoverOff() = 0;
-    virtual UIState SetFocusOn() = 0;
-    virtual UIState SetFocusOff() = 0;
-    virtual UIState OnKeyDown(InputCode) = 0;
-    virtual UIState OnKeyUp(InputCode) = 0;
-    virtual UIState OnMouseDown() = 0;
-    virtual UIState OnMouseUp() = 0;
-    virtual UIState OnScroll(float val) = 0;
-    virtual UIState OnText(char text[32]) = 0;
-    virtual UIState OnActivate() = 0; // Enter key, most widgets won't have this
-    UIState QueryState(); 
 
     void ClearBindings();
-    void AddBinding(UIEvent, std::function<void(UIData const &)>);
+    void AddBinding(UIEvent, std::function<void(Message *)>);
+
+    //---------------------------------------------------------------------------
+    // Internal
+    virtual void _Draw() {}
+
+    //virtual void _SetHoverOn() = 0;
+    //virtual void _SetHoverOff() = 0;
+    //virtual void _SetFocusOn() = 0;
+    //virtual void _SetFocusOff() = 0;
+
+    void HandleMessage(Message *);
+    virtual void HandleMessage(Message_GUI_GoBack *)         {}
+    virtual void HandleMessage(Message_GUI_Up *)             {}
+    virtual void HandleMessage(Message_GUI_Down *)           {}
+    virtual void HandleMessage(Message_GUI_Left *)           {}
+    virtual void HandleMessage(Message_GUI_Right *)          {}
+    virtual void HandleMessage(Message_GUI_Select *)         {}
+    virtual void HandleMessage(Message_GUI_PointerSelect *)  {}
+    virtual void HandleMessage(Message_GUI_PointerMove *)    {}
+    virtual void HandleMessage(Message_GUI_Text *)           {}
+
+    UIState _QueryState() const;
 
   protected:
 
@@ -97,9 +82,8 @@ namespace Engine
 
   protected:
 
-    std::function<void(UIData const &)> m_callbacks[(size_t)UIEvent::COUNT];
-    mat3 m_T_Global_to_Local;
-    int m_depth;
+    UIWidget * m_pParent;
+    std::function<void(Message *)> m_callbacks[(size_t)UIEvent::COUNT];
     UIState m_state;
   };
 }
