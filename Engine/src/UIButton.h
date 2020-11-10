@@ -28,16 +28,22 @@ namespace Engine
 
     //void _SetHoverOn() override;
     //void _SetHoverOff() override;
-    
+
+    void ClearBindings();
+
+    void BindHoverOn(std::function<void()> a_fn);
+    void BindHoverOff(std::function<void()> a_fn);
+    void BindHoverSelect(std::function<void()> a_fn);
+
     void HandleMessage(Message *) override;
-    void HandleMessage(Message_GUI_PointerSelect *);
+    void HandleMessage(Message_GUI_PointerDown *);
     void HandleMessage(Message_GUI_PointerMove *);
 
-    void _Draw() override;
+    void Draw() override;
 
-  private:
-
-    bool IsInside(vec2 const &) const;
+    UIState QueryState() const override;
+    UIWidget * GetParent() const override;
+    void SetParent(UIWidget *) override;
 
   private:
 
@@ -45,6 +51,12 @@ namespace Engine
     uint32_t m_fontID;
     vec2 m_position;
     vec2 m_size;
+    UIState m_state;
+    UIWidget * m_pParent;
+
+    std::function<void()> m_clbk_HoverOn;
+    std::function<void()> m_clbk_HoverOff;
+    std::function<void()> m_clbk_Select;
   };
 }
 

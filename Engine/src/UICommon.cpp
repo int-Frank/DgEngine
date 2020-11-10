@@ -1,24 +1,24 @@
 //@group UI
-//
-//#include "UICommon.h"
-//#include "UIWidget.h"
-//
-//namespace Engine
-//{
-//  //Inserts widget in depth order
-//  /*void InsertWidget(UIWidget* a_pWgt, Dg::DoublyLinkedList<UIWidget*>& a_out)
-//  {
-//    bool inserted = false;
-//    for (auto it = a_out.begin(); it != a_out.end(); it++)
-//    {
-//      if (a_pWgt->GetDepth() <= (*it)->GetDepth())
-//      {
-//        a_out.insert(it, a_pWgt);
-//        inserted = true;
-//      }
-//    }
-//
-//    if (!inserted)
-//      a_out.push_back(a_pWgt);
-//  }*/
-//}
+
+#include "UICommon.h"
+#include "UIWidget.h"
+
+namespace Engine
+{
+  bool UIPointInBox(vec2 const & boxMin, vec2 const & boxSize, vec2 const & point)
+  {
+    if (point.x() < boxMin.x())
+      return false;
+
+    if (point.y() < boxMin.y())
+      return false;
+
+    if (point.x() > boxMin.x() + boxSize.x())
+      return false;
+
+    if (point.y() > boxMin.y() + boxSize.y())
+      return false;
+
+    return true;
+  }
+}

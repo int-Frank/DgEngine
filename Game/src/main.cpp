@@ -13,7 +13,6 @@
 #include "Texture.h"
 #include "InputCodes.h"
 
-#include "UIGroup.h"
 #include "UIButton.h"
 #include "EngineMessages.h"
 #include "DgBinPacker.h"
@@ -197,12 +196,9 @@ public:
     m_material->Bind();
 
     m_pButton = new Engine::UIButton(nullptr, "Hello", 0, {20.f, 20.f}, {200.f, 200.f});
-    m_pButton->AddBinding(Engine::UIEvent::Activate, [](Engine::UICallbackData const * a_pData)
-      {
-        LOG_WARN("PRESSED: [{}, {}]", a_pData->pointerSelect.x, a_pData->pointerSelect.y);
-      });
-    m_pButton->AddBinding(Engine::UIEvent::HoverOn, [](Engine::UICallbackData const *){LOG_DEBUG("HOVER ON");});
-    m_pButton->AddBinding(Engine::UIEvent::HoverOff, [](Engine::UICallbackData const *){LOG_DEBUG("HOVER OFF");});
+    m_pButton->BindHoverSelect([]() {LOG_WARN("PRESSED");});
+    m_pButton->BindHoverOn([](){LOG_DEBUG("HOVER ON");});
+    m_pButton->BindHoverOff([](){LOG_DEBUG("HOVER OFF");});
 
     /*Engine::UIButton * btn0 = Engine::UIButton::Create("btn0", mat1);
     Engine::UIButton * btn1 = Engine::UIButton::Create("btn1", mat2);
@@ -274,6 +270,7 @@ public:
       LOG_ERROR("Couldn't find input layer!");
     else
     {
+      // Hook up GUI events
       layer->AddBinding(Engine::Message_Input_MouseMove::GetStaticID(),
         [](Engine::Message const * pMsg)
         {
@@ -291,8 +288,21 @@ public:
           if (pIn->button != Engine::IC_MOUSE_BUTTON_LEFT)
             return;
 
-          Engine::Message_GUI_PointerSelect * pOut = nullptr;
-          ALLOC_NEW_MESSAGE(Engine::Message_GUI_PointerSelect, pOut);
+          Engine::Message_GUI_PointerDown * pOut = nullptr;
+          ALLOC_NEW_MESSAGE(Engine::Message_GUI_PointerDown, pOut);
+          pOut->x = pIn->x;
+          pOut->y = pIn->y;
+        });
+
+      layer->AddBinding(Engine::Message_Input_MouseButtonUp::GetStaticID(),
+        [](Engine::Message const * pMsg)
+        {
+          Engine::Message_Input_MouseButtonUp * pIn = (Engine::Message_Input_MouseButtonUp *)pMsg;
+          if (pIn->button != Engine::IC_MOUSE_BUTTON_LEFT)
+            return;
+
+          Engine::Message_GUI_PointerUp * pOut = nullptr;
+          ALLOC_NEW_MESSAGE(Engine::Message_GUI_PointerUp, pOut);
           pOut->x = pIn->x;
           pOut->y = pIn->y;
         });

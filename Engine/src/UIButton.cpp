@@ -6,11 +6,15 @@
 namespace Engine
 {
   UIButton::UIButton(UIWidget * a_pParent, std::string const & a_text, uint32_t a_fontID, vec2 const & a_position, vec2 const & a_size)
-    : UIWidget(a_pParent)
-    , m_text(a_text)
+    : m_text(a_text)
     , m_fontID(a_fontID)
     , m_position(a_position)
     , m_size(a_size)
+    , m_state(UIState::None)
+    , m_pParent(a_pParent)
+    , m_clbk_HoverOn(nullptr)
+    , m_clbk_HoverOff(nullptr)
+    , m_clbk_Select(nullptr)
   {
 
   }
@@ -20,63 +24,80 @@ namespace Engine
 
   }
 
+  void UIButton::BindHoverOn(std::function<void()> a_fn)
+  {
+    m_clbk_HoverOn = a_fn;
+  }
+
+  void UIButton::BindHoverOff(std::function<void()> a_fn)
+  {
+    m_clbk_HoverOff = a_fn;
+  }
+
+  void UIButton::BindHoverSelect(std::function<void()> a_fn)
+  {
+    m_clbk_Select = a_fn;
+  }
+
   void UIButton::HandleMessage(Message * a_pMsg)
   {
     if (a_pMsg->GetCategory() != MC_GUI)
       return;
 
     DISPATCH_MESSAGE(Message_GUI_PointerMove);
-    DISPATCH_MESSAGE(Message_GUI_PointerSelect);
+    DISPATCH_MESSAGE(Message_GUI_PointerDown);
   }
 
-  void UIButton::HandleMessage(Message_GUI_PointerSelect * a_pMsg)
+  void UIButton::HandleMessage(Message_GUI_PointerDown * a_pMsg)
   {
-    if (IsInside(vec2((float)a_pMsg->x, (float)a_pMsg->y)) 
-      && m_callbacks[static_cast<int>(UIEvent::Activate)] != nullptr)
+    if (UIPointInBox(m_position, m_size, vec2((float)a_pMsg->x, (float)a_pMsg->y)) && m_clbk_Select != nullptr)
     {
-      UICallbackData data;
-      data.pointerSelect.x = (float)a_pMsg->x;
-      data.pointerSelect.y = (float)a_pMsg->y;
-      m_callbacks[static_cast<int>(UIEvent::Activate)](&data);
+      m_clbk_Select();
+      a_pMsg->SetFlag(Engine::Message::Flag::Handled, true);
     }
   }
 
   void UIButton::HandleMessage(Message_GUI_PointerMove * a_pMsg)
   {
-    bool isInside = IsInside(vec2((float)a_pMsg->x, (float)a_pMsg->y));
+    bool isInside = UIPointInBox(m_position, m_size, vec2((float)a_pMsg->x, (float)a_pMsg->y));
     if (isInside && m_state == UIState::None)
     {
       m_state = UIState::HoverOn;
-      if (m_callbacks[static_cast<int>(UIEvent::HoverOn)] != nullptr)
-        m_callbacks[static_cast<int>(UIEvent::HoverOn)](nullptr);
+      if (m_clbk_HoverOn != nullptr)
+        m_clbk_HoverOn();
     }
     if (!isInside && m_state == UIState::HoverOn)
     {
       m_state = UIState::None;
-      if (m_callbacks[static_cast<int>(UIEvent::HoverOff)] != nullptr)
-        m_callbacks[static_cast<int>(UIEvent::HoverOff)](nullptr);
+      if (m_clbk_HoverOff != nullptr)
+        m_clbk_HoverOff();
     }
   }
 
-  bool UIButton::IsInside(vec2 const & a_point) const
+  void UIButton::ClearBindings()
   {
-    if (a_point.x() < m_position.x())
-      return false;
-
-    if (a_point.y() < m_position.y())
-      return false;
-
-    if (a_point.x() > m_position.x() + m_size.x())
-      return false;
-
-    if (a_point.y() > m_position.y() + m_size.y())
-      return false;
-
-    return true;
+    m_clbk_HoverOn = nullptr;
+    m_clbk_HoverOff = nullptr;
+    m_clbk_Select = nullptr;
   }
 
-  void UIButton::_Draw()
+  void UIButton::Draw()
   {
 
+  }
+
+  UIState UIButton::QueryState() const
+  {
+    return m_state;
+  }
+
+  UIWidget * UIButton::GetParent() const
+  {
+    return m_pParent;
+  }
+
+  void UIButton::SetParent(UIWidget * a_pParent)
+  {
+    m_pParent = a_pParent;
   }
 }

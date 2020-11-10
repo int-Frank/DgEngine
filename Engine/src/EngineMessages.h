@@ -18,7 +18,8 @@
   ITEM(GUI_Left, GUI) \
   ITEM(GUI_Right, GUI) \
   ITEM(GUI_Select, GUI) \
-  ITEM(GUI_PointerSelect, GUI) \
+  ITEM(GUI_PointerDown, GUI) \
+  ITEM(GUI_PointerUp, GUI) \
   ITEM(GUI_PointerMove, GUI) \
   ITEM(GUI_Text, GUI) \
   ITEM(Window_Shown, Window) \
@@ -59,9 +60,16 @@ namespace Engine
   MESSAGE_CLASS_HEADER(GUI_Left) };
   MESSAGE_CLASS_HEADER(GUI_Right) };
   MESSAGE_CLASS_HEADER(GUI_Select) }; // eg Enter, xBox controller 'A'
-  
+
   // eg mouse click, joystick pointer...
-  MESSAGE_CLASS_HEADER(GUI_PointerSelect)
+  MESSAGE_CLASS_HEADER(GUI_PointerDown)
+    uint32_t context; // eg main select, secondary select (left click, right click)
+    int32_t x;
+    int32_t y;
+  };
+
+  // eg mouse click, joystick pointer...
+  MESSAGE_CLASS_HEADER(GUI_PointerUp)
     uint32_t context; // eg main select, secondary select (left click, right click)
     int32_t x;
     int32_t y;

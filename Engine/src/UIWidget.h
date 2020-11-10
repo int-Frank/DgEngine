@@ -25,28 +25,6 @@
 
 namespace Engine
 {
-  struct UICallbackData
-  {
-    union
-    {
-      struct PointerSelect
-      {
-        float x, y;
-      } pointerSelect;
-    };
-  };
-
-  enum class UIEvent
-  {
-    HoverOn,
-    HoverOff,
-    GainFocus,
-    LoseFocus,
-    Activate,   //Button
-    NewValue,   //Slider, Lists, Checkbox
-    COUNT
-  };
-
   enum class UIState
   {
     None,
@@ -58,35 +36,15 @@ namespace Engine
   {
   public:
 
-    UIWidget(UIWidget * pParent);
-
     virtual ~UIWidget();
 
-    void ClearBindings();
-    void AddBinding(UIEvent, std::function<void(UICallbackData const *)>);
-
-    //---------------------------------------------------------------------------
-    // Internal
-    virtual void _Draw() {}
-
-    //virtual void _SetHoverOn() = 0;
-    //virtual void _SetHoverOff() = 0;
-    //virtual void _SetFocusOn() = 0;
-    //virtual void _SetFocusOff() = 0;
+    virtual void Draw() {}
 
     virtual void HandleMessage(Message *) {};
 
-    UIState _QueryState() const;
-
-  protected:
-
-    virtual void OnNewTransform() {}
-
-  protected:
-
-    UIWidget * m_pParent;
-    std::function<void(UICallbackData const *)> m_callbacks[(size_t)UIEvent::COUNT];
-    UIState m_state;
+    virtual UIState QueryState() const = 0;
+    virtual UIWidget * GetParent() const = 0;
+    virtual void SetParent(UIWidget *) = 0;
   };
 }
 
