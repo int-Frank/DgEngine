@@ -306,18 +306,6 @@ public:
           pOut->x = pIn->x;
           pOut->y = pIn->y;
         });
-
-      /*layer->SetBindings(
-        {
-          {Engine::IC_MOUSE_BUTTON_LEFT,  Engine::IE_BUTTON_UP,   new Engine::Message_GUI_MouseButtonUp()},
-          {Engine::IC_MOUSE_BUTTON_LEFT,  Engine::IE_BUTTON_DOWN, new Engine::Message_GUI_MouseButtonDown()},
-          {Engine::IC_MOUSE_BUTTON_RIGHT, Engine::IE_BUTTON_UP,   new Engine::Message_GUI_MouseButtonUp()},
-          {Engine::IC_MOUSE_BUTTON_RIGHT, Engine::IE_BUTTON_DOWN, new Engine::Message_GUI_MouseButtonDown()},
-          {Engine::IC_MOUSE_MOTION,                               new Engine::Message_GUI_MouseMove()},
-          {Engine::IC_MOUSE_WHEEL_UP,                             new Engine::Message_GUI_MouseWheelUp()},
-          {Engine::IC_MOUSE_WHEEL_DOWN,                           new Engine::Message_GUI_MouseWheelDown()},
-          {Engine::IC_TEXT,                                       new Engine::Message_GUI_Text()}
-        });*/
     }
 
     LOG_TRACE("Game initialised!");

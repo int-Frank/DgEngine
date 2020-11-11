@@ -8,10 +8,13 @@
 
 namespace Engine
 {
-  typedef uint64_t SubBlockID;
-#define INVALID_UI_TEXTURE 0xFFFF'FFFF'FFFF'FFFF
+  bool UIInit();
+  void UIDestroy();
 
   bool UIPointInBox(vec2 const & boxMin, vec2 const & boxLengths, vec2 const & point);
+
+//  typedef uint64_t SubBlockID;
+//#define INVALID_UI_TEXTURE 0xFFFF'FFFF'FFFF'FFFF
 
 //#define UI_TEXTURE_ID_XY_BITS 20
 //#define UI_TEXTURE_ID_HW_BITS 12

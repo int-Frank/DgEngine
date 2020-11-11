@@ -112,6 +112,9 @@ namespace Engine
 
   Application::~Application()
   {
+    //TODO Before we shut down the render thread, we need to process all
+    //     calls to destroy render objects
+
     RenderThread::ShutDown();
     Renderer::ShutDown();
 

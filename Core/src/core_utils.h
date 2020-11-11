@@ -21,6 +21,18 @@ typedef Dg::R3::Vector<float>           vec4;
 typedef Dg::R2::Matrix<float>           mat3;
 typedef Dg::R3::Matrix<float>           mat4;
 
+//typedef uint32_t Colour;
+//#define SET_R(c, r) do{c = ((c & 0xFFFFFF00) | (r & 0xFF))} while(false)
+//#define SET_G(c, g) do{c = ((c & 0xFFFF00FF) | ((g & 0xFF) << 8))} while(false)
+//#define SET_B(c, b) do{c = ((c & 0xFF00FFFF) | ((b & 0xFF) << 16))} while(false)
+//#define SET_A(c, a) do{c = ((c & 0x00FFFFFF) | ((a & 0xFF) << 24))} while(false)
+//
+//#define GET_R(c) (c & 0xFF)
+//#define GET_G(c) ((c >> 8) & 0xFF)
+//#define GET_B(c) ((c >> 16) & 0xFF)
+//#define GET_A(c) ((c >> 24) & 0xFF)
+
+// TODO this can just be a typedef with some macros to set the channels
 class Colour
 {
 public:
