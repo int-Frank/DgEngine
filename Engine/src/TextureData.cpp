@@ -98,6 +98,11 @@ namespace Engine
 
   }
 
+  TextureData::~TextureData()
+  {
+    Clear();
+  }
+
   TextureData::TextureData(uint32_t a_width, uint32_t a_height, Colour* a_pPixels, TextureFlags a_flags)
     : flags(a_flags)
     , width(a_width)
@@ -188,7 +193,7 @@ namespace Engine
     flags = a_other.flags;
     width = a_other.width;
     height = a_other.height;
-    pPixels = new Colour[width * height];
+    pPixels = new Colour[size_t(width) * height];
     memcpy(pPixels, a_other.pPixels, sizeof(Colour) * (size_t)width * height);
   }
 

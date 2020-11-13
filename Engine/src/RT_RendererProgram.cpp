@@ -38,40 +38,39 @@ namespace Engine
   // RT_RendererProgram
   //--------------------------------------------------------------------------------------------------
 
-  RT_RendererProgram::RT_RendererProgram()
-    : m_rendererID(0)
-    , m_loaded(false)
-  {
+  //RT_RendererProgram::RT_RendererProgram()
+  //  : m_rendererID(0)
+  //  , m_loaded(false)
+  //{
+  //
+  //}
 
-  }
-
-  RT_RendererProgram::RT_RendererProgram(ResourceID a_id)
+  RT_RendererProgram::RT_RendererProgram(ResourceID a_shaderDataID)
     : m_rendererID(0)
-    , m_loaded(false)
   {
-    Init(a_id);
+    m_pShaderData = ResourceManager::Instance()->GetResource<ShaderData>(a_shaderDataID);
+    if (m_pShaderData == nullptr)
+    {
+      LOG_WARN("RT_RendererProgram failed to find shader data resource!");
+      throw;
+    }
+
+    if (!CompileAndUploadShader())
+      throw;
+
+    ResolveUniforms();
   }
 
   RT_RendererProgram::~RT_RendererProgram()
   {
-    
-  }
-
-  void RT_RendererProgram::Destroy()
-  {
-    if (m_loaded)
-    {
-      glDeleteProgram(m_rendererID);
-      m_rendererID = 0;
-      m_uniformLocations.clear();
-      m_loaded = false;
-    }
+    glDeleteProgram(m_rendererID);
+    m_rendererID = 0;
+    m_uniformLocations.clear();
   }
 
   void RT_RendererProgram::Bind() const
   {
-    if (m_loaded)
-      glUseProgram(m_rendererID);
+    glUseProgram(m_rendererID);
   }
 
   void RT_RendererProgram::Unbind() const
@@ -79,23 +78,20 @@ namespace Engine
     glUseProgram(0);
   }
 
-  bool RT_RendererProgram::Init(ResourceID a_shaderDataID)
+  RT_RendererProgram * RT_RendererProgram::Create(ResourceID a_shaderDataID)
   {
-    Destroy();
-    m_pShaderData = ResourceManager::Instance()->GetResource<ShaderData>(a_shaderDataID);
-    if (m_pShaderData == nullptr)
+    RT_RendererProgram * pResult = nullptr;
+
+    try
     {
-      LOG_WARN("RT_RendererProgram failed to find shader data resource!");
-      return false;
+      pResult = new RT_RendererProgram(a_shaderDataID);
+    }
+    catch (...)
+    {
+      pResult = nullptr;
     }
 
-    if (!CompileAndUploadShader())
-      return false;
-
-    ResolveUniforms();
-
-    m_loaded = true;
-    return m_loaded;
+    return pResult;
   }
 
   bool RT_RendererProgram::CompileAndUploadShader()
@@ -238,10 +234,10 @@ namespace Engine
     {
       RenderResourceID id = a_textureIDs[i];
 
-      RT_Texture2D *pTexture = RenderThreadData::Instance()->textures.at(id);
+      RT_Texture2D **ppTexture = RenderThreadData::Instance()->textures.at(id);
       
-      if (pTexture != nullptr)
-        pTexture->Bind(textureUnit);
+      if (*ppTexture != nullptr)
+        (*ppTexture)->Bind(textureUnit);
       textureUnit++;
     }
   }

@@ -28,13 +28,12 @@ namespace Engine
 {
   class RT_VertexArray
   {
+    RT_VertexArray();
   public:
 
-    RT_VertexArray();
     ~RT_VertexArray();
 
-    void Init();
-    void Destroy();
+    static RT_VertexArray * Create();
 
     void Bind() const;
     void Unbind() const;

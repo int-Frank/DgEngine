@@ -33,29 +33,20 @@ namespace Engine
 
   VertexArray::VertexArray()
   {
-
-  }
-
-  void VertexArray::Init()
-  {
     RenderState state = RenderState::Create();
     state.Set<RenderState::Attr::Type>(RenderState::Type::Command);
     state.Set<RenderState::Attr::Command>(RenderState::Command::VertexArrayCreate);
 
     RENDER_SUBMIT(state, [resID = m_id]() mutable
       {
-        ::Engine::RT_VertexArray va;
-        va.Init();
-        ::Engine::RenderThreadData::Instance()->VAOs.insert(resID, va);
+        ::Engine::RT_VertexArray * pVA = ::Engine::RT_VertexArray::Create();
+        ::Engine::RenderThreadData::Instance()->VAOs.insert(resID, pVA);
       });
   }
 
   Ref<VertexArray> VertexArray::Create()
   {
-    VertexArray * p = new VertexArray();
-    Ref<VertexArray> ref(p);
-    p->Init();
-    return ref;
+    return Ref<VertexArray>(new VertexArray());
   }
 
   VertexArray::~VertexArray()
@@ -66,13 +57,14 @@ namespace Engine
 
     RENDER_SUBMIT(state, [resID = m_id]() mutable
       {
-        RT_VertexArray * pVA =  RenderThreadData::Instance()->VAOs.at(resID);
-        if (pVA == nullptr)
+        RT_VertexArray ** ppVA =  RenderThreadData::Instance()->VAOs.at(resID);
+        if (ppVA == nullptr)
         {
           LOG_WARN("VertexArray::~VertexArray: RefID '{}' does not exist!", resID);
           return;
         }
-        pVA->Destroy();
+        delete (*ppVA);
+        *ppVA = nullptr;
         ::Engine::RenderThreadData::Instance()->VAOs.erase(resID);
       });
   }
@@ -85,13 +77,13 @@ namespace Engine
 
     RENDER_SUBMIT(state, [resID = m_id]() mutable
       {
-        RT_VertexArray * pID =  RenderThreadData::Instance()->VAOs.at(resID);
-        if (pID == nullptr)
+        RT_VertexArray ** ppID =  RenderThreadData::Instance()->VAOs.at(resID);
+        if (ppID == nullptr)
         {
           LOG_WARN("VertexArray::Bind(): RefID '{}' does not exist!", resID);
           return;
         }
-        pID->Bind();
+        (*ppID)->Bind();
       });
   }
 
@@ -103,13 +95,13 @@ namespace Engine
 
     RENDER_SUBMIT(state, [resID = m_id]()
       {
-        RT_VertexArray* pID =  RenderThreadData::Instance()->VAOs.at(resID);
-        if (pID == nullptr)
+        RT_VertexArray ** ppID =  RenderThreadData::Instance()->VAOs.at(resID);
+        if (ppID == nullptr)
         {
           LOG_WARN("VertexArray::Unbind(): RefID '{}' does not exist!", resID);
           return;
         }
-        pID->Unbind();
+        (*ppID)->Unbind();
       });
   }
 
@@ -121,13 +113,13 @@ namespace Engine
 
     RENDER_SUBMIT(state, [vbID = a_vertexBuffer->GetID(), vaoID = m_id]() mutable
       {
-        RT_VertexArray* pID =  RenderThreadData::Instance()->VAOs.at(vaoID);
-        if (pID == nullptr)
+        RT_VertexArray ** ppID =  RenderThreadData::Instance()->VAOs.at(vaoID);
+        if (ppID == nullptr)
         {
           LOG_WARN("VertexArray::AddVertexBuffer(): RefID '{}' does not exist!", vaoID);
           return;
         }
-        pID->AddVertexBuffer(vbID);
+        (*ppID)->AddVertexBuffer(vbID);
       });
   }
 
@@ -139,13 +131,13 @@ namespace Engine
 
     RENDER_SUBMIT(state, [iboID = a_indexBuffer->GetID(), vaoID = m_id]()
     {
-      RT_VertexArray* pID =  RenderThreadData::Instance()->VAOs.at(vaoID);
-      if (pID == nullptr)
+      RT_VertexArray ** ppID =  RenderThreadData::Instance()->VAOs.at(vaoID);
+      if (ppID == nullptr)
       {
         LOG_WARN("VertexArray::SetIndexBuffer(): RefID '{}' does not exist!", vaoID);
         return;
       }
-      pID->SetIndexBuffer(iboID);
+      (*ppID)->SetIndexBuffer(iboID);
     });
   }
 }

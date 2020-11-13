@@ -20,8 +20,12 @@ namespace Engine
 
     RENDER_SUBMIT(state, [resID = m_id, shaderDataID = m_shaderDataID]()
     {
-      RT_RendererProgram rp(shaderDataID);
-      RenderThreadData::Instance()->rendererPrograms.insert(resID, rp);
+      if (RenderThreadData::Instance()->rendererPrograms.at(resID) != nullptr)
+      {
+        LOG_WARN("RendererProgram::RendererProgram: RefID '{}' already exists!", resID);
+        return;
+      }
+      RenderThreadData::Instance()->rendererPrograms.insert(resID, RT_RendererProgram::Create(shaderDataID));
     });
   }
 
@@ -46,13 +50,14 @@ namespace Engine
 
     RENDER_SUBMIT(state, [resID = m_id]()
     {
-      RT_RendererProgram* pRP = RenderThreadData::Instance()->rendererPrograms.at(resID);
-      if (pRP == nullptr)
+      RT_RendererProgram ** ppRP = RenderThreadData::Instance()->rendererPrograms.at(resID);
+      if (ppRP == nullptr)
       {
         LOG_WARN("RendererProgram::~RendererProgram: RefID '{}' does not exist!", resID);
         return;
       }
-      pRP->Destroy();
+      delete (*ppRP);
+      *ppRP = nullptr;
       ::Engine::RenderThreadData::Instance()->rendererPrograms.erase(resID);
     });
   }
@@ -86,24 +91,6 @@ namespace Engine
     });
   }*/
 
-  void RendererProgram::Destroy()
-  {
-    RenderState state = RenderState::Create();
-    state.Set<RenderState::Attr::Type>(RenderState::Type::Command);
-    state.Set<RenderState::Attr::Command>(RenderState::Command::RendererProgramDestroy);
-
-    RENDER_SUBMIT(state, [resID = m_id]()
-    {
-      RT_RendererProgram* pRP = RenderThreadData::Instance()->rendererPrograms.at(resID);
-      if (pRP == nullptr)
-      {
-        LOG_WARN("RendererProgram::Destroy: RefID '{}' does not exist!", resID);
-        return;
-      }
-      pRP->Destroy();
-    });
-  }
-
   void RendererProgram::Bind()
   {
     RenderState state = RenderState::Create();
@@ -112,13 +99,13 @@ namespace Engine
 
     RENDER_SUBMIT(state, [resID = m_id]()
     {
-      RT_RendererProgram* pRP = RenderThreadData::Instance()->rendererPrograms.at(resID);
-      if (pRP == nullptr)
+      RT_RendererProgram ** ppRP = RenderThreadData::Instance()->rendererPrograms.at(resID);
+      if (ppRP == nullptr)
       {
         LOG_WARN("RendererProgram::Bind: RefID '{}' does not exist!", resID);
         return;
       }
-      pRP->Bind();
+      (*ppRP)->Bind();
     });
   }
 
@@ -130,13 +117,13 @@ namespace Engine
 
     RENDER_SUBMIT(state, [resID = m_id]()
     {
-      RT_RendererProgram* pRP = RenderThreadData::Instance()->rendererPrograms.at(resID);
-      if (pRP == nullptr)
+      RT_RendererProgram ** ppRP = RenderThreadData::Instance()->rendererPrograms.at(resID);
+      if (ppRP == nullptr)
       {
         LOG_WARN("RendererProgram::Unbind: RefID '{}' does not exist!", resID);
         return;
       }
-      pRP->Unbind();
+      (*ppRP)->Unbind();
     });
   }
 
@@ -155,13 +142,13 @@ namespace Engine
 
     RENDER_SUBMIT(state, [resID = m_id, buf = buf_data]()
     {
-      RT_RendererProgram* pRP = RenderThreadData::Instance()->rendererPrograms.at(resID);
-      if (pRP == nullptr)
+      RT_RendererProgram ** ppRP = RenderThreadData::Instance()->rendererPrograms.at(resID);
+      if (ppRP == nullptr)
       {
         LOG_WARN("RendererProgram::UploadUniformBuffer: RefID '{}' does not exist!", resID);
         return;
       }
-      pRP->UploadUniformBuffer(buf);
+      (*ppRP)->UploadUniformBuffer(buf);
     });
   }
 
@@ -194,8 +181,8 @@ namespace Engine
 
     RENDER_SUBMIT(state, [resID = m_id, size = a_size, buf_name = buf_name, buf_data = buf_data]()
     {
-      RT_RendererProgram* pRP = RenderThreadData::Instance()->rendererPrograms.at(resID);
-      if (pRP == nullptr)
+      RT_RendererProgram ** ppRP = RenderThreadData::Instance()->rendererPrograms.at(resID);
+      if (ppRP == nullptr)
       {
         LOG_WARN("RendererProgram::Bind: RefID '{}' does not exist!", resID);
         return;
@@ -203,7 +190,7 @@ namespace Engine
       std::string name;
 
       Core::Deserialize(buf_name, &name, 1);
-      pRP->UploadUniform(name, buf_data, size);
+      (*ppRP)->UploadUniform(name, buf_data, size);
     });
   }
 

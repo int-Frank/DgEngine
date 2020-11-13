@@ -30,25 +30,17 @@ namespace Engine
     , m_indexBuffer(INVALID_RENDER_RESOURE_ID)
     , m_vertexAttribIndex(0)
   {
-
+    glCreateVertexArrays(1, &m_rendererID);
   }
 
   RT_VertexArray::~RT_VertexArray()
   {
-
-  }
-
-  void RT_VertexArray::Init()
-  {
-    BSR_ASSERT(m_rendererID == 0, "Already initialized!");
-    glCreateVertexArrays(1, &m_rendererID);
-  }
-
-  void RT_VertexArray::Destroy()
-  {
-    BSR_ASSERT(m_rendererID != 0, "Trying to destroy a verex array that wasn't initialized!");
     glDeleteVertexArrays(1, &m_rendererID);
-    m_rendererID = 0;
+  }
+
+  RT_VertexArray * RT_VertexArray::Create()
+  {
+    return new RT_VertexArray();
   }
 
   void RT_VertexArray::Bind() const
@@ -63,13 +55,14 @@ namespace Engine
 
   void RT_VertexArray::AddVertexBuffer(RenderResourceID a_id)
   {
-    RT_VertexBuffer* pVB = RenderThreadData::Instance()->VBOs.at(a_id);
-    if (pVB == nullptr)
+    RT_VertexBuffer** ppVB = RenderThreadData::Instance()->VBOs.at(a_id);
+    if (ppVB == nullptr)
     {
       LOG_WARN("RT_VertexArray::AddVertexBuffer(): Failed to find the index buffer! RefID : {}", a_id);
       return;
     }
-
+    RT_VertexBuffer *pVB = *ppVB;
+    BSR_ASSERT(pVB != nullptr, "A vertex Buffer in the render data is null!");
     BSR_ASSERT(pVB->GetLayout().GetElements().size(), "Vertex Buffer has no layout!");
     Bind();
     pVB->Bind();
@@ -103,15 +96,15 @@ namespace Engine
 
   void RT_VertexArray::SetIndexBuffer(RenderResourceID a_id)
   {
-    RT_IndexBuffer * pIB = RenderThreadData::Instance()->IBOs.at(a_id);
-    if (pIB == nullptr)
+    RT_IndexBuffer ** ppIB = RenderThreadData::Instance()->IBOs.at(a_id);
+    if (ppIB == nullptr)
     {
       LOG_WARN("RT_VertexArray::SetIndexBuffer(): Failed to find the index buffer! RefID : {}", a_id);
       return;
     }
 
     Bind();
-    pIB->Bind();
+    (*ppIB)->Bind();
     m_indexBuffer = a_id;
   }
 

@@ -29,6 +29,27 @@ namespace Engine
 
   struct RenderAPICapabilities
   {
+    RenderAPICapabilities()
+      : vendor()
+      , renderer()
+      , version()
+      , maxSamples(-1)
+      , maxAnisotropy(-1.f)
+      , maxTextureUnits(-1)
+      , maxVertexUniformBlocks(-1)
+      , maxFragmentUniformBlocks(-1)
+      , maxGeometryUniformBlocks(-1)
+      , maxUniformBlockSize(-1)
+      , maxUniformBufferBindings(-1)
+      , maxVertexShaderStorageBlocks(-1)
+      , maxFragmentShaderStorageBlocks(-1)
+      , maxGeometryShaderStorageBlocks(-1)
+      , maxShaderStorageBlockSize(-1)
+      , maxShaderStorageBufferBindings(-1)
+    {
+    
+    }
+
     std::string vendor;
     std::string renderer;
     std::string version;

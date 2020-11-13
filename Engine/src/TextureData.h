@@ -60,6 +60,7 @@ namespace Engine
   public:
 
     TextureData();
+    ~TextureData();
 
     //Takes ownership of a_pixels
     TextureData(uint32_t a_width, uint32_t a_height, Colour * a_pixels, TextureFlags a_flags);
@@ -84,7 +85,7 @@ namespace Engine
     TextureFlags  flags;
     uint32_t      width;
     uint32_t      height;
-    Colour *        pPixels; // TODO should be uint8_t. The format can change
+    Colour *      pPixels; // TODO should be uint8_t. The format can change
   };
 }
 

@@ -33,11 +33,12 @@ namespace Engine
 
     RENDER_SUBMIT(state, [resID = m_id]()
     {
-      RT_Texture2D* pTexture =  RenderThreadData::Instance()->textures.at(resID);
-      if (pTexture == nullptr)
+      RT_Texture2D ** ppTexture =  RenderThreadData::Instance()->textures.at(resID);
+      if (ppTexture == nullptr)
         return;
 
-      pTexture->Destroy();
+      delete *ppTexture;
+      *ppTexture = nullptr;
       RenderThreadData::Instance()->textures.erase(resID);
     });
   }
@@ -48,19 +49,22 @@ namespace Engine
     state.Set<RenderState::Attr::Type>(RenderState::Type::Command);
     state.Set<RenderState::Attr::Command>(RenderState::Command::TextureCreate);
 
-    TextureData data;
-    data.Duplicate(m_data);
+    TextureData * pData = new TextureData();
+    pData->Duplicate(m_data);
     
-    RENDER_SUBMIT(state, [resID = m_id, data = data]() mutable
+    RENDER_SUBMIT(state, [resID = m_id, pData = pData]() mutable
     {
-      RT_Texture2D *pTexture =  RenderThreadData::Instance()->textures.at(resID);
-      if (pTexture != nullptr)
-        pTexture->Destroy();
-      else
-        pTexture = RenderThreadData::Instance()->textures.insert(resID, RT_Texture2D());
-      
-      pTexture->Init(data);
-      data.Clear();
+      // TODO all of these we should check that *ptr != nullptr, but really, nullptrs should not be in RenderThreadData
+      RT_Texture2D ** ppTexture =  RenderThreadData::Instance()->textures.at(resID);
+      if (ppTexture != nullptr)
+      {
+        delete *ppTexture;
+        *ppTexture = nullptr;
+        RenderThreadData::Instance()->textures.erase(resID);
+      }
+        
+      RenderThreadData::Instance()->textures.insert(resID, RT_Texture2D::Create(*pData));
+      delete pData;
     });
   }
 
@@ -77,14 +81,14 @@ namespace Engine
 
     RENDER_SUBMIT(state, [resID = m_id, slot = a_slot]()
     {
-      RT_Texture2D* pTexture =  RenderThreadData::Instance()->textures.at(resID);
-      if (pTexture != nullptr)
+      RT_Texture2D ** ppTexture =  RenderThreadData::Instance()->textures.at(resID);
+      if (ppTexture == nullptr)
       {
         LOG_WARN("Texture2D::Bind(): ID '{}' does not exist!", resID);
         return;
       }
 
-      pTexture->Bind(slot);
+      (*ppTexture)->Bind(slot);
     });
   }
 }

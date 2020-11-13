@@ -37,14 +37,14 @@ namespace Engine
     typedef uint32_t Index;
     typedef int32_t  TextureUnit;
 
+    //RT_RendererProgram();
+    RT_RendererProgram(ResourceID shaderDataID);
+
   public:
 
-    RT_RendererProgram();
-    RT_RendererProgram(ResourceID shaderSourceID);
     ~RT_RendererProgram();
 
-    bool Init(ResourceID shaderDataID);
-    void Destroy();
+    static RT_RendererProgram * Create(ResourceID shaderDataID);
 
     void Bind() const;
     void Unbind() const;
@@ -73,7 +73,6 @@ namespace Engine
   private:
 
     RendererID m_rendererID;
-    bool m_loaded;
 
     std::string m_name;
     ShaderData const * m_pShaderData;

@@ -28,7 +28,6 @@ namespace Engine
   class VertexArray : public RenderResource
   {
     VertexArray();
-    void Init();
   public:
 
     static Ref<VertexArray> Create();

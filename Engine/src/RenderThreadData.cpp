@@ -7,6 +7,18 @@ namespace Engine
 {
   RenderThreadData* RenderThreadData::s_instance = nullptr;
 
+  RenderThreadData::~RenderThreadData()
+  {
+    for (auto kv : VAOs)  delete kv.second;
+    for (auto kv : IBOs)  delete kv.second;
+    for (auto kv : VBOs)  delete kv.second;
+    for (auto kv : UBOs)  delete kv.second;
+    for (auto kv : SSBOs)  delete kv.second;
+    for (auto kv : bindingPoints)  delete kv.second;
+    for (auto kv : textures)  delete kv.second;
+    for (auto kv : rendererPrograms)  delete kv.second;
+  }
+
   bool RenderThreadData::Init()
   {
     BSR_ASSERT(s_instance == nullptr, "RenderThreadData already intialised!");

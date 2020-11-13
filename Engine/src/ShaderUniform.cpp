@@ -427,13 +427,13 @@ namespace Engine
     state.Set<RenderState::Attr::Type>(RenderState::Type::Command);
     state.Set<RenderState::Attr::Command>(RenderState::Command::BindingPointCreate);
 
-    RENDER_SUBMIT(state, [resID = m_id, sbtype = a_type, domain = a_domain]()
-    {
-      ::Engine::RT_BindingPoint bp;
-      if (!bp.Capture(sbtype, domain))
-        LOG_WARN("BindingPoint::Init(): Failed to capture binding index!");
-      ::Engine::RenderThreadData::Instance()->bindingPoints.insert(resID, bp);
-    });
+    //RENDER_SUBMIT(state, [resID = m_id, sbtype = a_type, domain = a_domain]()
+    //{
+    //  ::Engine::RT_BindingPoint bp;
+    //  if (!bp.Capture(sbtype, domain))
+    //    LOG_WARN("BindingPoint::Init(): Failed to capture binding index!");
+    //  ::Engine::RenderThreadData::Instance()->bindingPoints.insert(resID, bp);
+    //});
   }
 
   BindingPoint::~BindingPoint()
@@ -442,18 +442,18 @@ namespace Engine
     state.Set<RenderState::Attr::Type>(RenderState::Type::Command);
     state.Set<RenderState::Attr::Command>(RenderState::Command::BindingPointDelete);
 
-    RENDER_SUBMIT(state, [resID = m_id]()
-    {
-      ::Engine::RT_BindingPoint * pbp = ::Engine::RenderThreadData::Instance()->bindingPoints.at(resID);
-      if (pbp == nullptr)
-      {
-        LOG_WARN("BindingPoint::~BindingPoint(): RefID '{}' does not exist!", resID);
-        return;
-      }
-
-      pbp->Release();
-      ::Engine::RenderThreadData::Instance()->bindingPoints.erase(resID);
-    });
+    //RENDER_SUBMIT(state, [resID = m_id]()
+    //{
+    //  ::Engine::RT_BindingPoint * pbp = ::Engine::RenderThreadData::Instance()->bindingPoints.at(resID);
+    //  if (pbp == nullptr)
+    //  {
+    //    LOG_WARN("BindingPoint::~BindingPoint(): RefID '{}' does not exist!", resID);
+    //    return;
+    //  }
+    //
+    //  pbp->Release();
+    //  ::Engine::RenderThreadData::Instance()->bindingPoints.erase(resID);
+    //});
   }
 
   //--------------------------------------------------------------------------------------------------

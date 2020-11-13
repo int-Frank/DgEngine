@@ -36,6 +36,11 @@ namespace Engine
 #define GET_CLASS_FROM_FLAG(i) (i & 7)
 #define GET_BASE_TYPE_FROM_FLAG(i) (i >> 3)
 
+  // cc: component count
+  // ubs:
+  // uba:
+  // uss:
+  // usa:
   static ShaderDataTypeData const SDT_data[] = 
   { 
     //     Type              |         Class            |      Base type             |      string      | GLenum              |cc | matrix column type  |    matrix row type      |ubs |uba |uss                  |usa      

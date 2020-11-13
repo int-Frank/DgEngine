@@ -42,19 +42,21 @@ namespace Engine
 
   class RT_BufferBase
   {
+    friend class RT_VertexBuffer;
+    friend class RT_IndexedBuffer;
+    friend class RT_UniformBuffer;
+    friend class RT_ShaderStorageBuffer;
+
     virtual BufferType GetType() const = 0;
+    RT_BufferBase(void * data, uint32_t size, BufferUsage usage);
+    RT_BufferBase(uint32_t size, BufferUsage usage);
 
   public:
 
-    RT_BufferBase();
     virtual ~RT_BufferBase();
 
     void SetData(void* data, uint32_t size, uint32_t offset = 0);
     void Bind() const;
-
-    void Init(void* data, uint32_t size, BufferUsage usage = BufferUsage::Dynamic);
-    void Init(uint32_t size, BufferUsage usage = BufferUsage::Dynamic);
-    void Destroy();
 
     BufferLayout const& GetLayout() const;
     void SetLayout(BufferLayout const&);
@@ -76,6 +78,14 @@ namespace Engine
   class RT_VertexBuffer : public RT_BufferBase
   {
     BufferType GetType() const;
+
+    RT_VertexBuffer(void * data, uint32_t size, BufferUsage usage);
+    RT_VertexBuffer(uint32_t size, BufferUsage usage);
+
+  public:
+
+    static RT_VertexBuffer * Create(void * data, uint32_t size, BufferUsage usage = BufferUsage::Dynamic);
+    static RT_VertexBuffer * Create(uint32_t size, BufferUsage usage = BufferUsage::Dynamic);
   };
 
   //------------------------------------------------------------------------------------------------
@@ -84,11 +94,19 @@ namespace Engine
 
   class RT_IndexedBuffer : public RT_BufferBase
   {
+    friend class RT_UniformBuffer;
+    friend class RT_ShaderStorageBuffer;
+
     virtual BufferType GetType() const = 0;
     virtual bool CanBind(RT_BindingPoint const&) const = 0;
+
+    RT_IndexedBuffer(void * data, uint32_t size, BufferUsage usage);
+    RT_IndexedBuffer(uint32_t size, BufferUsage usage);
+
   public:
     virtual ~RT_IndexedBuffer() {}
     void BindToPoint(RT_BindingPoint const&);
+
   private:
   };
 
@@ -100,6 +118,14 @@ namespace Engine
   {
     BufferType GetType() const;
     bool CanBind(RT_BindingPoint const&) const;
+
+    RT_UniformBuffer(void * data, uint32_t size, BufferUsage usage);
+    RT_UniformBuffer(uint32_t size, BufferUsage usage);
+
+  public:
+
+    static RT_UniformBuffer * Create(void * data, uint32_t size, BufferUsage usage = BufferUsage::Dynamic);
+    static RT_UniformBuffer * Create(uint32_t size, BufferUsage usage = BufferUsage::Dynamic);
   };
 
   //------------------------------------------------------------------------------------------------
@@ -110,6 +136,14 @@ namespace Engine
   {
     BufferType GetType() const;
     bool CanBind(RT_BindingPoint const&) const;
+
+    RT_ShaderStorageBuffer(void * data, uint32_t size, BufferUsage usage);
+    RT_ShaderStorageBuffer(uint32_t size, BufferUsage usage);
+
+  public:
+
+    static RT_ShaderStorageBuffer * Create(void * data, uint32_t size, BufferUsage usage = BufferUsage::Dynamic);
+    static RT_ShaderStorageBuffer * Create(uint32_t size, BufferUsage usage = BufferUsage::Dynamic);
   };
 
   //------------------------------------------------------------------------------------------------
@@ -117,14 +151,13 @@ namespace Engine
   //------------------------------------------------------------------------------------------------
   class RT_IndexBuffer
   {
+    RT_IndexBuffer(void * data, uint32_t size);
   public:
     typedef ::Engine::IndexBuffer::intType intType;
 
-    RT_IndexBuffer();
     ~RT_IndexBuffer();
 
-    void Init(void* data, uint32_t size);
-    void Destroy();
+    static RT_IndexBuffer * Create(void* data, uint32_t size);
 
     void SetData(void* data, uint32_t size, uint32_t offset = 0);
     void Bind() const;

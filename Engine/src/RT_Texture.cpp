@@ -37,20 +37,10 @@ namespace Engine
     }
   }
 
-  RT_Texture2D::RT_Texture2D()
+  RT_Texture2D::RT_Texture2D(TextureData const & a_data)
     : m_rendererID(0)
+    , m_flags(a_data.flags)
   {
-
-  }
-
-  RT_Texture2D::~RT_Texture2D()
-  {
-
-  }
-
-  void RT_Texture2D::Init(TextureData const & a_data)
-  {
-    m_flags = a_data.flags;
     glCreateTextures(GL_TEXTURE_2D, 1, &m_rendererID);
     glBindTexture(GL_TEXTURE_2D, m_rendererID);
 
@@ -64,19 +54,24 @@ namespace Engine
     else
       glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GetGL(m_flags.GetFilter()));
 
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, a_data.width, a_data.height, 0, GL_RGBA, GL_UNSIGNED_BYTE, (uint8_t*)a_data.pPixels);
-    
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, a_data.width, a_data.height, 0, GL_RGBA, GL_UNSIGNED_BYTE, (uint8_t *)a_data.pPixels);
+
     if (m_flags.IsMipmapped())
       glGenerateMipmap(GL_TEXTURE_2D);
 
     glBindTexture(GL_TEXTURE_2D, 0);
   }
 
-  void RT_Texture2D::Destroy()
+  RT_Texture2D::~RT_Texture2D()
   {
     GLuint count = 1;
     glDeleteTextures(m_rendererID, &count);
     m_rendererID = 0;
+  }
+
+  RT_Texture2D * RT_Texture2D::Create(TextureData const & a_data)
+  {
+    return new RT_Texture2D(a_data);
   }
 
   void RT_Texture2D::Bind(uint32_t a_slot)

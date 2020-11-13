@@ -10,13 +10,12 @@ namespace Engine
 {
   class RT_Texture2D
   {
+    RT_Texture2D(TextureData const & a_data);
   public:
 
-    RT_Texture2D();
     ~RT_Texture2D();
 
-    void Init(TextureData const &);
-    void Destroy();
+    static RT_Texture2D * Create(TextureData const &);
 
     void Bind(uint32_t slot = 0);
 

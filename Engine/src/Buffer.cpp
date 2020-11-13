@@ -191,9 +191,13 @@ namespace Engine
     RENDER_SUBMIT(state, [resID = m_id, size = a_size, usage = a_usage, data]()
       {
       //TODO all of these RT_* should be obtained through Framework, or throught GraphicsFramework class.
-        ::Engine::RT_VertexBuffer vb;
-        vb.Init(data, size, usage);
-        ::Engine::RenderThreadData::Instance()->VBOs.insert(resID, vb);
+        ::Engine::RT_VertexBuffer * pVB = ::Engine::RT_VertexBuffer::Create(data, size, usage);
+        if (pVB == nullptr)
+        {
+          LOG_WARN("VertexBuffer::VertexBuffer(): Failed to create vertex buffer!");
+          return;
+        }
+        ::Engine::RenderThreadData::Instance()->VBOs.insert(resID, pVB);
       });
   }
 
@@ -205,9 +209,13 @@ namespace Engine
 
     RENDER_SUBMIT(state, [resID = m_id, size = a_size, usage = a_usage]()
       {
-        ::Engine::RT_VertexBuffer vb;
-        vb.Init(size, usage);
-        ::Engine::RenderThreadData::Instance()->VBOs.insert(resID, vb);
+        ::Engine::RT_VertexBuffer * pVB = ::Engine::RT_VertexBuffer::Create(size, usage);
+        if (pVB == nullptr)
+        {
+          LOG_WARN("VertexBuffer::VertexBuffer(): Failed to create vertex buffer!");
+          return;
+        }
+        ::Engine::RenderThreadData::Instance()->VBOs.insert(resID, pVB);
       });
   }
   
@@ -219,13 +227,14 @@ namespace Engine
 
     RENDER_SUBMIT(state, [resID = m_id]() mutable
       {
-        RT_VertexBuffer * pVBO =  RenderThreadData::Instance()->VBOs.at(resID);
-        if (pVBO == nullptr)
+        RT_VertexBuffer ** ppVBO =  RenderThreadData::Instance()->VBOs.at(resID);
+        if (ppVBO == nullptr)
         {
           LOG_WARN("VertexBuffer::~VertexBuffer: RefID '{}' does not exist!", resID);
           return;
         }
-        pVBO->Destroy();
+        delete *ppVBO;
+        *ppVBO = nullptr;
         ::Engine::RenderThreadData::Instance()->VBOs.erase(resID);
       });
   }
@@ -243,14 +252,14 @@ namespace Engine
 
     RENDER_SUBMIT(state, [resID = m_id, offset = a_offset, size = a_size, data]()
       {
-        ::Engine::RT_VertexBuffer * pVBO = ::Engine::RenderThreadData::Instance()->VBOs.at(resID);
-        if (pVBO == nullptr)
+        ::Engine::RT_VertexBuffer ** ppVBO = ::Engine::RenderThreadData::Instance()->VBOs.at(resID);
+        if (ppVBO == nullptr)
         {
           LOG_WARN("VertexBuffer::SetData(): RefID '{}' does not exist!", resID);
           return;
         }
 
-        pVBO->SetData(data, size, offset);
+        (*ppVBO)->SetData(data, size, offset);
       });
   }
 
@@ -262,14 +271,14 @@ namespace Engine
 
     RENDER_SUBMIT(state, [resID = m_id]()
       {
-        ::Engine::RT_VertexBuffer * pVBO = ::Engine::RenderThreadData::Instance()->VBOs.at(resID);
-        if (pVBO == nullptr)
+        ::Engine::RT_VertexBuffer ** ppVBO = ::Engine::RenderThreadData::Instance()->VBOs.at(resID);
+        if (ppVBO == nullptr)
         {
           LOG_WARN("VertexBuffer::Bind(): RefID '{}' does not exist!", resID);
           return;
         }
 
-        pVBO->Bind();
+        (*ppVBO)->Bind();
       });
   }
 
@@ -284,15 +293,15 @@ namespace Engine
 
     RENDER_SUBMIT(state, [resID = m_id, buffer = buffer]()
     {
-      ::Engine::RT_VertexBuffer* pVBO = ::Engine::RenderThreadData::Instance()->VBOs.at(resID);
-      if (pVBO == nullptr)
+      ::Engine::RT_VertexBuffer ** ppVBO = ::Engine::RenderThreadData::Instance()->VBOs.at(resID);
+      if (ppVBO == nullptr)
       {
         LOG_WARN("VertexBuffer::SetLayout(): RefID '{}' does not exist!", resID);
         return;
       }
       BufferLayout layout;
       layout.Deserialize(buffer);
-      pVBO->SetLayout(layout);
+      (*ppVBO)->SetLayout(layout);
     });
   }
 
@@ -328,9 +337,13 @@ namespace Engine
 
     RENDER_SUBMIT(state, [resID = m_id, size = a_size, usage = a_usage, data]()
     {
-      ::Engine::RT_UniformBuffer ub;
-      ub.Init(data, size, usage);
-      ::Engine::RenderThreadData::Instance()->UBOs.insert(resID, ub);
+      ::Engine::RT_UniformBuffer * pUB = ::Engine::RT_UniformBuffer::Create(data, size, usage);
+      if (pUB == nullptr)
+      {
+        LOG_WARN("UniformBuffer::UniformBuffer(): Failed to create uniform buffer!");
+        return;
+      }
+      ::Engine::RenderThreadData::Instance()->UBOs.insert(resID, pUB);
     });
   }
 
@@ -342,9 +355,13 @@ namespace Engine
 
     RENDER_SUBMIT(state, [resID = m_id, size = a_size, usage = a_usage]()
     {
-      ::Engine::RT_UniformBuffer ub;
-      ub.Init(size, usage);
-      ::Engine::RenderThreadData::Instance()->UBOs.insert(resID, ub);
+      RT_UniformBuffer * pUB = RT_UniformBuffer::Create(size, usage);
+      if (pUB == nullptr)
+      {
+        LOG_WARN("UniformBuffer::UniformBuffer(): Failed to create uniform buffer!");
+        return;
+      }
+      RenderThreadData::Instance()->UBOs.insert(resID, pUB);
     });
   }
 
@@ -356,13 +373,14 @@ namespace Engine
 
     RENDER_SUBMIT(state, [resID = m_id]() mutable
     {
-      RT_UniformBuffer* pUBO =  RenderThreadData::Instance()->UBOs.at(resID);
-      if (pUBO == nullptr)
+      RT_UniformBuffer ** ppUB =  RenderThreadData::Instance()->UBOs.at(resID);
+      if (ppUB == nullptr)
       {
         LOG_WARN("UniformBuffer::~UniformBuffer: RefID '{}' does not exist!", resID);
         return;
       }
-      pUBO->Destroy();
+      delete *ppUB;
+      *ppUB = nullptr;
       ::Engine::RenderThreadData::Instance()->UBOs.erase(resID);
     });
   }
@@ -378,14 +396,14 @@ namespace Engine
 
     RENDER_SUBMIT(state, [resID = m_id, offset = a_offset, size = a_size, data]()
     {
-      ::Engine::RT_UniformBuffer* pUBO = ::Engine::RenderThreadData::Instance()->UBOs.at(resID);
-      if (pUBO == nullptr)
+      ::Engine::RT_UniformBuffer ** ppUB = ::Engine::RenderThreadData::Instance()->UBOs.at(resID);
+      if (ppUB == nullptr)
       {
         LOG_WARN("UniformBuffer::SetData(): RefID '{}' does not exist!", resID);
         return;
       }
 
-      pUBO->SetData(data, size, offset);
+      (*ppUB)->SetData(data, size, offset);
     });
   }
 
@@ -397,37 +415,37 @@ namespace Engine
 
     RENDER_SUBMIT(state, [resID = m_id]()
     {
-      ::Engine::RT_UniformBuffer* pUBO = ::Engine::RenderThreadData::Instance()->UBOs.at(resID);
-      if (pUBO == nullptr)
+      ::Engine::RT_UniformBuffer ** ppUB = ::Engine::RenderThreadData::Instance()->UBOs.at(resID);
+      if (ppUB == nullptr)
       {
         LOG_WARN("UniformBuffer::Bind(): RefID '{}' does not exist!", resID);
         return;
       }
 
-      pUBO->Bind();
+      (*ppUB)->Bind();
     });
   }
 
   void UniformBuffer::SetLayout(BufferLayout const& a_layout)
   {
-    void* buffer = RENDER_ALLOCATE(static_cast<uint32_t>(a_layout.Size()));
-    a_layout.Serialize(buffer);
+    void* pBuf = RENDER_ALLOCATE(static_cast<uint32_t>(a_layout.Size()));
+    a_layout.Serialize(pBuf);
 
     RenderState state = RenderState::Create();
     state.Set<RenderState::Attr::Type>(RenderState::Type::Command);
     state.Set<RenderState::Attr::Command>(RenderState::Command::BufferSetLayout);
 
-    RENDER_SUBMIT(state, [resID = m_id, buffer = buffer]()
+    RENDER_SUBMIT(state, [resID = m_id, pBuf = pBuf]()
     {
-      ::Engine::RT_UniformBuffer* pUBO = ::Engine::RenderThreadData::Instance()->UBOs.at(resID);
-      if (pUBO == nullptr)
+      ::Engine::RT_UniformBuffer ** ppUB = ::Engine::RenderThreadData::Instance()->UBOs.at(resID);
+      if (ppUB == nullptr)
       {
         LOG_WARN("UniformBuffer::SetLayout(): RefID '{}' does not exist!", resID);
         return;
       }
       BufferLayout layout;
-      layout.Deserialize(buffer);
-      pUBO->SetLayout(layout);
+      layout.Deserialize(pBuf);
+      (*ppUB)->SetLayout(layout);
     });
   }
 
@@ -454,21 +472,21 @@ namespace Engine
 
     RENDER_SUBMIT(state, [uboID = m_id, bpID = a_bp->GetID()]()
     {
-      ::Engine::RT_UniformBuffer* pUBO = ::Engine::RenderThreadData::Instance()->UBOs.at(uboID);
-      if (pUBO == nullptr)
+      ::Engine::RT_UniformBuffer ** ppUB = ::Engine::RenderThreadData::Instance()->UBOs.at(uboID);
+      if (ppUB == nullptr)
       {
         LOG_WARN("UniformBuffer::SetLayout(): UBO RefID '{}' does not exist!", uboID);
         return;
       }
 
-      ::Engine::RT_BindingPoint* pBP = ::Engine::RenderThreadData::Instance()->bindingPoints.at(bpID);
-      if (pUBO == nullptr)
+      ::Engine::RT_BindingPoint ** ppBP = ::Engine::RenderThreadData::Instance()->bindingPoints.at(bpID);
+      if (ppBP == nullptr)
       {
         LOG_WARN("UniformBuffer::SetLayout(): BP RefID '{}' does not exist!", bpID);
         return;
       }
       
-      pUBO->BindToPoint(*pBP);
+      (*ppUB)->BindToPoint(**ppBP);
     });
   }
   
@@ -489,9 +507,12 @@ namespace Engine
 
     RENDER_SUBMIT(state, [resID = m_id, size = a_size, usage = a_usage, data]()
     {
-      ::Engine::RT_ShaderStorageBuffer ssb;
-      ssb.Init(data, size, usage);
-      ::Engine::RenderThreadData::Instance()->SSBOs.insert(resID, ssb);
+      RT_ShaderStorageBuffer * pSSB = RT_ShaderStorageBuffer::Create(data, size, usage);
+      if (pSSB == nullptr)
+      {
+        LOG_WARN("RT_ShaderStorageBuffer::RT_ShaderStorageBuffer(): Failed to create object!");
+      }
+      RenderThreadData::Instance()->SSBOs.insert(resID, pSSB);
     });
   }
 
@@ -503,9 +524,12 @@ namespace Engine
 
     RENDER_SUBMIT(state, [resID = m_id, size = a_size, usage = a_usage]()
     {
-      ::Engine::RT_ShaderStorageBuffer ssb;
-      ssb.Init(size, usage);
-      ::Engine::RenderThreadData::Instance()->SSBOs.insert(resID, ssb);
+      RT_ShaderStorageBuffer * pSSB = RT_ShaderStorageBuffer::Create(size, usage);
+      if (pSSB == nullptr)
+      {
+        LOG_WARN("RT_ShaderStorageBuffer::RT_ShaderStorageBuffer(): Failed to create object!");
+      }
+      RenderThreadData::Instance()->SSBOs.insert(resID, pSSB);
     });
   }
 
@@ -517,14 +541,15 @@ namespace Engine
 
     RENDER_SUBMIT(state, [resID = m_id]() mutable
     {
-      RT_ShaderStorageBuffer* pSSBO =  RenderThreadData::Instance()->SSBOs.at(resID);
-      if (pSSBO == nullptr)
+      RT_ShaderStorageBuffer ** ppSSB =  RenderThreadData::Instance()->SSBOs.at(resID);
+      if (ppSSB == nullptr)
       {
         LOG_WARN("ShaderStorageBuffer::~ShaderStorageBuffer: RefID '{}' does not exist!", resID);
         return;
       }
-      pSSBO->Destroy();
-      ::Engine::RenderThreadData::Instance()->SSBOs.erase(resID);
+      delete * ppSSB;
+      *ppSSB = nullptr;
+      RenderThreadData::Instance()->SSBOs.erase(resID);
     });
   }
 
@@ -541,14 +566,14 @@ namespace Engine
 
     RENDER_SUBMIT(state, [resID = m_id, offset = a_offset, size = a_size, data]()
     {
-      ::Engine::RT_ShaderStorageBuffer* pSSBO = ::Engine::RenderThreadData::Instance()->SSBOs.at(resID);
-      if (pSSBO == nullptr)
+      RT_ShaderStorageBuffer ** ppSSB = RenderThreadData::Instance()->SSBOs.at(resID);
+      if (ppSSB == nullptr)
       {
         LOG_WARN("ShaderStorageBuffer::SetData(): RefID '{}' does not exist!", resID);
         return;
       }
 
-      pSSBO->SetData(data, size, offset);
+      (*ppSSB)->SetData(data, size, offset);
     });
   }
 
@@ -560,37 +585,37 @@ namespace Engine
 
     RENDER_SUBMIT(state, [resID = m_id]()
     {
-      ::Engine::RT_ShaderStorageBuffer* pSSBO = ::Engine::RenderThreadData::Instance()->SSBOs.at(resID);
-      if (pSSBO == nullptr)
+      RT_ShaderStorageBuffer ** ppSSB = RenderThreadData::Instance()->SSBOs.at(resID);
+      if (ppSSB == nullptr)
       {
         LOG_WARN("ShaderStorageBuffer::Bind(): RefID '{}' does not exist!", resID);
         return;
       }
 
-      pSSBO->Bind();
+      (*ppSSB)->Bind();
     });
   }
 
   void ShaderStorageBuffer::SetLayout(BufferLayout const& a_layout)
   {
-    void* buffer = RENDER_ALLOCATE(static_cast<uint32_t>(a_layout.Size()));
-    a_layout.Serialize(buffer);
+    void* pBuf = RENDER_ALLOCATE(static_cast<uint32_t>(a_layout.Size()));
+    a_layout.Serialize(pBuf);
 
     RenderState state = RenderState::Create();
     state.Set<RenderState::Attr::Type>(RenderState::Type::Command);
     state.Set<RenderState::Attr::Command>(RenderState::Command::BufferSetLayout);
 
-    RENDER_SUBMIT(state, [resID = m_id, buffer = buffer]()
+    RENDER_SUBMIT(state, [resID = m_id, pBuf = pBuf]()
     {
-      ::Engine::RT_ShaderStorageBuffer* pSSBO = ::Engine::RenderThreadData::Instance()->SSBOs.at(resID);
-      if (pSSBO == nullptr)
+      RT_ShaderStorageBuffer ** ppSSB = RenderThreadData::Instance()->SSBOs.at(resID);
+      if (ppSSB == nullptr)
       {
         LOG_WARN("ShaderStorageBuffer::SetLayout(): RefID '{}' does not exist!", resID);
         return;
       }
       BufferLayout layout;
-      layout.Deserialize(buffer);
-      pSSBO->SetLayout(layout);
+      layout.Deserialize(pBuf);
+      (*ppSSB)->SetLayout(layout);
     });
   }
 
@@ -617,21 +642,21 @@ namespace Engine
 
     RENDER_SUBMIT(state, [uboID = m_id, bpID = a_bp->GetID()]()
     {
-      ::Engine::RT_ShaderStorageBuffer* pSSBO = ::Engine::RenderThreadData::Instance()->SSBOs.at(uboID);
-      if (pSSBO == nullptr)
+      RT_ShaderStorageBuffer ** ppSSB = RenderThreadData::Instance()->SSBOs.at(uboID);
+      if (ppSSB == nullptr)
       {
         LOG_WARN("ShaderStorageBuffer::SetLayout(): SSBO RefID '{}' does not exist!", uboID);
         return;
       }
 
-      ::Engine::RT_BindingPoint* pBP = ::Engine::RenderThreadData::Instance()->bindingPoints.at(bpID);
-      if (pSSBO == nullptr)
+      ::Engine::RT_BindingPoint ** ppBP = ::Engine::RenderThreadData::Instance()->bindingPoints.at(bpID);
+      if (ppBP == nullptr)
       {
         LOG_WARN("ShaderStorageBuffer::SetLayout(): BP RefID '{}' does not exist!", bpID);
         return;
       }
       
-      pSSBO->BindToPoint(*pBP);
+      (*ppSSB)->BindToPoint(**ppBP);
     });
   }
 
@@ -652,9 +677,13 @@ namespace Engine
 
     RENDER_SUBMIT(state, [resID = m_id, size = a_size, data]()
       {
-        ::Engine::RT_IndexBuffer ib;
-        ib.Init(data, size);
-        ::Engine::RenderThreadData::Instance()->IBOs.insert(resID, ib);
+        RT_IndexBuffer * pIB = RT_IndexBuffer::Create(data, size);
+        if (pIB == nullptr)
+        {
+          LOG_WARN("RT_IndexBuffer::RT_IndexBuffer(): Failed to create index buffer!");
+          return;
+        }
+        RenderThreadData::Instance()->IBOs.insert(resID, pIB);
       });
   }
 
@@ -673,14 +702,15 @@ namespace Engine
 
     RENDER_SUBMIT(state, [resID = m_id]() mutable
       {
-        RT_IndexBuffer * pIB =  RenderThreadData::Instance()->IBOs.at(resID);
-        if (pIB == nullptr)
+        RT_IndexBuffer ** ppIB =  RenderThreadData::Instance()->IBOs.at(resID);
+        if (ppIB == nullptr)
         {
           LOG_WARN("IndexBuffer::~IndexBuffer: RefID '{}' does not exist!", resID);
           return;
         }
-        pIB->Destroy();
-        ::Engine::RenderThreadData::Instance()->IBOs.erase(resID);
+        delete *ppIB;
+        *ppIB = nullptr;
+        RenderThreadData::Instance()->IBOs.erase(resID);
       });
   }
 
@@ -697,14 +727,13 @@ namespace Engine
 
     RENDER_SUBMIT(state, [resID = m_id, offset = a_offset, size = a_size, data]()
       {
-        ::Engine::RT_IndexBuffer * pIBO = ::Engine::RenderThreadData::Instance()->IBOs.at(resID);
-        if (pIBO == nullptr)
+        RT_IndexBuffer ** ppIB = RenderThreadData::Instance()->IBOs.at(resID);
+        if (ppIB == nullptr)
         {
           LOG_WARN("IndexBuffer::SetData(): RefID '{}' does not exist!", resID);
           return;
         }
-
-        pIBO->SetData(data, size, offset);
+        (*ppIB)->SetData(data, size, offset);
       });
   }
 
@@ -716,14 +745,14 @@ namespace Engine
 
     RENDER_SUBMIT(state, [resID = m_id]()
       {
-        ::Engine::RT_IndexBuffer * pIBO = ::Engine::RenderThreadData::Instance()->IBOs.at(resID);
-        if (pIBO == nullptr)
+        RT_IndexBuffer ** ppIB = RenderThreadData::Instance()->IBOs.at(resID);
+        if (ppIB == nullptr)
         {
           LOG_WARN("IndexBuffer::Bind(): RefID '{}' does not exist!", resID);
           return;
         }
 
-        pIBO->Bind();
+        (*ppIB)->Bind();
       });
   }
 }

@@ -26,8 +26,6 @@ namespace Engine
 
     uint32_t UniformBufferSize() const;
 
-    void Destroy();
-
     void UploadUniformBuffer(byte const *);
     ShaderUniformDeclaration const * FindUniformDeclaration(std::string const&) const;
 

@@ -56,43 +56,27 @@ namespace Engine
   // BufferBase
   //------------------------------------------------------------------------------------------------
 
-  RT_BufferBase::RT_BufferBase()
-    : m_size(0)
-    , m_usage(BufferUsage::None)
+  RT_BufferBase::RT_BufferBase(void * a_data, uint32_t a_size, BufferUsage a_usage)
+    : m_size(a_size)
+    , m_usage(a_usage)
     , m_rendererID(0)
   {
-
-  }
-
-  void RT_BufferBase::Init(void* a_data,
-                             uint32_t a_size,
-                             BufferUsage a_usage)
-  {
-    m_size = a_size;
-    m_usage = a_usage;
-
     glCreateBuffers(1, &m_rendererID);
     glNamedBufferData(m_rendererID, m_size, a_data, OpenGLUsage(m_usage));
   }
 
-  void RT_BufferBase::Init(uint32_t a_size, BufferUsage a_usage)
+  RT_BufferBase::RT_BufferBase(uint32_t a_size, BufferUsage a_usage)
+    : m_size(a_size)
+    , m_usage(a_usage)
+    , m_rendererID(0)
   {
-    m_size = a_size;
-    m_usage = a_usage;
-
     glCreateBuffers(1, &m_rendererID);
     glNamedBufferData(m_rendererID, m_size, nullptr, OpenGLUsage(m_usage));
   }
 
   RT_BufferBase::~RT_BufferBase()
   {
-
-  }
-
-  void RT_BufferBase::Destroy()
-  {
     glDeleteBuffers(1, &m_rendererID);
-    m_rendererID = 0;
   }
 
   void RT_BufferBase::SetData(void* a_data, uint32_t a_size, uint32_t a_offset)
@@ -126,12 +110,50 @@ namespace Engine
   }
 
   //------------------------------------------------------------------------------------------------
+  // Indexed Buffer
+  //------------------------------------------------------------------------------------------------
+
+  RT_IndexedBuffer::RT_IndexedBuffer(void * a_data, uint32_t a_size, BufferUsage a_usage)
+    : RT_BufferBase(a_data, a_size, a_usage)
+  {
+  
+  }
+
+  RT_IndexedBuffer::RT_IndexedBuffer(uint32_t a_size, BufferUsage a_usage)
+    : RT_BufferBase(a_size, a_usage)
+  {
+
+  }
+
+  //------------------------------------------------------------------------------------------------
   // Vertex Buffer
   //------------------------------------------------------------------------------------------------
+
+  RT_VertexBuffer::RT_VertexBuffer(void * a_data, uint32_t a_size, BufferUsage a_usage)
+    : RT_BufferBase(a_data, a_size, a_usage)
+  {
+  
+  }
+
+  RT_VertexBuffer::RT_VertexBuffer(uint32_t a_size, BufferUsage a_usage)
+    : RT_BufferBase(a_size, a_usage)
+  {
+
+  }
 
   BufferType RT_VertexBuffer::GetType() const
   {
     return BufferType::Vertex;
+  }
+
+  RT_VertexBuffer * RT_VertexBuffer::Create(void * a_data, uint32_t a_size, BufferUsage a_usage)
+  {
+    return new RT_VertexBuffer(a_data, a_size, a_usage);
+  }
+
+  RT_VertexBuffer * RT_VertexBuffer::Create(uint32_t a_size, BufferUsage a_usage)
+  {
+    return new RT_VertexBuffer(a_size, a_usage);
   }
 
   //------------------------------------------------------------------------------------------------
@@ -160,6 +182,28 @@ namespace Engine
     return a_bp.GetID().Type() == StorageBlockType::Uniform;
   }
 
+  RT_UniformBuffer::RT_UniformBuffer(void * a_data, uint32_t a_size, BufferUsage a_usage)
+    : RT_IndexedBuffer(a_data, a_size, a_usage)
+  {
+
+  }
+
+  RT_UniformBuffer::RT_UniformBuffer(uint32_t a_size, BufferUsage a_usage)
+    : RT_IndexedBuffer(a_size, a_usage)
+  {
+
+  }
+
+  RT_UniformBuffer * RT_UniformBuffer::Create(void * a_data, uint32_t a_size, BufferUsage a_usage)
+  {
+    return new RT_UniformBuffer(a_data, a_size, a_usage);
+  }
+
+  RT_UniformBuffer * RT_UniformBuffer::Create(uint32_t a_size, BufferUsage a_usage)
+  {
+    return new RT_UniformBuffer(a_size, a_usage);
+  }
+
   //------------------------------------------------------------------------------------------------
   // Shader storage Buffer
   //------------------------------------------------------------------------------------------------
@@ -174,34 +218,48 @@ namespace Engine
     return a_bp.GetID().Type() == StorageBlockType::ShaderStorage;
   }
 
+  RT_ShaderStorageBuffer::RT_ShaderStorageBuffer(void * a_data, uint32_t a_size, BufferUsage a_usage)
+    : RT_IndexedBuffer(a_data, a_size, a_usage)
+  {
+
+  }
+
+  RT_ShaderStorageBuffer::RT_ShaderStorageBuffer(uint32_t a_size, BufferUsage a_usage)
+    : RT_IndexedBuffer(a_size, a_usage)
+  {
+
+  }
+
+  RT_ShaderStorageBuffer * RT_ShaderStorageBuffer::Create(void * a_data, uint32_t a_size, BufferUsage a_usage)
+  {
+    return new RT_ShaderStorageBuffer(a_data, a_size, a_usage);
+  }
+
+  RT_ShaderStorageBuffer * RT_ShaderStorageBuffer::Create(uint32_t a_size, BufferUsage a_usage)
+  {
+    return new RT_ShaderStorageBuffer(a_size, a_usage);
+  }
+
   //------------------------------------------------------------------------------------------------
   // RT_IndexBuffer
   //------------------------------------------------------------------------------------------------
     
-  RT_IndexBuffer::RT_IndexBuffer()
+  RT_IndexBuffer::RT_IndexBuffer(void * a_data, uint32_t a_size)
     : m_rendererID(0)
-    , m_size(0)
+    , m_size(a_size)
   {
-    
-  }
-
-  void RT_IndexBuffer::Init(void* a_data, uint32_t a_size)
-  {
-    m_size = a_size;
-
     glCreateBuffers(1, &m_rendererID);
     glNamedBufferData(m_rendererID, m_size, a_data, GL_STATIC_DRAW);
   }
 
-  RT_IndexBuffer::~RT_IndexBuffer()
+  RT_IndexBuffer * RT_IndexBuffer::Create(void* a_data, uint32_t a_size)
   {
-
+    return new RT_IndexBuffer(a_data, a_size);
   }
 
-  void RT_IndexBuffer::Destroy()
+  RT_IndexBuffer::~RT_IndexBuffer()
   {
     glDeleteBuffers(1, &m_rendererID);
-    m_rendererID = 0;
   }
 
   void RT_IndexBuffer::SetData(void* a_data, uint32_t a_size, uint32_t a_offset)
