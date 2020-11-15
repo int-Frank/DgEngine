@@ -8,7 +8,7 @@
 #define TEXT_INPUT_TEXT_SIZE 32
 
 // Smart list reduces the amount of code we have to write.
-// Input messages never make it out of Layer_InputHandler. This is where you convert them.
+// Input messages never make it out of System_Input. This is where you convert them.
 #undef ITEM
 #define MESSAGE_LIST \
   ITEM(None, None) \

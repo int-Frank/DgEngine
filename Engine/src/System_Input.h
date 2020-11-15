@@ -1,7 +1,7 @@
-//@group Layers
+//@group Systems
 
-#ifndef EN_LAYER_INPUTHANDLER_H
-#define EN_LAYER_INPUTHANDLER_H
+#ifndef EN_SYSTEM_INPUT_H
+#define EN_SYSTEM_INPUT_H
 
 #include <stdint.h>
 #include <initializer_list>
@@ -11,7 +11,7 @@
 #include "Memory.h"
 #include "MessageBus.h"
 #include "EngineMessages.h"
-#include "Layer.h"
+#include "System.h"
 #include "InputCodes.h"
 
 namespace Engine
@@ -20,14 +20,14 @@ namespace Engine
 
   typedef void (*InputMessageTranslator)(Message const *);
 
-  class Layer_InputHandler : public Layer
+  class System_Input : public System
   {
   public:
 
-    ASSIGN_ID(static_cast<ID>(DefaultLayer::InputHandler))
+    ASSIGN_ID(static_cast<ID>(DefaultSystem::InputHandler))
 
-    Layer_InputHandler();
-    ~Layer_InputHandler();
+    System_Input();
+    ~System_Input();
 
     void ClearBindings();
     void Update(float);

@@ -3,7 +3,7 @@
 #include <exception>
 
 #include "MessageBus.h"
-#include "LayerStack.h"
+#include "SystemStack.h"
 #include "Framework.h"
 #include "RenderThread.h"
 
@@ -18,11 +18,11 @@
 #include "Renderer.h"
 #include "ResourceManager.h"
 
-#include "Layer_Console.h"
-#include "Layer_InputHandler.h"
-#include "Layer_Window.h"
-#include "Layer_UI.h"
-#include "Layer_Application.h"
+#include "System_Console.h"
+#include "System_Input.h"
+#include "System_Window.h"
+#include "System_UI.h"
+#include "System_Application.h"
 
 namespace Engine
 {
@@ -39,7 +39,7 @@ namespace Engine
 
     bool        shouldQuit;
     IWindow *   pWindow;
-    LayerStack  layerStack;
+    SystemStack  layerStack;
   };
 
   //------------------------------------------------------------------------------------
@@ -62,12 +62,12 @@ namespace Engine
     return s_instance;
   }
 
-  void Application::PushLayer(Layer* a_pLayer)
+  void Application::PushLayer(System* a_pLayer)
   {
     m_pimpl->layerStack.PushLayer(a_pLayer, a_pLayer->GetID());
   }
 
-  Layer * Application::GetLayer(Layer::ID a_id)
+  System * Application::GetLayer(System::ID a_id)
   {
     return m_pimpl->layerStack.GetLayer(a_id);
   }
@@ -101,11 +101,11 @@ namespace Engine
     m_pimpl->pWindow->GetDimensions(imguiData.window_w, imguiData.window_h);
     //Framework::Instance()->InitImGui(imguiData);
 
-    m_pimpl->layerStack.PushLayer(new Layer_Application(), Layer_Application::GetStaticID());
-    m_pimpl->layerStack.PushLayer(new Layer_InputHandler(), Layer_InputHandler::GetStaticID());
-    m_pimpl->layerStack.PushLayer(new Layer_Window(m_pimpl->pWindow), Layer_Window::GetStaticID());
-    m_pimpl->layerStack.PushLayer(new Layer_Console(), Layer_Console::GetStaticID());
-    m_pimpl->layerStack.PushLayer(new Layer_UI(), Layer_UI::GetStaticID());
+    m_pimpl->layerStack.PushLayer(new System_Application(), System_Application::GetStaticID());
+    m_pimpl->layerStack.PushLayer(new System_Input(), System_Input::GetStaticID());
+    m_pimpl->layerStack.PushLayer(new System_Window(m_pimpl->pWindow), System_Window::GetStaticID());
+    m_pimpl->layerStack.PushLayer(new System_Console(), System_Console::GetStaticID());
+    m_pimpl->layerStack.PushLayer(new System_UI(), System_UI::GetStaticID());
 
     LOG_TRACE("Application initialised!");
   }
@@ -161,7 +161,7 @@ namespace Engine
       for (auto it = m_pimpl->layerStack.begin(); it != m_pimpl->layerStack.end(); it++)
         it->second->Update(dt);
 
-      //Layer_UI * imguiLayer = static_cast<Layer_UI*>(m_pimpl->layerStack.GetLayer(Layer_UI::GetID()));
+      //System_UI * imguiLayer = static_cast<System_UI*>(m_pimpl->layerStack.GetLayer(System_UI::GetID()));
       //imguiLayer->NewFrame();
       //for (auto it = m_pimpl->layerStack.begin(); it != m_pimpl->layerStack.end(); it++)
       //  it->second->DoImGui();

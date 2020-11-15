@@ -16,19 +16,19 @@
 
 namespace Engine
 {
-  class Layer;
-  class LayerStack;
+  class System;
+  class SystemStack;
 
   class MessageBus
   {
     static size_t const s_bufSize = 1 * 1024 * 1024;
     static MessageBus * s_instance;
 
-    MessageBus(LayerStack&);
+    MessageBus(SystemStack&);
 
   public:
 
-    static void Init(LayerStack&);
+    static void Init(SystemStack&);
     static void ShutDown();
     static MessageBus * Instance();
 
@@ -52,7 +52,7 @@ namespace Engine
     int                     m_producerIndex;
     PODArray<Message*>      m_messageQueue[2];
     MemBuffer               m_buf[2];
-    LayerStack &            m_layerStack;
+    SystemStack &            m_layerStack;
   };
 }
 

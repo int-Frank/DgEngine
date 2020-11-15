@@ -1,4 +1,4 @@
-//@group Layers
+//@group Systems
 
 /*
   Original Copyright Yan Chernikov <github.com/TheCherno/Hazel-dev> and contributors.
@@ -16,35 +16,35 @@
   Copyright 2017-2019 Frank Hart <frankhart010@gmail.com>
 */
 
-#ifndef EN_LAYERSTACK_H
-#define EN_LAYERSTACK_H
+#ifndef EN_SYSTEMSTACK_H
+#define EN_SYSTEMSTACK_H
 
 #include <stdint.h>
 #include "DgMap_AVL.h"
-#include "Layer.h"
+#include "System.h"
 
 namespace Engine
 {
-  class Layer;
+  class System;
 
-  class LayerStack
+  class SystemStack
   {
   public:
 
-    LayerStack();
-    ~LayerStack();
+    SystemStack();
+    ~SystemStack();
 
-    bool PushLayer(Layer *, Layer::ID);
-    void PopLayer(Layer::ID);
-    Layer * GetLayer(Layer::ID);
+    bool PushLayer(System *, System::ID);
+    void PopLayer(System::ID);
+    System * GetLayer(System::ID);
     void Clear();
 
-    Dg::Map_AVL<Layer::ID, Layer *>::iterator begin();
-    Dg::Map_AVL<Layer::ID, Layer *>::iterator end();
+    Dg::Map_AVL<System::ID, System *>::iterator begin();
+    Dg::Map_AVL<System::ID, System *>::iterator end();
 
   private:
 
-    Dg::Map_AVL<Layer::ID, Layer *>  m_layerStack;
+    Dg::Map_AVL<System::ID, System *>  m_layerStack;
   };
 }
 

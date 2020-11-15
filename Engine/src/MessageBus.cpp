@@ -2,14 +2,14 @@
 
 #include "Message.h"
 #include "MessageBus.h"
-#include "Layer.h"
-#include "LayerStack.h"
+#include "System.h"
+#include "SystemStack.h"
 
 namespace Engine
 {
   MessageBus * MessageBus::s_instance = nullptr;
 
-  void MessageBus::Init(LayerStack& a_ls)
+  void MessageBus::Init(SystemStack& a_ls)
   {
     s_instance = new MessageBus(a_ls);
   }
@@ -25,7 +25,7 @@ namespace Engine
     return s_instance;
   }
 
-  MessageBus::MessageBus(LayerStack & a_ss)
+  MessageBus::MessageBus(SystemStack & a_ss)
     : m_layerStack(a_ss)
     , m_producerIndex(0)
   {

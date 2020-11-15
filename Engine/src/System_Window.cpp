@@ -1,41 +1,41 @@
-//@group Layers
+//@group Systems
 
 #include "Memory.h"
 
-#include "Layer_Window.h"
+#include "System_Window.h"
 #include "EngineMessages.h"
 #include "Application.h"
 #include "IWindow.h"
 
 namespace Engine
 {
-  Layer_Window::Layer_Window(IWindow * a_pWindow)
+  System_Window::System_Window(IWindow * a_pWindow)
     : m_pWindow(a_pWindow)
   {
 
   }
 
-  Layer_Window::~Layer_Window()
+  System_Window::~System_Window()
   {
 
   }
 
-  void Layer_Window::OnAttach()
+  void System_Window::OnAttach()
   {
 
   }
 
-  void Layer_Window::OnDetach()
+  void System_Window::OnDetach()
   {
 
   }
 
-  void Layer_Window::Update(float a_dt)
+  void System_Window::Update(float a_dt)
   {
     m_pWindow->Update();
   }
 
-  void Layer_Window::HandleMessage(Message* a_pMsg)
+  void System_Window::HandleMessage(Message* a_pMsg)
   {
     if (a_pMsg->GetCategory() != MC_Window)
       return;
@@ -56,73 +56,73 @@ namespace Engine
     DISPATCH_MESSAGE(Message_Window_Take_Focus);
   }
 
-  void Layer_Window::HandleMessage(Message_Window_Shown*)
+  void System_Window::HandleMessage(Message_Window_Shown*)
   {
 
   }
 
-  void Layer_Window::HandleMessage(Message_Window_Hidden *)
-  {
-    
-  }
-
-  void Layer_Window::HandleMessage(Message_Window_Exposed *)
+  void System_Window::HandleMessage(Message_Window_Hidden *)
   {
     
   }
 
-  void Layer_Window::HandleMessage(Message_Window_Moved *)
+  void System_Window::HandleMessage(Message_Window_Exposed *)
   {
     
   }
 
-  void Layer_Window::HandleMessage(Message_Window_Resized *)
+  void System_Window::HandleMessage(Message_Window_Moved *)
   {
     
   }
 
-  void Layer_Window::HandleMessage(Message_Window_Minimized *)
+  void System_Window::HandleMessage(Message_Window_Resized *)
   {
     
   }
 
-  void Layer_Window::HandleMessage(Message_Window_Maximized *)
+  void System_Window::HandleMessage(Message_Window_Minimized *)
   {
     
   }
 
-  void Layer_Window::HandleMessage(Message_Window_Restored *)
+  void System_Window::HandleMessage(Message_Window_Maximized *)
   {
     
   }
 
-  void Layer_Window::HandleMessage(Message_Window_Enter *)
+  void System_Window::HandleMessage(Message_Window_Restored *)
   {
     
   }
 
-  void Layer_Window::HandleMessage(Message_Window_Leave *)
+  void System_Window::HandleMessage(Message_Window_Enter *)
   {
     
   }
 
-  void Layer_Window::HandleMessage(Message_Window_Focus_Gained *)
+  void System_Window::HandleMessage(Message_Window_Leave *)
   {
     
   }
 
-  void Layer_Window::HandleMessage(Message_Window_Focus_Lost *)
+  void System_Window::HandleMessage(Message_Window_Focus_Gained *)
   {
     
   }
 
-  void Layer_Window::HandleMessage(Message_Window_Close * a_pMsg)
+  void System_Window::HandleMessage(Message_Window_Focus_Lost *)
+  {
+    
+  }
+
+  void System_Window::HandleMessage(Message_Window_Close * a_pMsg)
   {
     Application::Instance()->RequestQuit();
     a_pMsg->SetFlag(Message::Flag::Handled, true);
   }
 
-  void Layer_Window::HandleMessage(Message_Window_Take_Focus *)
+  void System_Window::HandleMessage(Message_Window_Take_Focus *)
   {
 
   }

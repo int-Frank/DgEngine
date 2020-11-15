@@ -1,8 +1,8 @@
-//@group Layers
+//@group Systems
 
 #include <cstring>
 
-#include "Layer_InputHandler.h"
+#include "System_Input.h"
 #include "Framework.h"
 #include "core_Log.h"
 #include "InputCodes.h"
@@ -15,37 +15,37 @@
 namespace Engine
 {
   //------------------------------------------------------------------------------------
-  // Layer_InputHandler
+  // System_Input
   //------------------------------------------------------------------------------------
 
-  Layer_InputHandler::Layer_InputHandler()
+  System_Input::System_Input()
     : m_pEventPoller(Framework::Instance()->GetEventPoller())
   {
 
   }
 
-  Layer_InputHandler::~Layer_InputHandler()
+  System_Input::~System_Input()
   {
 
   }
 
-  void Layer_InputHandler::HandleMessage(Message *)
+  void System_Input::HandleMessage(Message *)
   {
   
   }
 
-  void Layer_InputHandler::ClearBindings()
+  void System_Input::ClearBindings()
   {
     m_bindings.clear();
   }
 
-  void Layer_InputHandler::AddBinding(uint32_t a_inputMessageID, InputMessageTranslator a_callback)
+  void System_Input::AddBinding(uint32_t a_inputMessageID, InputMessageTranslator a_callback)
   {
     m_bindings[a_inputMessageID] = a_callback;
   }
 
   /*template<>
-  void Layer_InputHandler::_SetProfile<Layer_InputHandler::BP_Menu>()
+  void System_Input::_SetProfile<System_Input::BP_Menu>()
   {
     m_bindings.clear();
 
@@ -106,7 +106,7 @@ namespace Engine
     m_mouseController->Release();
   }*/
 
-  void Layer_InputHandler::Update(float a_dt)
+  void System_Input::Update(float a_dt)
   {
     while (true)
     {

@@ -8,7 +8,7 @@
 #include "DgBit.h"
 
 #define RENDER_STATE_ATTR \
- ITEM(Layer)\
+ ITEM(System)\
  ITEM(Type)\
  ITEM(Command)\
  ITEM(Group)\
@@ -30,7 +30,7 @@ namespace Engine
         BitBegin = 0,
         BitCount = 7,
 
-        Layer         = 4,
+        System         = 4,
         Type          = 4,
 
         //Type == Command
@@ -44,8 +44,8 @@ namespace Engine
         Material      = 30,
       };
 
-      static_assert(Layer + Type + Command + Group == 64);
-      static_assert(Layer + Type + Translucency + Depth + VAO + Material == 64);
+      static_assert(System + Type + Command + Group == 64);
+      static_assert(System + Type + Translucency + Depth + VAO + Material == 64);
     };
 
     struct Begin
@@ -63,7 +63,7 @@ namespace Engine
         Depth         = VAO + Count::VAO,
         Translucency  = Depth + Count::Depth,
         Type          = Translucency + Count::Translucency,
-        Layer         = Type + Count::Type,
+        System         = Type + Count::Type,
       };
     };
 
@@ -125,7 +125,7 @@ namespace Engine
       };
     };
 
-    struct Layer
+    struct System
     {
       enum : uint64_t
       {

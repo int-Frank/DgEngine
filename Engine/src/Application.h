@@ -4,11 +4,11 @@
 #define EN_APPLICATION_H
 
 #include <string>
-#include "Layer.h"
+#include "System.h"
 
 namespace Engine
 {
-  class Layer;
+  class System;
   class IWindow;
 
   class Application
@@ -41,8 +41,8 @@ namespace Engine
 
     static Application * Instance();
 
-    void PushLayer(Layer*);
-    Layer * GetLayer(Layer::ID);
+    void PushLayer(System*);
+    System * GetLayer(System::ID);
 
     void Run();
     void RequestQuit();

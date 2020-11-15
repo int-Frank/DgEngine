@@ -1,27 +1,27 @@
-//@group Layers
+//@group Systems
 
-#ifndef EN_LAYER_WINDOW_H
-#define EN_LAYER_WINDOW_H
+#ifndef EN_SYSTEM_WINDOW_H
+#define EN_SYSTEM_WINDOW_H
 
 #include "Memory.h"
 
 #include "core_ErrorCodes.h"
-#include "Layer.h"
+#include "System.h"
 #include "Memory.h"
 
 namespace Engine
 {
   class IWindow;
 
-  class Layer_Window : public Layer
+  class System_Window : public System
   {
 
   public:
 
-    ASSIGN_ID(static_cast<ID>(DefaultLayer::Window))
+    ASSIGN_ID(static_cast<ID>(DefaultSystem::Window))
 
-    Layer_Window(IWindow *);
-    ~Layer_Window();
+    System_Window(IWindow *);
+    ~System_Window();
 
     void OnAttach();
     void OnDetach();

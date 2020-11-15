@@ -11,7 +11,7 @@ namespace Engine
   {
     RenderState state;
     state.m_data = 0;
-    state.Set<Attr::Layer>(Layer::None);
+    state.Set<Attr::System>(System::None);
     return state;
   }
 

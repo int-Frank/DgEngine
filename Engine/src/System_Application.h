@@ -1,24 +1,24 @@
-//@group Layers
+//@group Systems
 
-#ifndef EN_LAYER_APPLICATION_H
-#define EN_LAYER_APPLICATION_H
+#ifndef EN_SYSTEM_APPLICATION_H
+#define EN_SYSTEM_APPLICATION_H
 
 #include "Memory.h"
 
 #include "core_ErrorCodes.h"
-#include "Layer.h"
+#include "System.h"
 #include "Memory.h"
 
 namespace Engine
 {
-  class Layer_Application : public Layer
+  class System_Application : public System
   {
   public:
 
-    ASSIGN_ID(static_cast<ID>(DefaultLayer::Application))
+    ASSIGN_ID(static_cast<ID>(DefaultSystem::Application))
 
-      Layer_Application();
-    ~Layer_Application();
+      System_Application();
+    ~System_Application();
 
     void OnAttach();
     void OnDetach();

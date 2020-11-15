@@ -3,7 +3,7 @@
 #include <map>
 
 #include "Engine.h"
-#include "Layer_InputHandler.h"
+#include "System_Input.h"
 #include "Renderer.h"
 #include "RT_RendererAPI.h"
 #include "Buffer.h"
@@ -135,12 +135,12 @@ Colour * GenerateTexture(uint32_t a_width, uint32_t a_height)
   return pixels;
 }
 
-class GameLayer : public Engine::Layer
+class GameSystem : public Engine::System
 {
 public:
 
   ASSIGN_ID(256);
-  GameLayer()
+  GameSystem()
   {
 
   }
@@ -247,9 +247,9 @@ public:
   Game(Opts const & a_opts)
     : Application(a_opts)
   {
-    PushLayer(new GameLayer());
+    PushLayer(new GameSystem());
 
-    Engine::Layer_InputHandler * layer = static_cast<Engine::Layer_InputHandler*>(GetLayer(Engine::Layer_InputHandler::GetStaticID()));
+    Engine::System_Input * layer = static_cast<Engine::System_Input *>(GetLayer(Engine::System_Input::GetStaticID()));
     if (!layer)
       LOG_ERROR("Couldn't find input layer!");
     else

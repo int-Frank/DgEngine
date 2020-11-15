@@ -1,4 +1,4 @@
-//@group Layers
+//@group Systems
 
 /*
   Original Copyright Yan Chernikov <github.com/TheCherno/Hazel-dev> and contributors.
@@ -16,22 +16,22 @@
   Copyright 2017-2019 Frank Hart <frankhart010@gmail.com>
 */
 
-#include "LayerStack.h"
-#include "Layer.h"
+#include "SystemStack.h"
+#include "System.h"
 
 namespace Engine
 {
-  LayerStack::LayerStack()
+  SystemStack::SystemStack()
   {
 
   }
 
-  LayerStack::~LayerStack()
+  SystemStack::~SystemStack()
   {
     Clear();
   }
 
-  bool LayerStack::PushLayer(Layer * a_pLayer, Layer::ID a_ID)
+  bool SystemStack::PushLayer(System * a_pLayer, System::ID a_ID)
   {
     BSR_ASSERT(a_pLayer != nullptr);
 
@@ -43,7 +43,7 @@ namespace Engine
     return true;
   }
 
-  void LayerStack::PopLayer(Layer::ID a_ID)
+  void SystemStack::PopLayer(System::ID a_ID)
   {
     auto it = m_layerStack.find(a_ID);
     if (it != m_layerStack.end())
@@ -54,28 +54,28 @@ namespace Engine
     }
   }
 
-  void LayerStack::Clear()
+  void SystemStack::Clear()
   {
     for (auto kv : m_layerStack)
       delete kv.second;
     m_layerStack.clear();
   }
 
-  Layer * LayerStack::GetLayer(Layer::ID a_ID)
+  System * SystemStack::GetLayer(System::ID a_ID)
   {
-    Layer * result(nullptr);
+    System * result(nullptr);
     auto it = m_layerStack.find(a_ID);
     if (it != m_layerStack.end())
       result = it->second;
     return result;
   }
 
-  Dg::Map_AVL<Layer::ID, Layer *>::iterator LayerStack::begin()
+  Dg::Map_AVL<System::ID, System *>::iterator SystemStack::begin()
   {
     return m_layerStack.begin();
   }
 
-  Dg::Map_AVL<Layer::ID, Layer *>::iterator LayerStack::end()
+  Dg::Map_AVL<System::ID, System *>::iterator SystemStack::end()
   {
     return m_layerStack.end();
   }
