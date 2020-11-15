@@ -41,8 +41,8 @@ namespace Engine
 
     static Application * Instance();
 
-    void PushLayer(System*);
-    System * GetLayer(System::ID);
+    void PushSystem(System*);
+    System * GetSystem(System::ID);
 
     void Run();
     void RequestQuit();

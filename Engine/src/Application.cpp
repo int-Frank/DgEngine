@@ -17,6 +17,7 @@
 #include "Memory.h"
 #include "Renderer.h"
 #include "ResourceManager.h"
+#include "UI_Internal.h"
 
 #include "System_Console.h"
 #include "System_Input.h"
@@ -39,7 +40,7 @@ namespace Engine
 
     bool        shouldQuit;
     IWindow *   pWindow;
-    SystemStack  layerStack;
+    SystemStack  systemStack;
   };
 
   //------------------------------------------------------------------------------------
@@ -62,14 +63,14 @@ namespace Engine
     return s_instance;
   }
 
-  void Application::PushLayer(System* a_pLayer)
+  void Application::PushSystem(System* a_pLayer)
   {
-    m_pimpl->layerStack.PushLayer(a_pLayer, a_pLayer->GetID());
+    m_pimpl->systemStack.PushSystem(a_pLayer, a_pLayer->GetID());
   }
 
-  System * Application::GetLayer(System::ID a_id)
+  System * Application::GetSystem(System::ID a_id)
   {
-    return m_pimpl->layerStack.GetLayer(a_id);
+    return m_pimpl->systemStack.GetSystem(a_id);
   }
 
   Application::Application(Opts const & a_opts)
@@ -79,7 +80,7 @@ namespace Engine
     s_instance = this;
 
     ResourceManager::Init();
-    MessageBus::Init(m_pimpl->layerStack);
+    MessageBus::Init(m_pimpl->systemStack);
 
     if (a_opts.loggerType == E_UseFileLogger)
       Core::impl::Logger::Init_file(a_opts.loggerName.c_str(), a_opts.logFile.c_str());
@@ -99,13 +100,15 @@ namespace Engine
 
     Framework::ImGui_InitData imguiData;
     m_pimpl->pWindow->GetDimensions(imguiData.window_w, imguiData.window_h);
-    //Framework::Instance()->InitImGui(imguiData);
 
-    m_pimpl->layerStack.PushLayer(new System_Application(), System_Application::GetStaticID());
-    m_pimpl->layerStack.PushLayer(new System_Input(), System_Input::GetStaticID());
-    m_pimpl->layerStack.PushLayer(new System_Window(m_pimpl->pWindow), System_Window::GetStaticID());
-    m_pimpl->layerStack.PushLayer(new System_Console(), System_Console::GetStaticID());
-    m_pimpl->layerStack.PushLayer(new System_UI(), System_UI::GetStaticID());
+    UIRenderer::Init();
+    UIRenderer::Instance()->SetScreenSize(vec2((float)imguiData.window_w, (float)imguiData.window_h));
+
+    m_pimpl->systemStack.PushSystem(new System_Application(), System_Application::GetStaticID());
+    m_pimpl->systemStack.PushSystem(new System_Input(), System_Input::GetStaticID());
+    m_pimpl->systemStack.PushSystem(new System_Window(m_pimpl->pWindow), System_Window::GetStaticID());
+    m_pimpl->systemStack.PushSystem(new System_Console(), System_Console::GetStaticID());
+    m_pimpl->systemStack.PushSystem(new System_UI(), System_UI::GetStaticID());
 
     LOG_TRACE("Application initialised!");
   }
@@ -158,16 +161,16 @@ namespace Engine
 
       MessageBus::Instance()->DispatchMessages();
 
-      for (auto it = m_pimpl->layerStack.begin(); it != m_pimpl->layerStack.end(); it++)
+      for (auto it = m_pimpl->systemStack.begin(); it != m_pimpl->systemStack.end(); it++)
         it->second->Update(dt);
 
-      //System_UI * imguiLayer = static_cast<System_UI*>(m_pimpl->layerStack.GetLayer(System_UI::GetID()));
+      //System_UI * imguiLayer = static_cast<System_UI*>(m_pimpl->systemStack.GetSystem(System_UI::GetID()));
       //imguiLayer->NewFrame();
-      //for (auto it = m_pimpl->layerStack.begin(); it != m_pimpl->layerStack.end(); it++)
+      //for (auto it = m_pimpl->systemStack.begin(); it != m_pimpl->systemStack.end(); it++)
       //  it->second->DoImGui();
 
-      auto it = m_pimpl->layerStack.end();
-      while (it != m_pimpl->layerStack.begin())
+      auto it = m_pimpl->systemStack.end();
+      while (it != m_pimpl->systemStack.begin())
       {
         it--;
         it->second->Render();

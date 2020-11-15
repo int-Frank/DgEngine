@@ -16,7 +16,6 @@
   Copyright 2017-2019 Frank Hart <frankhart010@gmail.com>
 */
 
-#include "glad/glad.h"
 
 #include "Renderer.h"
 #include "RT_RendererAPI.h"
@@ -26,6 +25,8 @@
 #include "Message.h"
 #include "MessageBus.h"
 #include "RenderThreadData.h"
+
+#include "glad/glad.h"
 
 namespace Engine
 {

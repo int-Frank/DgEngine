@@ -20,7 +20,7 @@
 #define EN_SYSTEMSTACK_H
 
 #include <stdint.h>
-#include "DgMap_AVL.h"
+#include "DgDoublyLinkedList.h"
 #include "System.h"
 
 namespace Engine
@@ -30,21 +30,26 @@ namespace Engine
   class SystemStack
   {
   public:
+    typedef Dg::DoublyLinkedList<std::pair<System::ID, System *>> List;
 
     SystemStack();
     ~SystemStack();
 
-    bool PushLayer(System *, System::ID);
-    void PopLayer(System::ID);
-    System * GetLayer(System::ID);
+    bool PushSystem(System *, System::ID);
+    void PopSystem(System::ID);
+    System * GetSystem(System::ID);
     void Clear();
 
-    Dg::Map_AVL<System::ID, System *>::iterator begin();
-    Dg::Map_AVL<System::ID, System *>::iterator end();
+    List::iterator begin();
+    List::iterator end();
 
   private:
 
-    Dg::Map_AVL<System::ID, System *>  m_layerStack;
+    List::iterator Find(System::ID);
+
+  private:
+
+    List  m_systemStack;
   };
 }
 

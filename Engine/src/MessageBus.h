@@ -52,7 +52,7 @@ namespace Engine
     int                     m_producerIndex;
     PODArray<Message*>      m_messageQueue[2];
     MemBuffer               m_buf[2];
-    SystemStack &            m_layerStack;
+    SystemStack &           m_systemStack;
   };
 }
 

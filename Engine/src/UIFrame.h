@@ -30,7 +30,6 @@ namespace Engine
 
   private:
 
-    void HandleMessage(Message_Window_Resized *);
     void HandleMessage(Message_GUI_Up *);
     void HandleMessage(Message_GUI_Down *);
     void HandleMessage(Message_GUI_Left *);

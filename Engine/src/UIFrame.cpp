@@ -52,8 +52,6 @@ namespace Engine
 
   void UIFrame::HandleMessage(Message * a_pMsg)
   {
-    DISPATCH_MESSAGE(Message_Window_Resized);
-
     if (a_pMsg->GetCategory() != MC_GUI)
       return;
 
@@ -64,7 +62,7 @@ namespace Engine
         m_pFocus = nullptr;
       return;
     }
-
+     
     if (a_pMsg->GetID() == Message_GUI_Up::GetStaticID())
       HandleMessage(dynamic_cast<Message_GUI_Up *>(a_pMsg));
     else if (a_pMsg->GetID() == Message_GUI_Down::GetStaticID())
@@ -83,8 +81,6 @@ namespace Engine
       HandleMessage(dynamic_cast<Message_GUI_PointerMove *>(a_pMsg));
     else if (a_pMsg->GetID() == Message_GUI_Text::GetStaticID())
       HandleMessage(dynamic_cast<Message_GUI_Text *>(a_pMsg));
-
-    a_pMsg->SetFlag(Message::Flag::Handled, true);
   }
 
   ADD_MSG_HANDLER(Message_GUI_Up)
@@ -95,11 +91,6 @@ namespace Engine
   ADD_MSG_HANDLER(Message_GUI_PointerDown)
   ADD_MSG_HANDLER(Message_GUI_PointerMove)
   ADD_MSG_HANDLER(Message_GUI_Text)
-
-  void UIFrame::HandleMessage(Message_Window_Resized * a_pMsg)
-  {
-    UIRenderer::Instance()->SetScreenSize(vec2((float)a_pMsg->w, (float)a_pMsg->h));
-  }
 
   void UIFrame::Draw()
   {

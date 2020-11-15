@@ -31,52 +31,63 @@ namespace Engine
     Clear();
   }
 
-  bool SystemStack::PushLayer(System * a_pLayer, System::ID a_ID)
+  bool SystemStack::PushSystem(System * a_pLayer, System::ID a_ID)
   {
     BSR_ASSERT(a_pLayer != nullptr);
 
-    if (m_layerStack.find(a_ID) != m_layerStack.end())
+    if (Find(a_ID) != m_systemStack.end())
       return false;
 
-    m_layerStack.insert(a_ID, a_pLayer);
+    m_systemStack.push_back({a_ID, a_pLayer});
     a_pLayer->OnAttach();
     return true;
   }
 
-  void SystemStack::PopLayer(System::ID a_ID)
+  void SystemStack::PopSystem(System::ID a_ID)
   {
-    auto it = m_layerStack.find(a_ID);
-    if (it != m_layerStack.end())
+    auto it = Find(a_ID);
+    if (it != m_systemStack.end())
     {
       it->second->OnDetach();
       delete it->second;
-      m_layerStack.erase(it);
+      m_systemStack.erase(it);
     }
   }
 
   void SystemStack::Clear()
   {
-    for (auto kv : m_layerStack)
+    for (auto kv : m_systemStack)
       delete kv.second;
-    m_layerStack.clear();
+    m_systemStack.clear();
   }
 
-  System * SystemStack::GetLayer(System::ID a_ID)
+  System * SystemStack::GetSystem(System::ID a_ID)
   {
     System * result(nullptr);
-    auto it = m_layerStack.find(a_ID);
-    if (it != m_layerStack.end())
+    auto it = Find(a_ID);
+    if (it != m_systemStack.end())
       result = it->second;
     return result;
   }
 
-  Dg::Map_AVL<System::ID, System *>::iterator SystemStack::begin()
+  SystemStack::List::iterator SystemStack::Find(System::ID a_id)
   {
-    return m_layerStack.begin();
+    List::iterator it = m_systemStack.begin();
+    for (; it != m_systemStack.end(); it++)
+    {
+      if (it->first == a_id)
+        break;
+    }
+    return it;
   }
 
-  Dg::Map_AVL<System::ID, System *>::iterator SystemStack::end()
+  SystemStack::List::iterator SystemStack::begin()
   {
-    return m_layerStack.end();
+    return m_systemStack.begin();
+  }
+
+  SystemStack::List::iterator SystemStack::end()
+  {
+    return m_systemStack.end();
   }
 }

@@ -32,7 +32,7 @@ namespace Engine
   static char const * g_box_fs = R"(
       #version 430
       uniform vec4 colour;
-      out vec4 FragColor;
+      out vec4 FragColour;
       void main()
       {
         FragColour = colour;
@@ -72,6 +72,7 @@ namespace Engine
 
   UIRenderer * UIRenderer::Instance()
   {
+    BSR_ASSERT(s_pInstance != nullptr);
     return s_pInstance;
   }
 
@@ -92,5 +93,30 @@ namespace Engine
   UIRenderer::~UIRenderer()
   {
     delete m_pimpl;
+  }
+
+  void UIRenderer::Bind()
+  {
+  
+  }
+
+  void UIRenderer::Unbind()
+  {
+  
+  }
+
+  void UIRenderer::SetScreenSize(vec2 const & a_pos)
+  {
+    m_pimpl->material->SetUniform("windowSize", a_pos.GetData(), sizeof(a_pos));
+  }
+
+  void UIRenderer::DrawBox(vec2 const & a_position, vec2 const & a_size, Colour a_colour)
+  {
+  
+  }
+
+  void UIRenderer::DrawRoundedBox(vec2 const & a_position, vec2 const & a_size, Colour a_colour, float a_radius)
+  {
+  
   }
 }

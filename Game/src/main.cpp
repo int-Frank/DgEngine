@@ -247,9 +247,9 @@ public:
   Game(Opts const & a_opts)
     : Application(a_opts)
   {
-    PushLayer(new GameSystem());
+    PushSystem(new GameSystem());
 
-    Engine::System_Input * layer = static_cast<Engine::System_Input *>(GetLayer(Engine::System_Input::GetStaticID()));
+    Engine::System_Input * layer = static_cast<Engine::System_Input *>(GetSystem(Engine::System_Input::GetStaticID()));
     if (!layer)
       LOG_ERROR("Couldn't find input layer!");
     else

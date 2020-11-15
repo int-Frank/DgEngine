@@ -26,7 +26,7 @@ namespace Engine
   }
 
   MessageBus::MessageBus(SystemStack & a_ss)
-    : m_layerStack(a_ss)
+    : m_systemStack(a_ss)
     , m_producerIndex(0)
   {
 
@@ -68,8 +68,8 @@ namespace Engine
     for (size_t i = 0; i < m_messageQueue[ind].size(); i++)
     {
       Message* pMsg = m_messageQueue[ind][i];
-      auto it = m_layerStack.begin();
-      for (; it != m_layerStack.end(); it++)
+      auto it = m_systemStack.begin();
+      for (; it != m_systemStack.end(); it++)
       {
         it->second->HandleMessage(pMsg);
         if (pMsg->QueryFlag(Message::Flag::Handled))

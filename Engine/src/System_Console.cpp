@@ -24,8 +24,10 @@ namespace Engine
 
   void System_Console::HandleMessage(Message * a_pMsg)
   {
-    if (a_pMsg->GetCategory() != MC_Input)
-      return;
+    LOG_DEBUG("MSG: {}", a_pMsg->ToString());
+
+    //if (a_pMsg->GetCategory() != MC_Input)
+    //  return;
 
   }
 }
