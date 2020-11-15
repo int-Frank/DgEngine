@@ -34,7 +34,6 @@ namespace Engine
     void HandleMessage(Message_Window_Exposed *);
     void HandleMessage(Message_Window_Moved *);
     void HandleMessage(Message_Window_Resized *);
-    void HandleMessage(Message_Window_Size_Changed *);
     void HandleMessage(Message_Window_Minimized *);
     void HandleMessage(Message_Window_Maximized *);
     void HandleMessage(Message_Window_Restored *);

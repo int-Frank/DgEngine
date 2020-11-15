@@ -55,7 +55,7 @@ namespace Engine
     RENDER_SUBMIT(state, [resID = m_id, pData = pData]() mutable
     {
       // TODO all of these we should check that *ptr != nullptr, but really, nullptrs should not be in RenderThreadData
-      RT_Texture2D ** ppTexture =  RenderThreadData::Instance()->textures.at(resID);
+      RT_Texture2D ** ppTexture = RenderThreadData::Instance()->textures.at(resID);
       if (ppTexture != nullptr)
       {
         delete *ppTexture;

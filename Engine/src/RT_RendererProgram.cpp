@@ -17,7 +17,6 @@
 */
 
 //#include <fstream>
-#include "glad/glad.h"
 
 #include "RT_RendererProgram.h"
 #include "RT_Texture.h"
@@ -29,6 +28,8 @@
 #include "DgStringFunctions.h"
 #include "Serialize.h"
 #include "ResourceManager.h"
+
+#include "glad/glad.h"
 
 //TODO Parse uniform blocks, shader storage blocks
 

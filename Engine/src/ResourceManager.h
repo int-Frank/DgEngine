@@ -10,8 +10,14 @@
 
 namespace Engine
 {
+  // IDs above 0x80000000 are reserved
   typedef uint32_t ResourceID;
 #define INVALID_RESOURCE_ID 0xFFFFFFFF
+
+  enum InternalResourceID : ResourceID
+  {
+    ir_GUIShaderData = (0x80000000 + 1)
+  };
 
   class ResourceWrapperBase
   {

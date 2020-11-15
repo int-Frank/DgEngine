@@ -36,14 +36,17 @@ namespace Engine
     void BindHoverSelect(std::function<void()> a_fn);
 
     void HandleMessage(Message *) override;
-    void HandleMessage(Message_GUI_PointerDown *);
-    void HandleMessage(Message_GUI_PointerMove *);
 
     void Draw() override;
 
     UIState QueryState() const override;
     UIWidget * GetParent() const override;
     void SetParent(UIWidget *) override;
+
+  private:
+
+    void HandleMessage(Message_GUI_PointerDown *);
+    void HandleMessage(Message_GUI_PointerMove *);
 
   private:
 

@@ -277,7 +277,7 @@ namespace Engine
         return StaticPointerCast<Message>(pMsg);
       }
       case  SDL_WINDOWEVENT_SIZE_CHANGED:
-      case  SDL_WINDOWEVENT_RESIZED:
+      //case  SDL_WINDOWEVENT_RESIZED: // Use SDL_WINDOWEVENT_SIZE_CHANGED instead
       {
         TRef<Message_Window_Resized> pMsg = TRef<Message_Window_Resized>::New();
         pMsg->w = a_event.data1;

@@ -14,6 +14,7 @@
 #include "InputCodes.h"
 
 #include "UIButton.h"
+#include "UIWindow.h"
 #include "EngineMessages.h"
 #include "DgBinPacker.h"
 #include "DgRNG_Local.h"
@@ -199,23 +200,6 @@ public:
     m_pButton->BindHoverSelect([]() {LOG_WARN("PRESSED");});
     m_pButton->BindHoverOn([](){LOG_DEBUG("HOVER ON");});
     m_pButton->BindHoverOff([](){LOG_DEBUG("HOVER OFF");});
-
-    /*Engine::UIButton * btn0 = Engine::UIButton::Create("btn0", mat1);
-    Engine::UIButton * btn1 = Engine::UIButton::Create("btn1", mat2);
-    btn0->AddBinding(Engine::UIEvent::HoverOn, [](UIWidget * pWidget, UICallbackData const & a_data)
-      {
-        UIHoverMessage * ptr = RESERVE_AND_POST(sizeof(UIHoverMessage));
-        ptr->uiID = 1;
-      }); 
-    btn1->AddBinding(Engine::UIEvent::Activate, [](UIWidget * pWidget, UICallbackData const & a_data)
-      {
-        UIActivateMessage * ptr = RESERVE_AND_POST(sizeof(UIActivateMessage));
-        ptr->uiID = 2;
-        AnotherMessage * ptr = RESERVE_AND_POST(sizeof(AnotherMessage));
-        ptr->someData = someValue;
-      });
-    m_form.Add(btn0);
-    m_form.Add(btn1);*/
 
   }
 

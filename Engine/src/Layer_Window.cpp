@@ -45,7 +45,6 @@ namespace Engine
     DISPATCH_MESSAGE(Message_Window_Exposed);
     DISPATCH_MESSAGE(Message_Window_Moved);
     DISPATCH_MESSAGE(Message_Window_Resized);
-    DISPATCH_MESSAGE(Message_Window_Size_Changed);
     DISPATCH_MESSAGE(Message_Window_Minimized);
     DISPATCH_MESSAGE(Message_Window_Maximized);
     DISPATCH_MESSAGE(Message_Window_Restored);
@@ -78,11 +77,6 @@ namespace Engine
   }
 
   void Layer_Window::HandleMessage(Message_Window_Resized *)
-  {
-    
-  }
-
-  void Layer_Window::HandleMessage(Message_Window_Size_Changed *)
   {
     
   }

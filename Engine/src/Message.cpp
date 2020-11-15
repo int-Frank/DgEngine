@@ -134,13 +134,6 @@ namespace Engine
     return ss.str();
   }
 
-  std::string Message_Window_Size_Changed::ToString() const
-  {
-    std::stringstream ss;
-    ss << "Window_Size_Changed [w: " << w << ", h: " << h << "]";
-    return ss.str();
-  }
-
   std::string Message_Input_Text::ToString() const
   {
     std::stringstream ss;

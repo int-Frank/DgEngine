@@ -27,7 +27,6 @@
   ITEM(Window_Exposed, Window) \
   ITEM(Window_Moved, Window) \
   ITEM(Window_Resized, Window) \
-  ITEM(Window_Size_Changed, Window) \
   ITEM(Window_Minimized, Window) \
   ITEM(Window_Maximized, Window) \
   ITEM(Window_Restored, Window) \
@@ -94,11 +93,6 @@ namespace Engine
   };
 
   MESSAGE_CLASS_HEADER(Window_Resized)
-    int32_t   w;
-    int32_t   h;
-  };
-
-  MESSAGE_CLASS_HEADER(Window_Size_Changed)
     int32_t   w;
     int32_t   h;
   };
