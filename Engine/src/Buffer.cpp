@@ -177,7 +177,7 @@ namespace Engine
   // VertexBuffer
   //------------------------------------------------------------------------------------------------
   
-  VertexBuffer::VertexBuffer(void * a_pData, uint32_t a_size, BufferUsage a_usage)
+  VertexBuffer::VertexBuffer(void const * a_pData, uint32_t a_size, BufferUsage a_usage)
   {
     BSR_ASSERT(a_pData != nullptr);
 
@@ -239,7 +239,7 @@ namespace Engine
       });
   }
 
-  void VertexBuffer::SetData(void * a_pData, uint32_t a_size, uint32_t a_offset)
+  void VertexBuffer::SetData(void const * a_pData, uint32_t a_size, uint32_t a_offset)
   {
     BSR_ASSERT(a_pData != nullptr);
 
@@ -305,7 +305,7 @@ namespace Engine
     });
   }
 
-  Ref<VertexBuffer> VertexBuffer::Create(void * a_pData,
+  Ref<VertexBuffer> VertexBuffer::Create(void const * a_pData,
                                          uint32_t a_size,
                                          BufferUsage a_usage)
   {
@@ -324,7 +324,7 @@ namespace Engine
   // UniformBuffer
   //------------------------------------------------------------------------------------------------
 
-  UniformBuffer::UniformBuffer(void * a_pData, uint32_t a_size, BufferUsage a_usage)
+  UniformBuffer::UniformBuffer(void const * a_pData, uint32_t a_size, BufferUsage a_usage)
   {
     BSR_ASSERT(a_pData != nullptr);
 
@@ -385,7 +385,7 @@ namespace Engine
     });
   }
 
-  void UniformBuffer::SetData(void * a_pData, uint32_t a_size, uint32_t a_offset)
+  void UniformBuffer::SetData(void const * a_pData, uint32_t a_size, uint32_t a_offset)
   {
     uint8_t* data = (uint8_t*)RENDER_ALLOCATE(a_size);
     memcpy(data, a_pData, a_size);
@@ -449,7 +449,7 @@ namespace Engine
     });
   }
 
-  Ref<UniformBuffer> UniformBuffer::Create(void * a_pData,
+  Ref<UniformBuffer> UniformBuffer::Create(void const * a_pData,
                                            uint32_t a_size,
                                            BufferUsage a_usage)
   {
@@ -494,7 +494,7 @@ namespace Engine
   // ShaderStorageBuffer
   //------------------------------------------------------------------------------------------------
   
-  ShaderStorageBuffer::ShaderStorageBuffer(void * a_pData, uint32_t a_size, BufferUsage a_usage)
+  ShaderStorageBuffer::ShaderStorageBuffer(void const * a_pData, uint32_t a_size, BufferUsage a_usage)
   {
     BSR_ASSERT(a_pData != nullptr);
 
@@ -553,7 +553,7 @@ namespace Engine
     });
   }
 
-  void ShaderStorageBuffer::SetData(void * a_pData, uint32_t a_size, uint32_t a_offset)
+  void ShaderStorageBuffer::SetData(void const * a_pData, uint32_t a_size, uint32_t a_offset)
   {
     BSR_ASSERT(a_pData != nullptr);
 
@@ -619,7 +619,7 @@ namespace Engine
     });
   }
 
-  Ref<ShaderStorageBuffer> ShaderStorageBuffer::Create(void * a_pData,
+  Ref<ShaderStorageBuffer> ShaderStorageBuffer::Create(void const * a_pData,
                                            uint32_t a_size,
                                            BufferUsage a_usage)
   {
@@ -664,7 +664,7 @@ namespace Engine
   // IndexBuffer
   //------------------------------------------------------------------------------------------------
 
-  IndexBuffer::IndexBuffer(void * a_pData, uint32_t a_size)
+  IndexBuffer::IndexBuffer(void const * a_pData, uint32_t a_size)
   {
     BSR_ASSERT(a_pData != nullptr);
 
@@ -687,7 +687,7 @@ namespace Engine
       });
   }
 
-  Ref<IndexBuffer> IndexBuffer::Create(void * a_pData, uint32_t a_size)
+  Ref<IndexBuffer> IndexBuffer::Create(void const * a_pData, uint32_t a_size)
   {
     BSR_ASSERT(a_pData != nullptr);
 
@@ -714,7 +714,7 @@ namespace Engine
       });
   }
 
-  void IndexBuffer::SetData(void * a_pData, uint32_t a_size, uint32_t a_offset)
+  void IndexBuffer::SetData(void const * a_pData, uint32_t a_size, uint32_t a_offset)
   {
     BSR_ASSERT(a_pData != nullptr);
 

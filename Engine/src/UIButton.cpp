@@ -2,6 +2,7 @@
 
 #include "UIButton.h"
 #include "MessageHandler.h"
+#include "UI_Internal.h"
 
 namespace Engine
 {
@@ -83,7 +84,7 @@ namespace Engine
 
   void UIButton::Draw()
   {
-
+    UIRenderer::Instance()->DrawBox(m_position, m_size, 0xFF00FFFF);
   }
 
   UIState UIButton::QueryState() const

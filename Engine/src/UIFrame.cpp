@@ -94,7 +94,7 @@ namespace Engine
 
   void UIFrame::Draw()
   {
-    // Bind UI texture
+    UIRenderer::Instance()->Bind();
 
     for (UIWidget * pWidget : m_widgets)
       pWidget->Draw();

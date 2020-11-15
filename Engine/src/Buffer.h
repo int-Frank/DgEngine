@@ -95,7 +95,7 @@ namespace Engine
   class VertexBuffer : public RenderResource
   {
   private:
-    VertexBuffer(void* data, uint32_t size, BufferUsage a_usage = BufferUsage::Static);
+    VertexBuffer(void const * data, uint32_t size, BufferUsage a_usage = BufferUsage::Static);
     VertexBuffer(uint32_t size, BufferUsage a_usage = BufferUsage::Static);
 
     VertexBuffer(VertexBuffer const&) = delete;
@@ -103,7 +103,7 @@ namespace Engine
 
   public:
     
-    static Ref<VertexBuffer> Create(void * a_pData,
+    static Ref<VertexBuffer> Create(void const * a_pData,
                                   uint32_t a_size,
                                   BufferUsage a_usage = BufferUsage::Static);
 
@@ -112,7 +112,7 @@ namespace Engine
 
     ~VertexBuffer();
 
-    void SetData(void* data, uint32_t size, uint32_t offset = 0);
+    void SetData(void const * data, uint32_t size, uint32_t offset = 0);
     void Bind() const;
 
     void SetLayout(BufferLayout const &);
@@ -125,7 +125,7 @@ namespace Engine
   class UniformBuffer : public RenderResource
   {
   private:
-    UniformBuffer(void* data, uint32_t size, BufferUsage a_usage = BufferUsage::Static);
+    UniformBuffer(void const * data, uint32_t size, BufferUsage a_usage = BufferUsage::Static);
     UniformBuffer(uint32_t size, BufferUsage a_usage = BufferUsage::Static);
 
     UniformBuffer(UniformBuffer const&) = delete;
@@ -133,7 +133,7 @@ namespace Engine
 
   public:
     
-    static Ref<UniformBuffer> Create(void * a_pData,
+    static Ref<UniformBuffer> Create(void const * a_pData,
                                      uint32_t a_size,
                                      BufferUsage a_usage = BufferUsage::Static);
 
@@ -142,7 +142,7 @@ namespace Engine
 
     ~UniformBuffer();
 
-    void SetData(void* data, uint32_t size, uint32_t offset = 0);
+    void SetData(void const * data, uint32_t size, uint32_t offset = 0);
     void Bind() const;
     void Bind(Ref<BindingPoint> const&);
 
@@ -156,7 +156,7 @@ namespace Engine
   class ShaderStorageBuffer : public RenderResource
   {
   private:
-    ShaderStorageBuffer(void* data, uint32_t size, BufferUsage a_usage = BufferUsage::Static);
+    ShaderStorageBuffer(void const * data, uint32_t size, BufferUsage a_usage = BufferUsage::Static);
     ShaderStorageBuffer(uint32_t size, BufferUsage a_usage = BufferUsage::Static);
 
     ShaderStorageBuffer(ShaderStorageBuffer const&) = delete;
@@ -164,7 +164,7 @@ namespace Engine
 
   public:
     
-    static Ref<ShaderStorageBuffer> Create(void * a_pData,
+    static Ref<ShaderStorageBuffer> Create(void const * a_pData,
                                            uint32_t a_size,
                                            BufferUsage a_usage = BufferUsage::Static);
 
@@ -173,7 +173,7 @@ namespace Engine
 
     ~ShaderStorageBuffer();
 
-    void SetData(void* data, uint32_t size, uint32_t offset = 0);
+    void SetData(void const * data, uint32_t size, uint32_t offset = 0);
     void Bind() const;
     void Bind(Ref<BindingPoint> const&);
 
@@ -187,18 +187,18 @@ namespace Engine
 
   class IndexBuffer : public RenderResource
   {
-    IndexBuffer(void* data, uint32_t size);
+    IndexBuffer(void const * data, uint32_t size);
 
     IndexBuffer(IndexBuffer const&) = delete;
     IndexBuffer& operator=(IndexBuffer const&) = delete;
   public:
     typedef uint16_t intType;
 
-    static Ref<IndexBuffer> Create(void * a_pData, uint32_t a_size);
+    static Ref<IndexBuffer> Create(void const * a_pData, uint32_t a_size);
 
      ~IndexBuffer();
 
-    void SetData(void* data, uint32_t size, uint32_t offset);
+    void SetData(void const * data, uint32_t size, uint32_t offset);
     void Bind() const;
   };
 

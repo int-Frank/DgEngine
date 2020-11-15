@@ -275,6 +275,7 @@ namespace Engine
 
   void RT_RendererProgram::UploadUniformSingle(int a_location, ShaderDataType a_type,  void const* a_pbuf)
   {
+    // TODO FINISH THESE!
     switch (a_type)
     {
       case ShaderDataType::BOOL:
@@ -285,7 +286,17 @@ namespace Engine
       }
       case ShaderDataType::FLOAT:
       {
-        glUniform1f(a_location, *static_cast<float const*>(a_pbuf));
+        glUniform1f(a_location, *static_cast<float const *>(a_pbuf));
+        break;
+      }
+      case ShaderDataType::VEC2:
+      {
+        glUniform2fv(a_location, 1, static_cast<float const *>(a_pbuf));
+        break;
+      }
+      case ShaderDataType::VEC4:
+      {
+        glUniform4fv(a_location, 1, static_cast<float const *>(a_pbuf));
         break;
       }
     }
