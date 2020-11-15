@@ -255,7 +255,7 @@ namespace Engine
       ShaderUniformDeclaration const * pdecl = &m_pShaderData->GetUniforms()[i];
       uint32_t offset = pdecl->GetDataOffset();
       UniformBufferElementHeader header;
-      void const * buf = header.Deserialize(a_pbuf);
+      void const * buf = header.Deserialize(a_pbuf + offset);
       if (header.GetSize() == 0)
         continue;
 

@@ -91,10 +91,9 @@ namespace Engine
 
   void RenderCommandQueue::Swap()
   {
-    int readInd = (m_writeIndex + 1) % 2;
-    m_commandBuffer[readInd].Clear();
-    m_mem[readInd].clear();
-    m_writeIndex = readInd;
+    m_writeIndex = (m_writeIndex + 1) % 2;
+    m_commandBuffer[m_writeIndex].Clear();
+    m_mem[m_writeIndex].clear();
   }
 
   void RenderCommandQueue::PushCriterion(Ref<RenderSortCriterion> a_crit)

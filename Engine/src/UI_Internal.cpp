@@ -27,8 +27,8 @@ namespace Engine
       uniform vec2 buttonSize;
       void main()
       {
-        //vec2 xy = ((inPos * buttonSize / windowSize  + buttonPos / windowSize) - vec2(0.5, 0.5)) * 2.0;
-        vec2 xy = inPos * buttonPos / vec2(1050.0, 800.0);
+        vec2 xy = ((inPos * buttonSize + buttonPos)  / windowSize  - vec2(0.5, 0.5)) * 2.0;
+        xy.y = -xy.y;
         gl_Position = vec4(xy, 0.0, 1.0);
       })";
 

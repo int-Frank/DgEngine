@@ -248,7 +248,7 @@ public:
       LOG_ERROR("Couldn't find input layer!");
     else
     {
-      Engine::UIButton *pBtn = new Engine::UIButton(nullptr, "Hello", 0, {20.f, 20.f}, {200.f, 200.f});
+      Engine::UIButton *pBtn = new Engine::UIButton(nullptr, "Hello", 0, {20.f, 20.f}, {100.f, 50.f});
       pBtn->BindHoverSelect([](){LOG_WARN("PRESSED");});
       pBtn->BindHoverOn([](){LOG_DEBUG("HOVER ON");});
       pBtn->BindHoverOff([](){LOG_DEBUG("HOVER OFF");});
