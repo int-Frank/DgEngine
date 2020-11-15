@@ -97,7 +97,7 @@ namespace Engine
 
     // Create window
     m_pWindow = SDL_CreateWindow(a_props.name.c_str(), 100, 100,
-      a_props.width, a_props.height, SDL_WINDOW_OPENGL);
+      a_props.width, a_props.height, SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE);
     if(m_pWindow == nullptr)
     {
       LOG_ERROR("Failed to create window!");

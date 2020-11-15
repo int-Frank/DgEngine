@@ -20,9 +20,6 @@ namespace Engine
     static void Destroy();
     static UIRenderer * Instance();
 
-    void Bind();
-    void Unbind();
-
     void SetScreenSize(vec2 const &);
 
     void DrawBox(vec2 const & position, vec2 const & size, Colour colour);

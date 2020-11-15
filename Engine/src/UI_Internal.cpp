@@ -51,17 +51,49 @@ namespace Engine
 
   static int const g_boxIndices[] ={0, 1, 2, 0, 2, 3};
 
-  class UIRenderer::PIMPL
+  struct Renderable
   {
-  public:
-
     Ref<Material>     material;
     Ref<VertexBuffer> vb;
     Ref<IndexBuffer>  ib;
     Ref<VertexArray>  va;
   };
 
+  class UIRenderer::PIMPL
+  {
+  public:
+
+    Renderable renBox;
+
+    void InitBox();
+  };
+
   UIRenderer * UIRenderer::s_pInstance = nullptr;
+
+  void UIRenderer::PIMPL::InitBox()
+  {
+    renBox.vb = VertexBuffer::Create(g_boxVerts, SIZEOF32(g_boxVerts));
+    renBox.vb->SetLayout(
+      {
+        { Engine::ShaderDataType::VEC2, "inPos" }
+      });
+
+    renBox.ib = Engine::IndexBuffer::Create(g_boxIndices, SIZEOF32(g_boxIndices));
+    renBox.va = Engine::VertexArray::Create();
+
+    renBox.va->AddVertexBuffer(renBox.vb);
+    renBox.va->SetIndexBuffer(renBox.ib);
+
+    Engine::ShaderData * pSD = new ShaderData({
+        { Engine::ShaderDomain::Vertex, Engine::StrType::Source, g_box_vs },
+        { Engine::ShaderDomain::Fragment, Engine::StrType::Source, g_box_fs }
+      });
+
+    ResourceManager::Instance()->RegisterResource(ir_GUIShaderData, pSD);
+    Ref<Engine::RendererProgram> refProg;
+    refProg = Engine::RendererProgram::Create(ir_GUIShaderData);
+    renBox.material = Material::Create(refProg);
+  }
 
   bool UIRenderer::Init()
   {
@@ -85,27 +117,7 @@ namespace Engine
   UIRenderer::UIRenderer()
     : m_pimpl(new PIMPL())
   {
-    m_pimpl->vb = VertexBuffer::Create(g_boxVerts, SIZEOF32(g_boxVerts));
-    m_pimpl->vb->SetLayout(
-      {
-        { Engine::ShaderDataType::VEC2, "inPos" }
-      });
-
-    m_pimpl->ib = Engine::IndexBuffer::Create(g_boxIndices, SIZEOF32(g_boxIndices));
-    m_pimpl->va = Engine::VertexArray::Create();
-
-    m_pimpl->va->AddVertexBuffer(m_pimpl->vb);
-    m_pimpl->va->SetIndexBuffer(m_pimpl->ib);
-
-    Engine::ShaderData * pSD = new ShaderData({
-        { Engine::ShaderDomain::Vertex, Engine::StrType::Source, g_box_vs },
-        { Engine::ShaderDomain::Fragment, Engine::StrType::Source, g_box_fs }
-      });
-
-    ResourceManager::Instance()->RegisterResource(ir_GUIShaderData, pSD);
-    Ref<Engine::RendererProgram> refProg;
-    refProg = Engine::RendererProgram::Create(ir_GUIShaderData);
-    m_pimpl->material = Material::Create(refProg);
+    m_pimpl->InitBox();
   }
 
   UIRenderer::~UIRenderer()
@@ -113,31 +125,21 @@ namespace Engine
     delete m_pimpl;
   }
 
-  void UIRenderer::Bind()
-  {
-    m_pimpl->material->Bind(); // TODO this material is specific to drawing boxes and should be moved to DrawBox()
-  }
-
-  void UIRenderer::Unbind()
-  {
-    // ?? How to unbind / restore state?
-  }
-
   void UIRenderer::SetScreenSize(vec2 const & a_size)
   {
-    m_pimpl->material->SetUniform("windowSize", a_size.GetData(), sizeof(a_size));
+    m_pimpl->renBox.material->SetUniform("windowSize", a_size.GetData(), sizeof(a_size));
   }
 
   void UIRenderer::DrawBox(vec2 const & a_position, vec2 const & a_size, Colour a_colour)
   {
     float clr[4] = {a_colour.fr(), a_colour.fg(), a_colour.fb(), a_colour.fa()};
 
-    m_pimpl->material->SetUniform("colour", clr, sizeof(clr));
-    m_pimpl->material->SetUniform("buttonPos", a_position.GetData(), sizeof(a_position));
-    m_pimpl->material->SetUniform("buttonSize", a_size.GetData(), sizeof(a_size));
+    m_pimpl->renBox.material->SetUniform("colour", clr, sizeof(clr));
+    m_pimpl->renBox.material->SetUniform("buttonPos", a_position.GetData(), sizeof(a_position));
+    m_pimpl->renBox.material->SetUniform("buttonSize", a_size.GetData(), sizeof(a_size));
 
-    m_pimpl->material->Bind();
-    m_pimpl->va->Bind();
+    m_pimpl->renBox.material->Bind();
+    m_pimpl->renBox.va->Bind();
 
     Renderer::DrawIndexed(6, false);
   }

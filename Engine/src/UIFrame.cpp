@@ -94,8 +94,6 @@ namespace Engine
 
   void UIFrame::Draw()
   {
-    UIRenderer::Instance()->Bind();
-
     for (UIWidget * pWidget : m_widgets)
       pWidget->Draw();
 

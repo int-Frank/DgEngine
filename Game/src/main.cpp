@@ -216,12 +216,12 @@ public:
 
   void Render() override
   {
-    //Engine::Renderer::Clear(1.0f, 0.0f, 1.0f);
+    Engine::Renderer::Clear(1.0f, 0.0f, 1.0f);
 
-    //m_material->Bind();
-    //m_va->Bind();
+    m_material->Bind();
+    m_va->Bind();
 
-    //Engine::Renderer::DrawIndexed(6, false);
+    Engine::Renderer::DrawIndexed(6, false);
 
   }
 
@@ -232,7 +232,6 @@ private:
   Engine::Ref<Engine::VertexArray>      m_va;
   Engine::Ref<Engine::Texture2D>        m_texture;
   Engine::Ref<Engine::Material>         m_material;
-  //Engine::UIForm                        m_form;
 };
 
 class Game : public Engine::Application

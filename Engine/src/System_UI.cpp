@@ -43,7 +43,6 @@ namespace Engine
 
   void System_UI::Render()
   {
-    UIRenderer::Instance()->Bind();
     m_frame.Draw();
   }
 
