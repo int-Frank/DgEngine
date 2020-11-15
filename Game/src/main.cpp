@@ -4,6 +4,7 @@
 
 #include "Engine.h"
 #include "System_Input.h"
+#include "System_UI.h"
 #include "Renderer.h"
 #include "RT_RendererAPI.h"
 #include "Buffer.h"
@@ -195,17 +196,11 @@ public:
 
     m_material->SetTexture("texture1", m_texture);
     m_material->Bind();
-
-    m_pButton = new Engine::UIButton(nullptr, "Hello", 0, {20.f, 20.f}, {200.f, 200.f});
-    m_pButton->BindHoverSelect([]() {LOG_WARN("PRESSED");});
-    m_pButton->BindHoverOn([](){LOG_DEBUG("HOVER ON");});
-    m_pButton->BindHoverOff([](){LOG_DEBUG("HOVER OFF");});
-
   }
 
   void HandleMessage(Engine::Message* a_pMsg) override
   {
-    m_pButton->HandleMessage(a_pMsg);
+
   }
 
   void OnDetach() override
@@ -237,7 +232,6 @@ private:
   Engine::Ref<Engine::VertexArray>      m_va;
   Engine::Ref<Engine::Texture2D>        m_texture;
   Engine::Ref<Engine::Material>         m_material;
-  Engine::UIButton *                    m_pButton;
   //Engine::UIForm                        m_form;
 };
 
@@ -248,6 +242,18 @@ public:
     : Application(a_opts)
   {
     PushSystem(new GameSystem());
+
+    Engine::System_UI * pSysUI = static_cast<Engine::System_UI *>(GetSystem(Engine::System_UI::GetStaticID()));
+    if (!pSysUI)
+      LOG_ERROR("Couldn't find input layer!");
+    else
+    {
+      Engine::UIButton *pBtn = new Engine::UIButton(nullptr, "Hello", 0, {20.f, 20.f}, {200.f, 200.f});
+      pBtn->BindHoverSelect([](){LOG_WARN("PRESSED");});
+      pBtn->BindHoverOn([](){LOG_DEBUG("HOVER ON");});
+      pBtn->BindHoverOff([](){LOG_DEBUG("HOVER OFF");});
+      pSysUI->AddWidget(pBtn);
+    }
 
     Engine::System_Input * layer = static_cast<Engine::System_Input *>(GetSystem(Engine::System_Input::GetStaticID()));
     if (!layer)

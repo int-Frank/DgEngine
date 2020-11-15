@@ -43,6 +43,16 @@ namespace Engine
 
   void System_UI::Render()
   {
+    m_frame.Draw();
+  }
 
+  void System_UI::ClearFrame()
+  {
+    m_frame.Clear();
+  }
+
+  void System_UI::AddWidget(UIWidget * a_pWgt)
+  {
+    m_frame.Add(a_pWgt);
   }
 }

@@ -23,7 +23,8 @@ namespace Engine
     void Update(float);
     void Render();
 
-
+    void ClearFrame();
+    void AddWidget(UIWidget *);
 
   private:
 

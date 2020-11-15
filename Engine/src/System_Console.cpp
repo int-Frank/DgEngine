@@ -3,7 +3,8 @@
 #include "System_Console.h"
 #include "core_Log.h"
 
-#define LOG_MESSAGE(...) LOG_TRACE(__VA_ARGS__)
+#define IGNORE_MESSAGE(TYPE) if (a_pMsg->GetID() == TYPE::GetStaticID()) return
+#define LOG_MESSAGE(...) LOG_DEBUG(__VA_ARGS__)
 
 namespace Engine
 {
@@ -24,10 +25,7 @@ namespace Engine
 
   void System_Console::HandleMessage(Message * a_pMsg)
   {
-    LOG_DEBUG("MSG: {}", a_pMsg->ToString());
-
-    //if (a_pMsg->GetCategory() != MC_Input)
-    //  return;
-
+    IGNORE_MESSAGE(Message_GUI_PointerMove);
+    LOG_MESSAGE("MSG: {}", a_pMsg->ToString());
   }
 }
