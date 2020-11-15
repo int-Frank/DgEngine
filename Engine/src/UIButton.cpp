@@ -9,6 +9,8 @@ namespace Engine
   UIButton::UIButton(UIWidget * a_pParent, std::string const & a_text, uint32_t a_fontID, vec2 const & a_position, vec2 const & a_size)
     : m_text(a_text)
     , m_fontID(a_fontID)
+    , m_clrDefault(0xFF0000FF)
+    , m_clrHover(0xFF00FFFF)
     , m_position(a_position)
     , m_size(a_size)
     , m_state(UIState::None)
@@ -84,7 +86,7 @@ namespace Engine
 
   void UIButton::Draw()
   {
-    UIRenderer::Instance()->DrawBox(m_position, m_size, 0xFF00FFFF);
+    UIRenderer::Instance()->DrawBox(m_position, m_size, m_state == UIState::None ? m_clrDefault : m_clrHover);
   }
 
   UIState UIButton::QueryState() const

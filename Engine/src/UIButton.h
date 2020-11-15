@@ -26,9 +26,6 @@ namespace Engine
     //void SetBackgroundColour(Colour);
     //void SetHoverOnBackgroundColour(Colour);
 
-    //void _SetHoverOn() override;
-    //void _SetHoverOff() override;
-
     void ClearBindings();
 
     void BindHoverOn(std::function<void()> a_fn);
@@ -52,6 +49,8 @@ namespace Engine
 
     std::string m_text;
     uint32_t m_fontID;
+    Colour m_clrDefault;
+    Colour m_clrHover;
     vec2 m_position;
     vec2 m_size;
     UIState m_state;
