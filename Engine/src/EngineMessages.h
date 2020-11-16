@@ -34,7 +34,7 @@
   ITEM(Window_Leave, Window) \
   ITEM(Window_Focus_Gained, Window) \
   ITEM(Window_Focus_Lost, Window) \
-  ITEM(Window_Close, Window) \
+  ITEM(Quit, None) \
   ITEM(Window_Take_Focus, Window) \
   ITEM(Input_Text, Input) \
   ITEM(Input_KeyUp, Input) \
@@ -104,7 +104,7 @@ namespace Engine
   MESSAGE_CLASS_HEADER(Window_Leave) };
   MESSAGE_CLASS_HEADER(Window_Focus_Gained) };
   MESSAGE_CLASS_HEADER(Window_Focus_Lost) };
-  MESSAGE_CLASS_HEADER(Window_Close) };
+  MESSAGE_CLASS_HEADER(Quit) };
   MESSAGE_CLASS_HEADER(Window_Take_Focus) };
 
   MESSAGE_CLASS_HEADER(Input_Text)

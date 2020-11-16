@@ -266,9 +266,17 @@ public:
         {
           Engine::Message_Input_MouseMove * pIn = (Engine::Message_Input_MouseMove *)pMsg;
           Engine::Message_GUI_PointerMove * pOut = nullptr;
-          ALLOC_NEW_MESSAGE(Engine::Message_GUI_PointerMove, pOut);
+          EMPLACE_POST(Engine::Message_GUI_PointerMove, pOut);
           pOut->x = pIn->x;
           pOut->y = pIn->y;
+        });
+
+      layer->AddBinding(Engine::Message_Input_KeyDown::GetStaticID(),
+        [](Engine::Message const * pMsg)
+        {
+          Engine::Message_Input_KeyDown * pIn = (Engine::Message_Input_KeyDown *)pMsg;
+          if (pIn->keyCode == Engine::IC_KEY_Q && (pIn->modState & KM_ALT) != 0)
+            EMPLACE_POST(Engine::Message_Quit);
         });
 
       layer->AddBinding(Engine::Message_Input_MouseButtonDown::GetStaticID(),
@@ -279,7 +287,7 @@ public:
             return;
 
           Engine::Message_GUI_PointerDown * pOut = nullptr;
-          ALLOC_NEW_MESSAGE(Engine::Message_GUI_PointerDown, pOut);
+          EMPLACE_POST(Engine::Message_GUI_PointerDown, pOut);
           pOut->x = pIn->x;
           pOut->y = pIn->y;
         });
@@ -292,7 +300,7 @@ public:
             return;
 
           Engine::Message_GUI_PointerUp * pOut = nullptr;
-          ALLOC_NEW_MESSAGE(Engine::Message_GUI_PointerUp, pOut);
+          EMPLACE_POST(Engine::Message_GUI_PointerUp, pOut);
           pOut->x = pIn->x;
           pOut->y = pIn->y;
         });

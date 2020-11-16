@@ -41,7 +41,7 @@ namespace Engine
     void HandleMessage(Message_Window_Leave *);
     void HandleMessage(Message_Window_Focus_Gained *);
     void HandleMessage(Message_Window_Focus_Lost *);
-    void HandleMessage(Message_Window_Close *);
+    void HandleMessage(Message_Quit *);
     void HandleMessage(Message_Window_Take_Focus *);
 
   private:

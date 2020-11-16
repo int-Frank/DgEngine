@@ -6,10 +6,10 @@
 #include <stdint.h>
 #include "core_Utils.h"
 
-#define KM_SHIFT (KM_LSHIFT | KM_RSHIFT)
-#define KM_CTRL (KM_LCTRL | KM_RCTRL)
-#define KM_ALT  (KM_LALT | KM_RALT)
-#define KM_GUI  (KM_LGUI | KM_RGUI)
+#define KM_SHIFT (::Engine::KeyMod::KM_LSHIFT | ::Engine::KeyMod::KM_RSHIFT)
+#define KM_CTRL (::Engine::KeyMod::KM_LCTRL | ::Engine::KeyMod::KM_RCTRL)
+#define KM_ALT  (::Engine::KeyMod::KM_LALT | ::Engine::KeyMod::KM_RALT)
+#define KM_GUI  (::Engine::KeyMod::KM_LGUI | ::Engine::KeyMod::KM_RGUI)
 
 namespace Engine
 {

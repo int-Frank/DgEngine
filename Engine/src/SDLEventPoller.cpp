@@ -299,7 +299,7 @@ namespace Engine
       case  SDL_WINDOWEVENT_FOCUS_LOST:
         return StaticPointerCast<Message>(TRef<Message_Window_Focus_Lost>::New());
       case  SDL_WINDOWEVENT_CLOSE:
-        return StaticPointerCast<Message>(TRef<Message_Window_Close>::New());
+        return StaticPointerCast<Message>(TRef<Message_Quit>::New());
       case  SDL_WINDOWEVENT_TAKE_FOCUS:
         return StaticPointerCast<Message>(TRef<Message_Window_Take_Focus>::New());
       default:
@@ -385,7 +385,7 @@ namespace Engine
         case SDL_WINDOWEVENT:
           return TranslateWindowEvent(event.window);
         case SDL_QUIT:
-          return StaticPointerCast<Message>(TRef<Message_Window_Close>::New());
+          return StaticPointerCast<Message>(TRef<Message_Quit>::New());
         default:
           break;
       }

@@ -39,6 +39,8 @@ namespace Engine
 
   void System_Window::HandleMessage(Message* a_pMsg)
   {
+    DISPATCH_MESSAGE(Message_Quit);
+
     if (a_pMsg->GetCategory() != MC_Window)
       return;
 
@@ -54,7 +56,7 @@ namespace Engine
     DISPATCH_MESSAGE(Message_Window_Leave);
     DISPATCH_MESSAGE(Message_Window_Focus_Gained);
     DISPATCH_MESSAGE(Message_Window_Focus_Lost);
-    DISPATCH_MESSAGE(Message_Window_Close);
+    DISPATCH_MESSAGE(Message_Quit);
     DISPATCH_MESSAGE(Message_Window_Take_Focus);
   }
 
@@ -125,7 +127,7 @@ namespace Engine
     
   }
 
-  void System_Window::HandleMessage(Message_Window_Close * a_pMsg)
+  void System_Window::HandleMessage(Message_Quit * a_pMsg)
   {
     Application::Instance()->RequestQuit();
     a_pMsg->SetFlag(Message::Flag::Handled, true);

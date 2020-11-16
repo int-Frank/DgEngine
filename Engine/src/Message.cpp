@@ -94,12 +94,12 @@ namespace Engine
   MESSAGE_TO_STRING(Window_Leave)
   MESSAGE_TO_STRING(Window_Focus_Gained)
   MESSAGE_TO_STRING(Window_Focus_Lost)
-  MESSAGE_TO_STRING(Window_Close)
+  MESSAGE_TO_STRING(Quit)
   MESSAGE_TO_STRING(Window_Take_Focus)
   MESSAGE_TO_STRING(Input_MouseWheelUp)
   MESSAGE_TO_STRING(Input_MouseWheelDown)
 
-    std::string Message_GUI_PointerDown::ToString() const
+  std::string Message_GUI_PointerDown::ToString() const
   {
     std::stringstream ss;
     ss << "GUI_PointerDown [context: " << context << ", x: " << x << ", y: " << y << "]";

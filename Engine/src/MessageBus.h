@@ -12,7 +12,24 @@
 #include "Memory.h"
 
 #define POST(msg) ::Engine::MessageBus::Instance()->Register(msg)
-#define ALLOC_NEW_MESSAGE(msgType, ptr) ptr = static_cast<msgType*>(::Engine::MessageBus::Instance()->_ReserveAndRegister(sizeof(msgType))); new (ptr) msgType()
+#define EMPLACE_POST(...) CALL_OVERLOAD(EMPLACE_POST, __VA_ARGS__)
+
+// TODO check for nullptr
+#define EMPLACE_POST2(msgType, ptr) ptr = static_cast<msgType*>(::Engine::MessageBus::Instance()->_ReserveAndRegister(sizeof(msgType))); new (ptr) msgType()
+#define EMPLACE_POST1(msgType) new (static_cast<msgType*>(::Engine::MessageBus::Instance()->_ReserveAndRegister(sizeof(msgType)))) msgType()
+
+#define GLUE(x, y) x y
+
+#define RETURN_ARG_COUNT(_1_, _2_, _3, count, ...) count
+#define EXPAND_ARGS(args) RETURN_ARG_COUNT args
+#define COUNT_ARGS_MAX5(...) EXPAND_ARGS((__VA_ARGS__, 3, 2, 1, 0))
+
+#define OVERLOAD_MACRO2(name, count) name##count
+#define OVERLOAD_MACRO1(name, count) OVERLOAD_MACRO2(name, count)
+#define OVERLOAD_MACRO(name, count) OVERLOAD_MACRO1(name, count)
+
+#define CALL_OVERLOAD(name, ...) GLUE(OVERLOAD_MACRO(name, COUNT_ARGS_MAX5(__VA_ARGS__)), (__VA_ARGS__))
+
 
 namespace Engine
 {
