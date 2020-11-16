@@ -3,6 +3,7 @@
 #ifndef EN_OPENGLCONTEXT_H
 #define EN_OPENGLCONTEXT_H
 
+#include <stdint.h>
 #include "IGraphicsContext.h"
 
 struct SDL_Window;
@@ -22,6 +23,7 @@ namespace Engine
     Core::ErrorCode ShutDown() override;
     void SetSDLWindow(SDL_Window *);
     void SwapBuffers() override;
+    void Resize(uint32_t w, uint32_t h) override;
 
   private:
 

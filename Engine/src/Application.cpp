@@ -98,11 +98,11 @@ namespace Engine
     if (!RenderThread::Init())
       throw std::runtime_error("Failed to initialise Renderer!");
 
-    Framework::ImGui_InitData imguiData;
-    m_pimpl->pWindow->GetDimensions(imguiData.window_w, imguiData.window_h);
+    int windowWidth, windowHeight;
+    m_pimpl->pWindow->GetDimensions(windowWidth, windowHeight);
 
     UIRenderer::Init();
-    UIRenderer::Instance()->SetScreenSize(vec2((float)imguiData.window_w, (float)imguiData.window_h));
+    UIRenderer::Instance()->SetScreenSize(vec2((float)windowWidth, (float)windowHeight));
 
     m_pimpl->systemStack.PushSystem(new System_Application(), System_Application::GetStaticID());
     m_pimpl->systemStack.PushSystem(new System_Input(), System_Input::GetStaticID());
@@ -163,11 +163,6 @@ namespace Engine
 
       for (auto it = m_pimpl->systemStack.begin(); it != m_pimpl->systemStack.end(); it++)
         it->second->Update(dt);
-
-      //System_UI * imguiLayer = static_cast<System_UI*>(m_pimpl->systemStack.GetSystem(System_UI::GetID()));
-      //imguiLayer->NewFrame();
-      //for (auto it = m_pimpl->systemStack.begin(); it != m_pimpl->systemStack.end(); it++)
-      //  it->second->DoImGui();
 
       auto it = m_pimpl->systemStack.end();
       while (it != m_pimpl->systemStack.begin())

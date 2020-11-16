@@ -6,6 +6,8 @@
 #include "EngineMessages.h"
 #include "Application.h"
 #include "IWindow.h"
+#include "Framework.h"
+#include "Renderer.h"
 
 namespace Engine
 {
@@ -76,9 +78,16 @@ namespace Engine
     
   }
 
-  void System_Window::HandleMessage(Message_Window_Resized *)
+  void System_Window::HandleMessage(Message_Window_Resized * a_pMsg)
   {
-    
+    RenderState state = RenderState::Create();
+    state.Set<RenderState::Attr::Type>(RenderState::Type::Command);
+    state.Set<RenderState::Attr::Command>(RenderState::Command::Resize);
+
+    RENDER_SUBMIT(state, [w = a_pMsg->w, h = a_pMsg->h]() mutable
+      {
+        Framework::Instance()->GetGraphicsContext()->Resize(w, h);
+      });
   }
 
   void System_Window::HandleMessage(Message_Window_Minimized *)

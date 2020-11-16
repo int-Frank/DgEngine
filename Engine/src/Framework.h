@@ -30,14 +30,6 @@ namespace Engine
   {
   public:
 
-    struct ImGui_InitData
-    {
-      int window_w;
-      int window_h;
-    };
-
-  public:
-
     Framework();
     ~Framework();
 

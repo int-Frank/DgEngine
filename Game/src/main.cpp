@@ -259,6 +259,7 @@ public:
       LOG_ERROR("Couldn't find input layer!");
     else
     {
+      // TODO A helper function should live in the Engine
       // Hook up GUI events
       layer->AddBinding(Engine::Message_Input_MouseMove::GetStaticID(),
         [](Engine::Message const * pMsg)

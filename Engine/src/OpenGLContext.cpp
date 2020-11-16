@@ -68,9 +68,10 @@ namespace Engine
   void OpenGLContext::SwapBuffers()
   {
     SDL_GL_SwapWindow(m_pWindow);
-
-    //TODO move this to the renderer
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
   }
 
+  void OpenGLContext::Resize(uint32_t w, uint32_t h)
+  {
+    glViewport(0, 0, w, h);
+  }
 }

@@ -84,6 +84,7 @@ namespace Engine
       {
         None,
 
+        Resize,
         SwapWindow,
         SetClearColor,
         Clear,

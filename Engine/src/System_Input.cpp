@@ -116,13 +116,9 @@ namespace Engine
 
       auto it = m_bindings.find(pMsg->GetID());
       if (it != m_bindings.end())
-      {
         it->second(pMsg.Get());
-      }
-      else if (pMsg->GetID() == Message_Window_Close::GetStaticID())
-      {
+      else if (pMsg->GetCategory() != MC_Input) // Pass on everything but raw input
         POST(pMsg);
-      }
     }
   }
 }
