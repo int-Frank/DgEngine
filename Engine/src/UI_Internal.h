@@ -23,6 +23,7 @@ namespace Engine
     void SetScreenSize(vec2 const &);
 
     void DrawBox(vec2 const & position, vec2 const & size, Colour colour);
+    void DrawCorner(vec2 const & position, vec2 const & size, Colour colour);
     void DrawRoundedBox(vec2 const & position, vec2 const & size, Colour colour, float radius);
 
   private:

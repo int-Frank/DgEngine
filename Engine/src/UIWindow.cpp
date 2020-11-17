@@ -7,6 +7,31 @@
 
 namespace Engine
 {
+  class WindowGrab
+  {
+  public:
+
+    enum Type
+    {
+      Square,
+      Rounded,
+
+      COUNT
+    };
+
+    WindowGrab(Type = Square);
+
+    vec2 Size() const;
+    bool Intersects(vec2 const & point) const;
+    void Draw(vec2 const & position, Colour clr);
+
+  private:
+
+    static uint16_t s_masks[COUNT][16];
+
+    uint16_t m_mask[16];
+  };
+
   //------------------------------------------------------------------------------------
   // State class declarations
   //------------------------------------------------------------------------------------
@@ -16,9 +41,15 @@ namespace Engine
 
     struct Data
     {
+      Colour clrBackground;
+      Colour clrGrab;
+      Colour clrGrabActive;
+      Colour clrGrabCurrent;
+
       UIWidget * pParent;
       vec2 position;
       vec2 size;
+      WindowGrab grab;
       Dg::DoublyLinkedList<UIWidget *> children;
     };
 
@@ -101,6 +132,56 @@ namespace Engine
   //};
 
   //------------------------------------------------------------------------------------
+  // WindowGrab
+  //------------------------------------------------------------------------------------
+
+  uint16_t WindowGrab::s_masks[WindowGrab::COUNT][16] =
+  {
+    {
+      0x1, 0x3, 0x7, 0xF,
+      0x1F, 0x3F, 0x7F, 0xFF,
+      0x1FF, 0x3FF, 0x7FF, 0xFFF,
+      0x1FFF, 0x3FFF, 0x7FFF, 0xFFFF
+    },
+    {
+      0x1, 0x3, 0x7, 0xF,
+      0x1F, 0x3F, 0x7F, 0xFF,
+      0x1FF, 0x3FF, 0x7FF, 0xFFF,
+      0x1FFF, 0x3FFF, 0x7FFF, 0xFFFF
+    }
+  };
+
+  bool WindowGrab::Intersects(vec2 const & point) const
+  {
+    LOG_DEBUG("[{} {}]", point.x(), point.y());
+    int y = (int)point.y();
+    if (y < 0 || y > 15)
+      return false;
+
+    int x = (int)point.x();
+    if (x < 0 || x > 15)
+      return false;
+
+    return ((1 << (15 - x)) & m_mask[y]) != 0;
+  }
+  
+  WindowGrab::WindowGrab(Type t)
+    : m_mask{}
+  {
+    memcpy(m_mask, s_masks[t], 2 * 16);
+  }
+
+  vec2 WindowGrab::Size() const
+  {
+    return vec2(16.f, 16.f);
+  }
+
+  void WindowGrab::Draw(vec2 const & a_position, Colour a_clr)
+  {
+    UIRenderer::Instance()->DrawCorner(a_position, vec2(16.f, 16.f), a_clr);
+  }
+
+  //------------------------------------------------------------------------------------
   // UIWindowState
   //------------------------------------------------------------------------------------
 
@@ -170,7 +251,8 @@ namespace Engine
 
   void UIWindowState::Draw()
   {
-    UIRenderer::Instance()->DrawBox(m_pData->position, m_pData->size, 0xFF000000);
+    UIRenderer::Instance()->DrawBox(m_pData->position, m_pData->size, m_pData->clrBackground);
+    m_pData->grab.Draw(m_pData->position + m_pData->size - m_pData->grab.Size(), m_pData->clrGrabCurrent);
   }
 
   //------------------------------------------------------------------------------------
@@ -282,6 +364,12 @@ namespace Engine
         break;
       }
     }
+
+    m_pData->clrGrabCurrent = m_pData->clrGrab;
+    vec2 pointer((float)a_pMsg->x, (float)a_pMsg->y);
+    if (m_pData->grab.Intersects(pointer - (m_pData->position + m_pData->size - m_pData->grab.Size())))
+      m_pData->clrGrabCurrent = m_pData->clrGrabActive;
+
     return nullptr;
   }
 
@@ -336,6 +424,10 @@ namespace Engine
     : m_pState(nullptr)
   {
     UIWindowState::Data * pData = new UIWindowState::Data();
+    pData->clrBackground = 0xBB000000;
+    pData->clrGrab = 0xFFFF0000;
+    pData->clrGrabActive = 0xFFFF9999;
+    pData->clrGrabCurrent = pData->clrGrab;
     pData->pParent = a_pParent;
     pData->position = a_position;
     pData->size = a_size;

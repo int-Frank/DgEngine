@@ -49,7 +49,7 @@ namespace Engine
     1.0f, 0.0f,
   };
 
-  static int const g_boxIndices[] ={0, 1, 2, 0, 2, 3};
+  static int const g_boxIndices[] ={1, 2, 3, 3, 0, 1};
 
   struct Renderable
   {
@@ -142,6 +142,20 @@ namespace Engine
     m_pimpl->renBox.va->Bind();
 
     Renderer::DrawIndexed(6, false);
+  }
+
+  void UIRenderer::DrawCorner(vec2 const & a_position, vec2 const & a_size, Colour a_colour)
+  {
+    float clr[4] ={a_colour.fr(), a_colour.fg(), a_colour.fb(), a_colour.fa()};
+
+    m_pimpl->renBox.material->SetUniform("colour", clr, sizeof(clr));
+    m_pimpl->renBox.material->SetUniform("buttonPos", a_position.GetData(), sizeof(a_position));
+    m_pimpl->renBox.material->SetUniform("buttonSize", a_size.GetData(), sizeof(a_size));
+
+    m_pimpl->renBox.material->Bind();
+    m_pimpl->renBox.va->Bind();
+
+    Renderer::DrawIndexed(3, false);
   }
 
   void UIRenderer::DrawRoundedBox(vec2 const & a_position, vec2 const & a_size, Colour a_colour, float a_radius)
