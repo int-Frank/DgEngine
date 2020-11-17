@@ -3,6 +3,7 @@
 #include "UIWindow.h"
 #include "UIWidget.h"
 #include "UICommon.h"
+#include "UI_Internal.h"
 
 namespace Engine
 {
@@ -169,7 +170,7 @@ namespace Engine
 
   void UIWindowState::Draw()
   {
-    
+    UIRenderer::Instance()->DrawBox(m_pData->position, m_pData->size, 0xFF000000);
   }
 
   //------------------------------------------------------------------------------------
@@ -338,6 +339,7 @@ namespace Engine
     pData->pParent = a_pParent;
     pData->position = a_position;
     pData->size = a_size;
+    m_pState = new StaticState(pData);
   }
 
   UIWindow::~UIWindow()
@@ -346,9 +348,14 @@ namespace Engine
     delete m_pState;
   }
 
+  UIWindow * UIWindow::Create(UIWidget * a_pParent, vec2 const a_position, vec2 const & a_size)
+  {
+    return new UIWindow(a_pParent, a_position, a_size);
+  }
+
   void UIWindow::HandleMessage(Message * a_pMsg)
   {
-    m_pState->HandleMessage(a_pMsg);
+    UpdateState(m_pState->HandleMessage(a_pMsg));
   }
 
   void UIWindow::Clear()
@@ -384,5 +391,14 @@ namespace Engine
   void UIWindow::SetParent(UIWidget * a_pParent)
   {
     m_pState->SetParent(a_pParent);
+  }
+
+  void UIWindow::UpdateState(UIWindowState * a_pState)
+  {
+    if (a_pState != nullptr)
+    {
+      delete m_pState;
+      m_pState = a_pState;
+    }
   }
 }

@@ -27,6 +27,11 @@ namespace Engine
 
   }
 
+  UIButton * UIButton::Create(UIWidget * pParent, std::string const & text, uint32_t fontID, vec2 const & position, vec2 const & size)
+  {
+    return new UIButton(pParent, text, fontID, position, size);
+  }
+
   void UIButton::BindHoverOn(std::function<void()> a_fn)
   {
     m_clbk_HoverOn = a_fn;

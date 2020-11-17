@@ -11,9 +11,11 @@ namespace Engine
 {
   class UIButton : public UIWidget
   {
+    UIButton(UIWidget * pParent, std::string const & text, uint32_t fontID, vec2 const & position, vec2 const & size);
   public:
 
-    UIButton(UIWidget * pParent, std::string const & text, uint32_t fontID, vec2 const & position, vec2 const & size);
+    static UIButton * Create(UIWidget * pParent, std::string const & text, uint32_t fontID, vec2 const & position, vec2 const & size);
+
     ~UIButton();
 
     //void SetPosition(vec2 const &);

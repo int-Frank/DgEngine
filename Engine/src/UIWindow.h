@@ -13,9 +13,10 @@ namespace Engine
 
   class UIWindow : public UIWidget
   {
+    UIWindow(UIWidget * pParent, vec2 const position, vec2 const & size);
   public:
 
-    UIWindow(UIWidget * pParent, vec2 const position, vec2 const & size);
+    static UIWindow * Create(UIWidget * pParent, vec2 const position, vec2 const & size);
     ~UIWindow();
 
     //void SetPosition(vec2 const &);
@@ -34,6 +35,10 @@ namespace Engine
     UIState QueryState() const override;
     UIWidget * GetParent() const override;
     void SetParent(UIWidget *) override;
+
+  private:
+
+    void UpdateState(UIWindowState *);
 
   private:
 
