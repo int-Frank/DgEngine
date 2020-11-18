@@ -299,6 +299,10 @@ namespace Engine
         glUniform4fv(a_location, 1, static_cast<float const *>(a_pbuf));
         break;
       }
+      default:
+      {
+        BSR_ASSERT(false, "This type is not handled!");
+      }
     }
   }
 
@@ -317,6 +321,10 @@ namespace Engine
       {
         glUniform1fv(a_location, a_count, static_cast<float const*>(a_pbuf));
         break;
+      }
+      default:
+      {
+        BSR_ASSERT(false, "This type is not handled!");
       }
     }
   }

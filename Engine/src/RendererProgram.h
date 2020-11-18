@@ -39,7 +39,7 @@ namespace Engine
     void Unbind();
 
   private:
-    //TODO this needs to be Ref<ShaderData const>
+
     // Now that we have access to the uniform data, we can create a buffer to transform
     // uniforms over to the render thread
     ResourceID m_shaderDataID;

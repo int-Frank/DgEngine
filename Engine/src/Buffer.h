@@ -82,8 +82,7 @@ namespace Engine
     void CalculateOffsetsAndStride();
 
   private:
-    //TODO Make this a Dg::DynamicArray, only, I need to implement constructor from
-    //     initializer list.
+
     std::vector<BufferElement> m_elements;
     uint32_t m_stride;
   };
