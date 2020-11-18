@@ -16,7 +16,17 @@ namespace Engine
     UIWindow(UIWidget * pParent, vec2 const position, vec2 const & size);
   public:
 
-    static UIWindow * Create(UIWidget * pParent, vec2 const position, vec2 const & size);
+    static vec2 const s_minSize;
+
+    enum Flags : uint32_t
+    {
+      Resizable = (1u << 0),
+      Movable   = (1u << 1),
+
+      COUNT
+    };
+
+    static UIWindow * Create(UIWidget * pParent, vec2 const position, vec2 const & size, uint32_t flags = Resizable | Movable);
     ~UIWindow();
 
     //void SetPosition(vec2 const &);

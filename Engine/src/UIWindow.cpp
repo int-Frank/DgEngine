@@ -116,20 +116,23 @@ namespace Engine
     vec2 m_positionAnchor;
   };
 
-  //class ResizeState : public UIWindowState
-  //{
-  //public:
-  //
-  //  ~ResizeState();
-  //
-  //  vec2 GetPosition() const;
-  //  vec2 GetSize() const;
-  //
-  //  UIWindowState * HandleMessage(Message *) override;
-  //  void HandleMessage(Message_GUI_PointerDown *);
-  //  void HandleMessage(Message_GUI_PointerMove *);
-  //  void HandleMessage(Message_GUI_Select *);
-  //};
+  class ResizeState : public UIWindowState
+  {
+  public:
+
+    ResizeState(Data * a_pData, vec2 const & a_controlAnchor);
+    ~ResizeState();
+  
+    UIState QueryState() const override;
+  
+    UIWindowState * HandleMessage(Message *) override;
+    UIWindowState * HandleMessage(Message_GUI_PointerMove *);
+
+  private:
+
+    vec2 m_controlAnchor;
+    vec2 m_sizeAnchor;
+  };
 
   //------------------------------------------------------------------------------------
   // WindowGrab
@@ -153,7 +156,6 @@ namespace Engine
 
   bool WindowGrab::Intersects(vec2 const & point) const
   {
-    LOG_DEBUG("[{} {}]", point.x(), point.y());
     int y = (int)point.y();
     if (y < 0 || y > 15)
       return false;
@@ -326,8 +328,13 @@ namespace Engine
       }
     }
     vec2 point((float)a_pMsg->x, (float)a_pMsg->y);
+
+    if (m_pData->grab.Intersects(point - (m_pData->position + m_pData->size - m_pData->grab.Size())))
+      return new ResizeState(m_pData, point);
+
     if (UIPointInBox(m_pData->position, m_pData->size, point))
       return new MoveState(m_pData, point);
+
     return nullptr;
   }
 
@@ -417,8 +424,62 @@ namespace Engine
   }
 
   //------------------------------------------------------------------------------------
+  // ResizeState
+  //------------------------------------------------------------------------------------
+
+  ResizeState::ResizeState(Data * a_pData, vec2 const & a_controlAnchor)
+    : UIWindowState(a_pData)
+    , m_controlAnchor(a_controlAnchor)
+    , m_sizeAnchor(a_pData->size)
+  {
+
+  }
+
+  ResizeState::~ResizeState()
+  {
+
+  }
+
+  UIState ResizeState::QueryState() const
+  {
+    return UIState::HasFocus;
+  }
+
+  UIWindowState * ResizeState::HandleMessage(Message * a_pMsg)
+  {
+    if (a_pMsg->GetCategory() != MC_GUI)
+      return nullptr;
+
+    if (a_pMsg->GetID() == Message_GUI_PointerUp::GetStaticID())
+      return new StaticState(m_pData);
+
+    if (a_pMsg->GetID() == Message_GUI_PointerMove::GetStaticID())
+      return HandleMessage(dynamic_cast<Message_GUI_PointerMove *>(a_pMsg));
+
+    return nullptr;
+  }
+
+  UIWindowState * ResizeState::HandleMessage(Message_GUI_PointerMove * a_pMsg)
+  {
+    vec2 point((float)a_pMsg->x, (float)a_pMsg->y);
+    vec2 newSize = m_sizeAnchor + (point - m_controlAnchor);
+
+    if (newSize.x() < UIWindow::s_minSize.x())
+      newSize.x() = UIWindow::s_minSize.x();
+
+    if (newSize.y() < UIWindow::s_minSize.y())
+      newSize.y() = UIWindow::s_minSize.y();
+
+    m_pData->size = newSize;
+
+    return nullptr;
+  }
+
+  //------------------------------------------------------------------------------------
   // UIWindow
   //------------------------------------------------------------------------------------
+
+  vec2 const UIWindow::s_minSize = vec2(50.f, 20.f);
 
   UIWindow::UIWindow(UIWidget * a_pParent, vec2 const a_position, vec2 const & a_size)
     : m_pState(nullptr)
@@ -440,7 +501,7 @@ namespace Engine
     delete m_pState;
   }
 
-  UIWindow * UIWindow::Create(UIWidget * a_pParent, vec2 const a_position, vec2 const & a_size)
+  UIWindow * UIWindow::Create(UIWidget * a_pParent, vec2 const a_position, vec2 const & a_size, uint32_t a_flags)
   {
     return new UIWindow(a_pParent, a_position, a_size);
   }
