@@ -51,6 +51,7 @@ namespace Engine
       vec2 size;
       WindowGrab grab;
       Dg::DoublyLinkedList<UIWidget *> children;
+      uint32_t flags;
     };
 
     UIWindowState(Data * a_pData);
@@ -74,6 +75,8 @@ namespace Engine
     virtual UIWindowState * HandleMessage(Message *) = 0;
 
   protected:
+
+    bool HasFlag(UIWindow::Flag) const;
 
     Data * m_pData;
   };
@@ -254,7 +257,13 @@ namespace Engine
   void UIWindowState::Draw()
   {
     UIRenderer::Instance()->DrawBox(m_pData->position, m_pData->size, m_pData->clrBackground);
-    m_pData->grab.Draw(m_pData->position + m_pData->size - m_pData->grab.Size(), m_pData->clrGrabCurrent);
+    if (HasFlag(UIWindow::Movable))
+      m_pData->grab.Draw(m_pData->position + m_pData->size - m_pData->grab.Size(), m_pData->clrGrabCurrent);
+  }
+
+  bool UIWindowState::HasFlag(UIWindow::Flag a_flag) const
+  {
+    return (m_pData->flags & a_flag) != 0;
   }
 
   //------------------------------------------------------------------------------------
@@ -329,10 +338,10 @@ namespace Engine
     }
     vec2 point((float)a_pMsg->x, (float)a_pMsg->y);
 
-    if (m_pData->grab.Intersects(point - (m_pData->position + m_pData->size - m_pData->grab.Size())))
+    if (HasFlag(UIWindow::Resizable) && m_pData->grab.Intersects(point - (m_pData->position + m_pData->size - m_pData->grab.Size())))
       return new ResizeState(m_pData, point);
 
-    if (UIPointInBox(m_pData->position, m_pData->size, point))
+    if (HasFlag(UIWindow::Movable) && UIPointInBox(m_pData->position, m_pData->size, point))
       return new MoveState(m_pData, point);
 
     return nullptr;
@@ -481,7 +490,7 @@ namespace Engine
 
   vec2 const UIWindow::s_minSize = vec2(50.f, 20.f);
 
-  UIWindow::UIWindow(UIWidget * a_pParent, vec2 const a_position, vec2 const & a_size)
+  UIWindow::UIWindow(UIWidget * a_pParent, vec2 const a_position, vec2 const & a_size, uint32_t a_flags)
     : m_pState(nullptr)
   {
     UIWindowState::Data * pData = new UIWindowState::Data();
@@ -492,6 +501,7 @@ namespace Engine
     pData->pParent = a_pParent;
     pData->position = a_position;
     pData->size = a_size;
+    pData->flags = a_flags;
     m_pState = new StaticState(pData);
   }
 
@@ -503,7 +513,7 @@ namespace Engine
 
   UIWindow * UIWindow::Create(UIWidget * a_pParent, vec2 const a_position, vec2 const & a_size, uint32_t a_flags)
   {
-    return new UIWindow(a_pParent, a_position, a_size);
+    return new UIWindow(a_pParent, a_position, a_size, a_flags);
   }
 
   void UIWindow::HandleMessage(Message * a_pMsg)

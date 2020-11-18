@@ -13,12 +13,12 @@ namespace Engine
 
   class UIWindow : public UIWidget
   {
-    UIWindow(UIWidget * pParent, vec2 const position, vec2 const & size);
+    UIWindow(UIWidget * pParent, vec2 const position, vec2 const & size, uint32_t flags);
   public:
 
     static vec2 const s_minSize;
 
-    enum Flags : uint32_t
+    enum Flag : uint32_t
     {
       Resizable = (1u << 0),
       Movable   = (1u << 1),
