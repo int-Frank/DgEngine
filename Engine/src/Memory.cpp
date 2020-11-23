@@ -3,6 +3,7 @@
 #include <mutex>
 #include "MemBuffer.h"
 #include "Memory.h"
+#include "Options.h"
 
 namespace Engine
 {
@@ -11,7 +12,7 @@ namespace Engine
     namespace TRef
     {
       static std::mutex mutex;
-      static MemBuffer buf(10 * 1024 * 1024);
+      static MemBuffer buf(TEMP_BUFFER_SIZE);
     }
   }
 

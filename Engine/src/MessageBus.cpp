@@ -4,6 +4,7 @@
 #include "MessageBus.h"
 #include "System.h"
 #include "SystemStack.h"
+#include "options.h"
 
 namespace Engine
 {

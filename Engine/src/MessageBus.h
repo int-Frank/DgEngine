@@ -38,7 +38,6 @@ namespace Engine
 
   class MessageBus
   {
-    static size_t const s_bufSize = 1 * 1024 * 1024;
     static MessageBus * s_instance;
 
     MessageBus(SystemStack&);

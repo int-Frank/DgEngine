@@ -250,13 +250,14 @@ public:
     else
     {
       Engine::UIWindow * pWindow = Engine::UIWindow::Create(nullptr, {20.f, 20.f}, {200.f, 100.f});
-      pSysUI->AddWidget(pWindow);
 
-      //Engine::UIButton *pBtn = Engine::UIButton::Create(nullptr, "Hello", 0, {20.f, 20.f}, {100.f, 50.f});
-      //pBtn->BindHoverSelect([](){LOG_WARN("PRESSED");});
-      //pBtn->BindHoverOn([](){LOG_DEBUG("HOVER ON");});
-      //pBtn->BindHoverOff([](){LOG_DEBUG("HOVER OFF");});
-      //pSysUI->AddWidget(pBtn);
+      Engine::UIButton *pBtn = Engine::UIButton::Create(nullptr, "Hello", 0, {20.f, 20.f}, {100.f, 50.f});
+      pBtn->BindHoverSelect([](){LOG_WARN("PRESSED");});
+      pBtn->BindHoverOn([](){LOG_DEBUG("HOVER ON");});
+      pBtn->BindHoverOff([](){LOG_DEBUG("HOVER OFF");});
+      pWindow->Add(pBtn);
+
+      pSysUI->AddWidget(pWindow);
     }
 
     Engine::System_Input * layer = static_cast<Engine::System_Input *>(GetSystem(Engine::System_Input::GetStaticID()));

@@ -37,6 +37,7 @@ namespace Engine
     void HandleMessage(Message *) override;
 
     void Draw() override;
+    vec2 GetLocalPosition() const override;
 
     UIState QueryState() const override;
     UIWidget * GetParent() const override;

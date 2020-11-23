@@ -45,6 +45,16 @@ namespace Engine
     virtual UIState QueryState() const = 0;
     virtual UIWidget * GetParent() const = 0;
     virtual void SetParent(UIWidget *) = 0;
+    
+    vec2 GetGlobalPosition() const
+    {
+      UIWidget * pParent = GetParent();
+      if (pParent == nullptr)
+        return GetLocalPosition();
+      return pParent->GetGlobalPosition() + GetLocalPosition();
+    }
+
+    virtual vec2 GetLocalPosition() const = 0;
   };
 }
 

@@ -45,6 +45,7 @@ namespace Engine
     UIState QueryState() const override;
     UIWidget * GetParent() const override;
     void SetParent(UIWidget *) override;
+    vec2 GetLocalPosition() const override;
 
   private:
 

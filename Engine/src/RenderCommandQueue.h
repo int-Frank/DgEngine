@@ -26,6 +26,7 @@
 #include "PODArray.h"
 #include "RenderState.h"
 #include "MemBuffer.h"
+#include "options.h"
 
 namespace Engine
 {
@@ -38,9 +39,8 @@ namespace Engine
 
   class RenderCommandQueue
   {
-    static size_t const s_cmdBufSize = 1 * 1024 * 1024;
-    static size_t const s_outBufSize = 1 * 1024 * 1024;
-    static size_t const s_memBufSize = 10 * 1024 * 1024;
+    static size_t const s_cmdBufSize = RENDER_COMMAND_BUFFER_SIZE;
+    static size_t const s_memBufSize = RENDER_COMMAND_BUFFER_MEM_POOL;
 
   public:
 

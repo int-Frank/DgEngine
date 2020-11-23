@@ -46,6 +46,7 @@ namespace Engine
       Colour clrGrabActive;
       Colour clrGrabCurrent;
 
+      UIWindow * pWindow;
       UIWidget * pParent;
       vec2 position;
       vec2 size;
@@ -71,6 +72,7 @@ namespace Engine
     void Remove(UIWidget * a_pWgt);
 
     void Draw();
+    vec2 GetLocalPosition() const;
 
     virtual UIWindowState * HandleMessage(Message *) = 0;
 
@@ -256,14 +258,23 @@ namespace Engine
 
   void UIWindowState::Draw()
   {
-    UIRenderer::Instance()->DrawBox(m_pData->position, m_pData->size, m_pData->clrBackground);
+    vec2 pos = m_pData->pWindow->GetGlobalPosition();
+    UIRenderer::Instance()->DrawBox(pos, m_pData->size, m_pData->clrBackground);
     if (HasFlag(UIWindow::Movable))
-      m_pData->grab.Draw(m_pData->position + m_pData->size - m_pData->grab.Size(), m_pData->clrGrabCurrent);
+      m_pData->grab.Draw(pos + m_pData->size - m_pData->grab.Size(), m_pData->clrGrabCurrent);
+
+    for (UIWidget * pWgt : m_pData->children)
+      pWgt->Draw();
   }
 
   bool UIWindowState::HasFlag(UIWindow::Flag a_flag) const
   {
     return (m_pData->flags & a_flag) != 0;
+  }
+
+  vec2 UIWindowState::GetLocalPosition() const
+  {
+    return m_pData->position;
   }
 
   //------------------------------------------------------------------------------------
@@ -499,6 +510,7 @@ namespace Engine
     pData->clrGrabActive = 0xFFFF9999;
     pData->clrGrabCurrent = pData->clrGrab;
     pData->pParent = a_pParent;
+    pData->pWindow = this;
     pData->position = a_position;
     pData->size = a_size;
     pData->flags = a_flags;
@@ -528,6 +540,7 @@ namespace Engine
 
   void UIWindow::Add(UIWidget * a_pMsg)
   {
+    a_pMsg->SetParent(this);
     m_pState->Add(a_pMsg);
   }
 
@@ -563,5 +576,10 @@ namespace Engine
       delete m_pState;
       m_pState = a_pState;
     }
+  }
+
+  vec2 UIWindow::GetLocalPosition() const
+  {
+    return m_pState->GetLocalPosition();
   }
 }
