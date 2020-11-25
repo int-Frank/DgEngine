@@ -64,8 +64,6 @@ namespace Engine
     UIWidget * GetParent() const;
     void SetParent(UIWidget * a_pParent);
 
-    vec2 GetPosition() const;
-    vec2 GetSize() const;
     void Clear();
 
     void Add(UIWidget * a_pWgt);
@@ -73,6 +71,7 @@ namespace Engine
 
     void Draw();
     vec2 GetLocalPosition() const;
+    vec2 GetSize() const;
 
     virtual UIWindowState * HandleMessage(Message *) = 0;
 
@@ -221,11 +220,6 @@ namespace Engine
     m_pData->pParent = a_pParent;
   }
 
-  vec2 UIWindowState::GetPosition() const
-  {
-    return m_pData->position;
-  }
-
   vec2 UIWindowState::GetSize() const
   {
     return m_pData->size;
@@ -258,8 +252,13 @@ namespace Engine
 
   void UIWindowState::Draw()
   {
-    vec2 pos = m_pData->pWindow->GetGlobalPosition();
-    UIRenderer::Instance()->DrawBox(pos, m_pData->size, m_pData->clrBackground);
+    vec2 pos, size;
+    if (!m_pData->pWindow->GetGlobalAABB(pos, size))
+      return;
+
+    UIRenderer::Instance()->DrawBox(pos, size, m_pData->clrBackground);
+
+    // TODO This needs to be clipped for windows inside windows
     if (HasFlag(UIWindow::Movable))
       m_pData->grab.Draw(pos + m_pData->size - m_pData->grab.Size(), m_pData->clrGrabCurrent);
 
@@ -334,6 +333,15 @@ namespace Engine
 
   UIWindowState * StaticState::HandleMessage(Message_GUI_PointerDown * a_pMsg)
   {
+    vec2 pos, size;
+    if (!m_pData->pWindow->GetGlobalAABB(pos, size))
+      return nullptr;
+
+    vec2 point((float)a_pMsg->x, (float)a_pMsg->y);
+
+    if (!UIPointInBox(pos, size, point))
+      return nullptr;
+
     for (UIWidget * pWidget : m_pData->children)
     {
       pWidget->HandleMessage(a_pMsg);
@@ -347,12 +355,11 @@ namespace Engine
         return nullptr;
       }
     }
-    vec2 point((float)a_pMsg->x, (float)a_pMsg->y);
 
     if (HasFlag(UIWindow::Resizable) && m_pData->grab.Intersects(point - (m_pData->position + m_pData->size - m_pData->grab.Size())))
       return new ResizeState(m_pData, point);
 
-    if (HasFlag(UIWindow::Movable) && UIPointInBox(m_pData->position, m_pData->size, point))
+    if (HasFlag(UIWindow::Movable) && UIPointInBox(pos, size, point))
       return new MoveState(m_pData, point);
 
     return nullptr;
@@ -392,9 +399,17 @@ namespace Engine
       }
     }
 
+    vec2 pos, size;
+    if (!m_pData->pWindow->GetGlobalAABB(pos, size))
+      return nullptr;
+
+    vec2 point((float)a_pMsg->x, (float)a_pMsg->y);
+
+    if (!UIPointInBox(pos, size, point))
+      return nullptr;
+
     m_pData->clrGrabCurrent = m_pData->clrGrab;
-    vec2 pointer((float)a_pMsg->x, (float)a_pMsg->y);
-    if (m_pData->grab.Intersects(pointer - (m_pData->position + m_pData->size - m_pData->grab.Size())))
+    if (m_pData->grab.Intersects(point - (m_pData->position + m_pData->size - m_pData->grab.Size())))
       m_pData->clrGrabCurrent = m_pData->clrGrabActive;
 
     return nullptr;
@@ -581,5 +596,10 @@ namespace Engine
   vec2 UIWindow::GetLocalPosition() const
   {
     return m_pState->GetLocalPosition();
+  }
+
+  vec2 UIWindow::GetSize() const
+  {
+    return m_pState->GetSize();
   }
 }

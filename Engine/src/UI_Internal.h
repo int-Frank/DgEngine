@@ -31,6 +31,10 @@ namespace Engine
     class PIMPL;
     PIMPL * m_pimpl;
   };
+
+  bool UIIntersection(vec2 const & posA, vec2 const & sizeA,
+                      vec2 const & posB, vec2 const & sizeB,
+                      vec2 & posOut, vec2 & sizeOut);
 }
 
 #endif

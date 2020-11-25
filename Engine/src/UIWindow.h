@@ -46,6 +46,7 @@ namespace Engine
     UIWidget * GetParent() const override;
     void SetParent(UIWidget *) override;
     vec2 GetLocalPosition() const override;
+    vec2 GetSize() const override;
 
   private:
 

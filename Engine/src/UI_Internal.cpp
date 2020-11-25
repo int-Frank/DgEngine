@@ -8,6 +8,7 @@
 #include "RendererProgram.h"
 #include "VertexArray.h"
 #include "Renderer.h"
+#include <algorithm>
 
 namespace Engine
 {
@@ -161,5 +162,27 @@ namespace Engine
   void UIRenderer::DrawRoundedBox(vec2 const & a_position, vec2 const & a_size, Colour a_colour, float a_radius)
   {
   
+  }
+
+  bool UIIntersection(vec2 const & posA, vec2 const & sizeA,
+                      vec2 const & posB, vec2 const & sizeB,
+                      vec2 & posOut, vec2 & sizeOut)
+  {
+    float xMin = std::max(posA.x(), posB.x());
+    float xMax = std::min(posA.x() + sizeA.x(), posB.x() + sizeB.x());
+
+    if (xMin >= xMax)
+      return false;
+
+    float yMin = std::max(posA.y(), posB.y());
+    float yMax = std::min(posA.y() + sizeA.y(), posB.y() + sizeB.y());
+
+    if (yMin >= yMax)
+      return false;
+
+    posOut = vec2(xMin, yMin);
+    sizeOut = vec2(xMax - xMin, yMax - yMin);
+
+    return true;
   }
 }

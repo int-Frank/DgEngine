@@ -46,15 +46,10 @@ namespace Engine
     virtual UIWidget * GetParent() const = 0;
     virtual void SetParent(UIWidget *) = 0;
     
-    vec2 GetGlobalPosition() const
-    {
-      UIWidget * pParent = GetParent();
-      if (pParent == nullptr)
-        return GetLocalPosition();
-      return pParent->GetGlobalPosition() + GetLocalPosition();
-    }
-
+    bool GetGlobalAABB(vec2 & a_position, vec2 & a_size) const;
+    vec2 GetGlobalPosition() const;
     virtual vec2 GetLocalPosition() const = 0;
+    virtual vec2 GetSize() const = 0;
   };
 }
 

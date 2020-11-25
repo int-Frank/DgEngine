@@ -38,6 +38,7 @@ namespace Engine
 
     void Draw() override;
     vec2 GetLocalPosition() const override;
+    vec2 GetSize() const override;
 
     UIState QueryState() const override;
     UIWidget * GetParent() const override;

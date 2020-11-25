@@ -58,9 +58,11 @@ namespace Engine
 
   void UIButton::HandleMessage(Message_GUI_PointerDown * a_pMsg)
   {
-    vec2 pos = GetGlobalPosition();
+    vec2 pos, size;
+    if (!GetGlobalAABB(pos, size))
+      return;
 
-    if (UIPointInBox(pos, m_size, vec2((float)a_pMsg->x, (float)a_pMsg->y)) && m_clbk_Select != nullptr)
+    if (UIPointInBox(pos, size, vec2((float)a_pMsg->x, (float)a_pMsg->y)) && m_clbk_Select != nullptr)
     {
       m_clbk_Select();
       a_pMsg->SetFlag(Engine::Message::Flag::Handled, true);
@@ -69,9 +71,11 @@ namespace Engine
 
   void UIButton::HandleMessage(Message_GUI_PointerMove * a_pMsg)
   {
-    vec2 pos = GetGlobalPosition();
+    vec2 pos, size;
+    if (!GetGlobalAABB(pos, size))
+      return;
 
-    bool isInside = UIPointInBox(pos, m_size, vec2((float)a_pMsg->x, (float)a_pMsg->y));
+    bool isInside = UIPointInBox(pos, size, vec2((float)a_pMsg->x, (float)a_pMsg->y));
     if (isInside && m_state == UIState::None)
     {
       m_state = UIState::HoverOn;
@@ -95,8 +99,11 @@ namespace Engine
 
   void UIButton::Draw()
   {
-    vec2 pos = GetGlobalPosition();
-    UIRenderer::Instance()->DrawBox(pos, m_size, m_state == UIState::None ? m_clrDefault : m_clrHover);
+    vec2 pos, size;
+    if (!GetGlobalAABB(pos, size))
+      return;
+
+    UIRenderer::Instance()->DrawBox(pos, size, m_state == UIState::None ? m_clrDefault : m_clrHover);
   }
 
   UIState UIButton::QueryState() const
@@ -117,5 +124,10 @@ namespace Engine
   vec2 UIButton::GetLocalPosition() const
   {
     return m_position;
+  }
+
+  vec2 UIButton::GetSize() const
+  {
+    return m_size;
   }
 }
