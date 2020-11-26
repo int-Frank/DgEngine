@@ -258,12 +258,12 @@ namespace Engine
 
     UIRenderer::Instance()->DrawBox(pos, size, m_pData->clrBackground);
 
+    for (UIWidget * pWgt : m_pData->children)
+      pWgt->Draw();
+
     // TODO This needs to be clipped for windows inside windows
     if (HasFlag(UIWindow::Movable))
       m_pData->grab.Draw(pos + m_pData->size - m_pData->grab.Size(), m_pData->clrGrabCurrent);
-
-    for (UIWidget * pWgt : m_pData->children)
-      pWgt->Draw();
   }
 
   bool UIWindowState::HasFlag(UIWindow::Flag a_flag) const
@@ -342,6 +342,12 @@ namespace Engine
     if (!UIPointInBox(pos, size, point))
       return nullptr;
 
+    if (HasFlag(UIWindow::Resizable) && m_pData->grab.Intersects((point - (m_pData->position + m_pData->size - m_pData->grab.Size())) * 0.999f))
+    {
+      a_pMsg->SetFlag(Message::Flag::Handled, true);
+      return new ResizeState(m_pData, point);
+    }
+
     for (UIWidget * pWidget : m_pData->children)
     {
       pWidget->HandleMessage(a_pMsg);
@@ -356,11 +362,11 @@ namespace Engine
       }
     }
 
-    if (HasFlag(UIWindow::Resizable) && m_pData->grab.Intersects(point - (m_pData->position + m_pData->size - m_pData->grab.Size())))
-      return new ResizeState(m_pData, point);
-
     if (HasFlag(UIWindow::Movable) && UIPointInBox(pos, size, point))
+    {
+      a_pMsg->SetFlag(Message::Flag::Handled, true);
       return new MoveState(m_pData, point);
+    }
 
     return nullptr;
   }
@@ -385,6 +391,20 @@ namespace Engine
 
   UIWindowState * StaticState::HandleMessage(Message_GUI_PointerMove * a_pMsg)
   {
+    vec2 point((float)a_pMsg->x, (float)a_pMsg->y);
+
+    m_pData->clrGrabCurrent = m_pData->clrGrab;
+
+    if (m_pData->grab.Intersects((point - (m_pData->position + m_pData->size - m_pData->grab.Size())) * 0.999f))
+    {
+      m_pData->clrGrabCurrent = m_pData->clrGrabActive;
+
+      // TODO come up with a better solution for this. THe grab has 'consumed' Message_GUI_PointerMove,
+      //      but we still need to pass it on for other UI elements. We are sort of in a half consumed state.
+      a_pMsg->x = -1;
+      a_pMsg->y = -1;
+    }
+
     for (UIWidget * pWidget : m_pData->children)
     {
       pWidget->HandleMessage(a_pMsg);
@@ -398,19 +418,6 @@ namespace Engine
         break;
       }
     }
-
-    vec2 pos, size;
-    if (!m_pData->pWindow->GetGlobalAABB(pos, size))
-      return nullptr;
-
-    vec2 point((float)a_pMsg->x, (float)a_pMsg->y);
-
-    if (!UIPointInBox(pos, size, point))
-      return nullptr;
-
-    m_pData->clrGrabCurrent = m_pData->clrGrab;
-    if (m_pData->grab.Intersects(point - (m_pData->position + m_pData->size - m_pData->grab.Size())))
-      m_pData->clrGrabCurrent = m_pData->clrGrabActive;
 
     return nullptr;
   }
@@ -443,7 +450,10 @@ namespace Engine
       return nullptr;
 
     if (a_pMsg->GetID() == Message_GUI_PointerUp::GetStaticID())
+    {
+      a_pMsg->SetFlag(Message::Flag::Handled, true);
       return new StaticState(m_pData);
+    }
 
     if (a_pMsg->GetID() == Message_GUI_PointerMove::GetStaticID())
       return HandleMessage(dynamic_cast<Message_GUI_PointerMove *>(a_pMsg));
@@ -455,6 +465,7 @@ namespace Engine
   {
     vec2 point((float)a_pMsg->x, (float)a_pMsg->y);
     m_pData->position = m_positionAnchor + (point - m_controlAnchor);
+    a_pMsg->SetFlag(Message::Flag::Handled, true);
     return nullptr;
   }
 
@@ -486,7 +497,10 @@ namespace Engine
       return nullptr;
 
     if (a_pMsg->GetID() == Message_GUI_PointerUp::GetStaticID())
+    {
+      a_pMsg->SetFlag(Message::Flag::Handled, true);
       return new StaticState(m_pData);
+    }
 
     if (a_pMsg->GetID() == Message_GUI_PointerMove::GetStaticID())
       return HandleMessage(dynamic_cast<Message_GUI_PointerMove *>(a_pMsg));
@@ -506,6 +520,7 @@ namespace Engine
       newSize.y() = UIWindow::s_minSize.y();
 
     m_pData->size = newSize;
+    a_pMsg->SetFlag(Message::Flag::Handled, true);
 
     return nullptr;
   }
