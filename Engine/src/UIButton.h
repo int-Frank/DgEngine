@@ -18,9 +18,9 @@ namespace Engine
 
     ~UIButton();
 
-    //void SetPosition(vec2 const &);
-    //void SetSize(vec2 const &);
-    //
+    void SetPosition(vec2 const &) override;
+    void SetSize(vec2 const &) override;
+    
     //void SetFont(uint32_t fontID);
     //void SetText(std::string const &);
     //void SetTextColour(Colour);
@@ -32,7 +32,7 @@ namespace Engine
 
     void BindHoverOn(std::function<void()> a_fn);
     void BindHoverOff(std::function<void()> a_fn);
-    void BindHoverSelect(std::function<void()> a_fn);
+    void BindSelect(std::function<void()> a_fn);
 
     void HandleMessage(Message *) override;
 

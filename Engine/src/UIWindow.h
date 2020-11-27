@@ -29,8 +29,9 @@ namespace Engine
     static UIWindow * Create(UIWidget * pParent, vec2 const position, vec2 const & size, uint32_t flags = Resizable | Movable);
     ~UIWindow();
 
-    //void SetPosition(vec2 const &);
-    //void SetSize(vec2 const &);
+    void SetPosition(vec2 const &) override;
+    void SetSize(vec2 const &) override;
+
     //void SetBackgroundColour(Colour);
     //void SetHoverOnBackgroundColour(Colour);
 

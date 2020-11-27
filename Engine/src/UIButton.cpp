@@ -42,7 +42,7 @@ namespace Engine
     m_clbk_HoverOff = a_fn;
   }
 
-  void UIButton::BindHoverSelect(std::function<void()> a_fn)
+  void UIButton::BindSelect(std::function<void()> a_fn)
   {
     m_clbk_Select = a_fn;
   }
@@ -102,7 +102,6 @@ namespace Engine
     vec2 pos, size;
     if (!GetGlobalAABB(pos, size))
       return;
-
     UIRenderer::Instance()->DrawBox(pos, size, m_state == UIState::None ? m_clrDefault : m_clrHover);
   }
 
@@ -129,5 +128,15 @@ namespace Engine
   vec2 UIButton::GetSize() const
   {
     return m_size;
+  }
+
+  void UIButton::SetPosition(vec2 const & a_position)
+  {
+    m_position = a_position;
+  }
+
+  void UIButton::SetSize(vec2 const & a_size)
+  {
+    m_size = a_size;
   }
 }

@@ -4,34 +4,10 @@
 #include "UIWidget.h"
 #include "UICommon.h"
 #include "UI_Internal.h"
+#include "UIButton.h"
 
 namespace Engine
 {
-  class WindowGrab
-  {
-  public:
-
-    enum Type
-    {
-      Square,
-      Rounded,
-
-      COUNT
-    };
-
-    WindowGrab(Type = Square);
-
-    vec2 Size() const;
-    bool Intersects(vec2 const & point) const;
-    void Draw(vec2 const & position, Colour clr);
-
-  private:
-
-    static uint16_t s_masks[COUNT][16];
-
-    uint16_t m_mask[16];
-  };
-
   //------------------------------------------------------------------------------------
   // State class declarations
   //------------------------------------------------------------------------------------
@@ -42,15 +18,14 @@ namespace Engine
     struct Data
     {
       Colour clrBackground;
-      Colour clrGrab;
-      Colour clrGrabActive;
-      Colour clrGrabCurrent;
 
       UIWindow * pWindow;
       UIWidget * pParent;
       vec2 position;
       vec2 size;
-      WindowGrab grab;
+      UIButton * pGrab;
+      bool grabPressed;
+      bool grabHover;
       Dg::DoublyLinkedList<UIWidget *> children;
       uint32_t flags;
     };
@@ -65,6 +40,9 @@ namespace Engine
     void SetParent(UIWidget * a_pParent);
 
     void Clear();
+
+    void SetPosition(vec2 const &);
+    void SetSize(vec2 const &);
 
     void Add(UIWidget * a_pWgt);
     void Remove(UIWidget * a_pWgt);
@@ -139,55 +117,6 @@ namespace Engine
   };
 
   //------------------------------------------------------------------------------------
-  // WindowGrab
-  //------------------------------------------------------------------------------------
-
-  uint16_t WindowGrab::s_masks[WindowGrab::COUNT][16] =
-  {
-    {
-      0x1, 0x3, 0x7, 0xF,
-      0x1F, 0x3F, 0x7F, 0xFF,
-      0x1FF, 0x3FF, 0x7FF, 0xFFF,
-      0x1FFF, 0x3FFF, 0x7FFF, 0xFFFF
-    },
-    {
-      0x1, 0x3, 0x7, 0xF,
-      0x1F, 0x3F, 0x7F, 0xFF,
-      0x1FF, 0x3FF, 0x7FF, 0xFFF,
-      0x1FFF, 0x3FFF, 0x7FFF, 0xFFFF
-    }
-  };
-
-  bool WindowGrab::Intersects(vec2 const & point) const
-  {
-    int y = (int)point.y();
-    if (y < 0 || y > 15)
-      return false;
-
-    int x = (int)point.x();
-    if (x < 0 || x > 15)
-      return false;
-
-    return ((1 << (15 - x)) & m_mask[y]) != 0;
-  }
-  
-  WindowGrab::WindowGrab(Type t)
-    : m_mask{}
-  {
-    memcpy(m_mask, s_masks[t], 2 * 16);
-  }
-
-  vec2 WindowGrab::Size() const
-  {
-    return vec2(16.f, 16.f);
-  }
-
-  void WindowGrab::Draw(vec2 const & a_position, Colour a_clr)
-  {
-    UIRenderer::Instance()->DrawCorner(a_position, vec2(16.f, 16.f), a_clr);
-  }
-
-  //------------------------------------------------------------------------------------
   // UIWindowState
   //------------------------------------------------------------------------------------
 
@@ -206,6 +135,7 @@ namespace Engine
   {
     Clear();
 
+    delete m_pData->pGrab;
     delete m_pData;
     m_pData = nullptr;
   }
@@ -261,9 +191,8 @@ namespace Engine
     for (UIWidget * pWgt : m_pData->children)
       pWgt->Draw();
 
-    // TODO This needs to be clipped for windows inside windows
-    if (HasFlag(UIWindow::Movable))
-      m_pData->grab.Draw(pos + m_pData->size - m_pData->grab.Size(), m_pData->clrGrabCurrent);
+    if (m_pData->pGrab != nullptr)
+      m_pData->pGrab->Draw();
   }
 
   bool UIWindowState::HasFlag(UIWindow::Flag a_flag) const
@@ -274,6 +203,16 @@ namespace Engine
   vec2 UIWindowState::GetLocalPosition() const
   {
     return m_pData->position;
+  }
+
+  void UIWindowState::SetPosition(vec2 const & a_position)
+  {
+    m_pData->position = a_position;
+  }
+
+  void UIWindowState::SetSize(vec2 const & a_size)
+  {
+    m_pData->size = a_size;
   }
 
   //------------------------------------------------------------------------------------
@@ -342,10 +281,14 @@ namespace Engine
     if (!UIPointInBox(pos, size, point))
       return nullptr;
 
-    if (HasFlag(UIWindow::Resizable) && m_pData->grab.Intersects((point - (m_pData->position + m_pData->size - m_pData->grab.Size())) * 0.999f))
+    if (m_pData->pGrab != nullptr)
     {
-      a_pMsg->SetFlag(Message::Flag::Handled, true);
-      return new ResizeState(m_pData, point);
+      m_pData->pGrab->HandleMessage((Message*)a_pMsg);
+      if (m_pData->grabPressed)
+      {
+        m_pData->grabPressed = false;
+        return new ResizeState(m_pData, point);
+      }
     }
 
     for (UIWidget * pWidget : m_pData->children)
@@ -393,16 +336,17 @@ namespace Engine
   {
     vec2 point((float)a_pMsg->x, (float)a_pMsg->y);
 
-    m_pData->clrGrabCurrent = m_pData->clrGrab;
-
-    if (m_pData->grab.Intersects((point - (m_pData->position + m_pData->size - m_pData->grab.Size())) * 0.999f))
+    if (m_pData->pGrab != nullptr)
     {
-      m_pData->clrGrabCurrent = m_pData->clrGrabActive;
-
-      // TODO come up with a better solution for this. THe grab has 'consumed' Message_GUI_PointerMove,
-      //      but we still need to pass it on for other UI elements. We are sort of in a half consumed state.
-      a_pMsg->x = -1;
-      a_pMsg->y = -1;
+      m_pData->pGrab->HandleMessage((Message*)a_pMsg);
+      if (m_pData->grabHover)
+      {
+        // TODO come up with a better solution for this. The grab has 'consumed' Message_GUI_PointerMove,
+        //      but we still need to pass it on for other UI elements, but with no possibility to interact with 
+        //      another element. We are sort of in a half consumed state.
+        a_pMsg->x = -1;
+        a_pMsg->y = -1;
+      }
     }
 
     for (UIWidget * pWidget : m_pData->children)
@@ -522,6 +466,9 @@ namespace Engine
     m_pData->size = newSize;
     a_pMsg->SetFlag(Message::Flag::Handled, true);
 
+    if (m_pData->pGrab != nullptr)
+      m_pData->pGrab->SetPosition(m_pData->size - m_pData->pGrab->GetSize());
+
     return nullptr;
   }
 
@@ -536,14 +483,24 @@ namespace Engine
   {
     UIWindowState::Data * pData = new UIWindowState::Data();
     pData->clrBackground = 0xBB000000;
-    pData->clrGrab = 0xFFFF0000;
-    pData->clrGrabActive = 0xFFFF9999;
-    pData->clrGrabCurrent = pData->clrGrab;
     pData->pParent = a_pParent;
     pData->pWindow = this;
     pData->position = a_position;
     pData->size = a_size;
     pData->flags = a_flags;
+
+    vec2 grabSize(16.f, 16.f);
+    pData->grabPressed = false;
+    pData->pGrab = nullptr;
+
+    if (a_flags & Flag::Resizable)
+    {
+      pData->pGrab = UIButton::Create(this, "", 0, a_size - grabSize, grabSize);
+      pData->pGrab->BindSelect([pBool = &pData->grabPressed](){*pBool = true; });
+      pData->pGrab->BindHoverOn([pBool = &pData->grabHover](){*pBool = true; });
+      pData->pGrab->BindHoverOff([pBool = &pData->grabHover](){*pBool = false; });
+    }
+
     m_pState = new StaticState(pData);
   }
 
@@ -616,5 +573,15 @@ namespace Engine
   vec2 UIWindow::GetSize() const
   {
     return m_pState->GetSize();
+  }
+
+  void UIWindow::SetPosition(vec2 const & a_position)
+  {
+    m_pState->SetPosition(a_position);
+  }
+
+  void UIWindow::SetSize(vec2 const & a_size)
+  {
+    m_pState->SetSize(a_size);
   }
 }

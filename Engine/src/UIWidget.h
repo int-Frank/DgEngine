@@ -42,6 +42,9 @@ namespace Engine
 
     virtual void HandleMessage(Message *) {};
 
+    virtual void SetPosition(vec2 const &) = 0;
+    virtual void SetSize(vec2 const &) = 0;
+
     virtual UIState QueryState() const = 0;
     virtual UIWidget * GetParent() const = 0;
     virtual void SetParent(UIWidget *) = 0;

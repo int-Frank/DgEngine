@@ -29,8 +29,10 @@ namespace Engine
       return true;
     }
 
-    vec2 posParent, sizeParent;
-    pParent->GetGlobalAABB(posParent, sizeParent);
-    return UIIntersection(posParent, sizeParent, posParent + GetLocalPosition(), GetSize(), a_position, a_size);
+    vec2 posAABB, sizeAABB;
+    if (!pParent->GetGlobalAABB(posAABB, sizeAABB))
+      return false;
+
+    return UIIntersection(posAABB, sizeAABB, pParent->GetGlobalPosition() + GetLocalPosition(), GetSize(), a_position, a_size);
   }
 }
