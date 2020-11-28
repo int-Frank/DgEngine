@@ -44,15 +44,14 @@ namespace Engine
   {
   public:
 
-    virtual ~UIWidget();
-
-    virtual void Draw() {}
-
-    virtual void HandleMessage(Message *) {};
-
     virtual void SetPosition(vec2 const &) = 0;
     virtual void SetSize(vec2 const &) = 0;
 
+    // Internal use...
+    virtual ~UIWidget();
+
+    virtual void HandleMessage(Message *) {};
+    virtual void Draw() {}
     virtual UIState QueryState() const = 0;
     virtual UIWidget * GetParent() const = 0;
     virtual void SetParent(UIWidget *) = 0;

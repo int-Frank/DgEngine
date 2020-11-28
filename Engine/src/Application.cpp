@@ -108,7 +108,7 @@ namespace Engine
     m_pimpl->systemStack.PushSystem(new System_Input(), System_Input::GetStaticID());
     m_pimpl->systemStack.PushSystem(new System_Window(m_pimpl->pWindow), System_Window::GetStaticID());
     m_pimpl->systemStack.PushSystem(new System_Console(), System_Console::GetStaticID());
-    m_pimpl->systemStack.PushSystem(new System_UI(), System_UI::GetStaticID());
+    m_pimpl->systemStack.PushSystem(new System_UI(windowWidth, windowHeight), System_UI::GetStaticID());
 
     LOG_TRACE("Application initialised!");
   }

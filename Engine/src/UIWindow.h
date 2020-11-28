@@ -20,8 +20,9 @@ namespace Engine
 
     enum Flag : uint32_t
     {
-      Resizable = (1u << 0),
-      Movable   = (1u << 1),
+      Resizable     = (1u << 0),
+      Movable       = (1u << 1),
+      NoBackground  = (1u << 2),
 
       COUNT
     };

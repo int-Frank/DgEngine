@@ -182,21 +182,24 @@ namespace Engine
 
   void UIWindowState::Draw()
   {
-    UIAABB aabb;
-    UIAABBType t = m_pData->pWindow->GetGlobalAABB(aabb);
-    if (t == UIAABBType::None)
-      return;
+    if (!HasFlag(UIWindow::Flag::NoBackground))
+    {
+      UIAABB aabb;
+      UIAABBType t = m_pData->pWindow->GetGlobalAABB(aabb);
+      if (t == UIAABBType::None)
+        return;
 
-    if (t == UIAABBType::Window)
-    {
-      Renderer::Enable(RenderFeature::Sissor);
-      Renderer::SetSissorBox((int)aabb.position.x(), (int)aabb.position.y(), (int)aabb.size.x(), (int)aabb.size.y());
-      UIRenderer::Instance()->DrawBox({m_pData->pWindow->GetGlobalPosition(), m_pData->pWindow->GetSize()}, m_pData->clrBackground);
-      Renderer::Disable(RenderFeature::Sissor);
-    }
-    else
-    {
-      UIRenderer::Instance()->DrawBox(m_pData->aabb, m_pData->clrBackground);
+      if (t == UIAABBType::Window)
+      {
+        Renderer::Enable(RenderFeature::Sissor);
+        Renderer::SetSissorBox((int)aabb.position.x(), (int)aabb.position.y(), (int)aabb.size.x(), (int)aabb.size.y());
+        UIRenderer::Instance()->DrawBox({m_pData->pWindow->GetGlobalPosition(), m_pData->pWindow->GetSize()}, m_pData->clrBackground);
+        Renderer::Disable(RenderFeature::Sissor);
+      }
+      else
+      {
+        UIRenderer::Instance()->DrawBox(m_pData->aabb, m_pData->clrBackground);
+      }
     }
 
     for (UIWidget * pWgt : m_pData->children)

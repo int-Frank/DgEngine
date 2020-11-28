@@ -5,7 +5,7 @@
 
 #include "EngineMessages.h"
 #include "System.h"
-#include "UIFrame.h"
+#include "UIWindow.h"
 
 namespace Engine
 {
@@ -15,7 +15,7 @@ namespace Engine
 
     ASSIGN_ID(static_cast<ID>(DefaultSystem::UI))
     
-    System_UI();
+    System_UI(int windowW, int windowH);
     ~System_UI();
 
     void HandleMessage(Message *) override;
@@ -32,7 +32,7 @@ namespace Engine
 
   private:
 
-    UIFrame m_frame;
+    UIWindow * m_pScreen;
     float m_dt;
   };
 }
