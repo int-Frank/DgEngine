@@ -3,6 +3,7 @@
 #include "UIButton.h"
 #include "MessageHandler.h"
 #include "UI_Internal.h"
+#include "Renderer.h"
 
 namespace Engine
 {
@@ -11,8 +12,7 @@ namespace Engine
     , m_fontID(a_fontID)
     , m_clrDefault(0xFF0000FF)
     , m_clrHover(0xFF00FFFF)
-    , m_position(a_position)
-    , m_size(a_size)
+    , m_aabb{a_position, a_size}
     , m_state(UIState::None)
     , m_pParent(a_pParent)
     , m_clbk_HoverOn(nullptr)
@@ -58,11 +58,11 @@ namespace Engine
 
   void UIButton::HandleMessage(Message_GUI_PointerDown * a_pMsg)
   {
-    vec2 pos, size;
-    if (!GetGlobalAABB(pos, size))
+    UIAABB aabb;
+    if (GetGlobalAABB(aabb) == UIAABBType::None)
       return;
 
-    if (UIPointInBox(pos, size, vec2((float)a_pMsg->x, (float)a_pMsg->y)) && m_clbk_Select != nullptr)
+    if (UIPointInBox(vec2((float)a_pMsg->x, (float)a_pMsg->y), aabb) && m_clbk_Select != nullptr)
     {
       m_clbk_Select();
       a_pMsg->SetFlag(Engine::Message::Flag::Handled, true);
@@ -71,11 +71,11 @@ namespace Engine
 
   void UIButton::HandleMessage(Message_GUI_PointerMove * a_pMsg)
   {
-    vec2 pos, size;
-    if (!GetGlobalAABB(pos, size))
+    UIAABB aabb;
+    if (GetGlobalAABB(aabb) == UIAABBType::None)
       return;
 
-    bool isInside = UIPointInBox(pos, size, vec2((float)a_pMsg->x, (float)a_pMsg->y));
+    bool isInside = UIPointInBox(vec2((float)a_pMsg->x, (float)a_pMsg->y), aabb);
     if (isInside && m_state == UIState::None)
     {
       m_state = UIState::HoverOn;
@@ -99,10 +99,24 @@ namespace Engine
 
   void UIButton::Draw()
   {
-    vec2 pos, size;
-    if (!GetGlobalAABB(pos, size))
+    UIAABB sissor;
+    UIAABBType t = GetGlobalAABB(sissor);
+    if (t == UIAABBType::None)
       return;
-    UIRenderer::Instance()->DrawBox(pos, size, m_state == UIState::None ? m_clrDefault : m_clrHover);
+
+    //UIAABB aabb = {GetGlobalPosition(), GetSize()};
+
+    if (t == UIAABBType::Window)
+    {
+      Renderer::Enable(RenderFeature::Sissor);
+      Renderer::SetSissorBox((int)sissor.position.x(), (int)sissor.position.y(), (int)sissor.size.x(), (int)sissor.size.y());
+      UIRenderer::Instance()->DrawBox({GetGlobalPosition(), GetSize()}, m_state == UIState::None ? m_clrDefault : m_clrHover);
+      Renderer::Disable(RenderFeature::Sissor);
+    }
+    else
+    {
+      UIRenderer::Instance()->DrawBox(m_aabb, m_state == UIState::None ? m_clrDefault : m_clrHover);
+    }
   }
 
   UIState UIButton::QueryState() const
@@ -122,21 +136,31 @@ namespace Engine
 
   vec2 UIButton::GetLocalPosition() const
   {
-    return m_position;
+    return m_aabb.position;
   }
 
   vec2 UIButton::GetSize() const
   {
-    return m_size;
+    return m_aabb.size;
   }
 
   void UIButton::SetPosition(vec2 const & a_position)
   {
-    m_position = a_position;
+    m_aabb.position = a_position;
   }
 
   void UIButton::SetSize(vec2 const & a_size)
   {
-    m_size = a_size;
+    m_aabb.size = a_size;
+  }
+
+  void UIButton::SetBackgroundColour(Colour a_clr)
+  {
+    m_clrDefault = a_clr;
+  }
+
+  void UIButton::SetHoverOnBackgroundColour(Colour a_clr)
+  {
+    m_clrHover = a_clr;
   }
 }

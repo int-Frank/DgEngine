@@ -22,9 +22,9 @@ namespace Engine
 
     void SetScreenSize(vec2 const &);
 
-    void DrawBox(vec2 const & position, vec2 const & size, Colour colour);
-    void DrawCorner(vec2 const & position, vec2 const & size, Colour colour);
-    void DrawRoundedBox(vec2 const & position, vec2 const & size, Colour colour, float radius);
+    void DrawBox(UIAABB const &, Colour colour);
+    //void DrawCorner(UIAABB const &, Colour colour, UIAABB const * pSissor = nullptr);
+    //void DrawRoundedBox(UIAABB const &, Colour colour, float radius, UIAABB const * pSissor = nullptr);
 
   private:
 
@@ -32,9 +32,9 @@ namespace Engine
     PIMPL * m_pimpl;
   };
 
-  bool UIIntersection(vec2 const & posA, vec2 const & sizeA,
-                      vec2 const & posB, vec2 const & sizeB,
-                      vec2 & posOut, vec2 & sizeOut);
+  bool UIIntersection(UIAABB const & A,
+                      UIAABB const & B,
+                      UIAABB & out);
 }
 
 #endif

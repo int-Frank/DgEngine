@@ -71,6 +71,13 @@ namespace Engine
     int maxShaderStorageBufferBindings;
   };
 
+  enum class RenderFeature
+  {
+    Sissor,
+
+    COUNT
+  };
+
   class RendererAPI
   {
   private:
@@ -82,6 +89,9 @@ namespace Engine
     static void Clear();
     static void Clear(float r, float g, float b, float a);
     static void SetClearColor(float r, float g, float b, float a);
+    static void SetSissorBox(int x, int y, int w, int h);
+    static void Enable(RenderFeature);
+    static void Disable(RenderFeature);
 
     static void DrawIndexed(unsigned int count, bool depthTest = true);
 

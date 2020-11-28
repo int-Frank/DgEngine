@@ -5,18 +5,18 @@
 
 namespace Engine
 {
-  bool UIPointInBox(vec2 const & boxMin, vec2 const & boxSize, vec2 const & point)
+  bool UIPointInBox(vec2 const & a_point, UIAABB const & a_box)
   {
-    if (point.x() < boxMin.x())
+    if (a_point.x() < a_box.position.x())
       return false;
 
-    if (point.y() < boxMin.y())
+    if (a_point.y() < a_box.position.y())
       return false;
 
-    if (point.x() > boxMin.x() + boxSize.x())
+    if (a_point.x() > a_box.position.x() + a_box.size.x())
       return false;
 
-    if (point.y() > boxMin.y() + boxSize.y())
+    if (a_point.y() > a_box.position.y() + a_box.size.y())
       return false;
 
     return true;

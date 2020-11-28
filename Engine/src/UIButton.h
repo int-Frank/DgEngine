@@ -20,13 +20,13 @@ namespace Engine
 
     void SetPosition(vec2 const &) override;
     void SetSize(vec2 const &) override;
+    void SetBackgroundColour(Colour);
+    void SetHoverOnBackgroundColour(Colour);
     
     //void SetFont(uint32_t fontID);
     //void SetText(std::string const &);
     //void SetTextColour(Colour);
     //void SetHoverOnTextColour(Colour);
-    //void SetBackgroundColour(Colour);
-    //void SetHoverOnBackgroundColour(Colour);
 
     void ClearBindings();
 
@@ -55,8 +55,7 @@ namespace Engine
     uint32_t m_fontID;
     Colour m_clrDefault;
     Colour m_clrHover;
-    vec2 m_position;
-    vec2 m_size;
+    UIAABB m_aabb;
     UIState m_state;
     UIWidget * m_pParent;
 

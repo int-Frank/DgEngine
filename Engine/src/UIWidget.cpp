@@ -19,20 +19,22 @@ namespace Engine
     return pParent->GetGlobalPosition() + GetLocalPosition();
   }
 
-  bool UIWidget::GetGlobalAABB(vec2 & a_position, vec2 & a_size) const
+  UIAABBType UIWidget::GetGlobalAABB(UIAABB & a_out) const
   {
     UIWidget * pParent = GetParent();
     if (pParent == nullptr)
     {
-      a_position = GetLocalPosition();
-      a_size = GetSize();
-      return true;
+      a_out.position = GetLocalPosition();
+      a_out.size = GetSize();
+      return UIAABBType::FullScreen;
     }
 
-    vec2 posAABB, sizeAABB;
-    if (!pParent->GetGlobalAABB(posAABB, sizeAABB))
-      return false;
+    UIAABB aabb = {};
+    if (pParent->GetGlobalAABB(aabb) == UIAABBType::None)
+      return UIAABBType::None;
 
-    return UIIntersection(posAABB, sizeAABB, pParent->GetGlobalPosition() + GetLocalPosition(), GetSize(), a_position, a_size);
+    if(!UIIntersection(aabb, {pParent->GetGlobalPosition() + GetLocalPosition(), GetSize()}, a_out))
+      return UIAABBType::None;
+    return UIAABBType::Window;
   }
 }

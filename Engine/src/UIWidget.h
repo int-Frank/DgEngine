@@ -8,6 +8,7 @@
 
 #include "core_utils.h"
 #include "EngineMessages.h"
+#include "UICommon.h"
 
 /*
   - Button
@@ -32,6 +33,13 @@ namespace Engine
     HasFocus // Eg text inputs in focus and waiting for input
   };
 
+  enum class UIAABBType
+  {
+    FullScreen,
+    Window,
+    None
+  };
+
   class UIWidget
   {
   public:
@@ -49,7 +57,7 @@ namespace Engine
     virtual UIWidget * GetParent() const = 0;
     virtual void SetParent(UIWidget *) = 0;
     
-    bool GetGlobalAABB(vec2 & a_position, vec2 & a_size) const;
+    UIAABBType GetGlobalAABB(UIAABB &) const;
     vec2 GetGlobalPosition() const;
     virtual vec2 GetLocalPosition() const = 0;
     virtual vec2 GetSize() const = 0;

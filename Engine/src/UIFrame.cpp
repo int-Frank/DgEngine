@@ -62,25 +62,15 @@ namespace Engine
         m_pFocus = nullptr;
       return;
     }
-     
-    if (a_pMsg->GetID() == Message_GUI_Up::GetStaticID())
-      HandleMessage(dynamic_cast<Message_GUI_Up *>(a_pMsg));
-    else if (a_pMsg->GetID() == Message_GUI_Down::GetStaticID())
-      HandleMessage(dynamic_cast<Message_GUI_Down *>(a_pMsg));
-    else if (a_pMsg->GetID() == Message_GUI_Left::GetStaticID())
-      HandleMessage(dynamic_cast<Message_GUI_Left *>(a_pMsg));
-    else if (a_pMsg->GetID() == Message_GUI_Left::GetStaticID())
-      HandleMessage(dynamic_cast<Message_GUI_Left *>(a_pMsg));
-    else if (a_pMsg->GetID() == Message_GUI_Right::GetStaticID())
-      HandleMessage(dynamic_cast<Message_GUI_Right *>(a_pMsg));
-    else if (a_pMsg->GetID() == Message_GUI_PointerUp::GetStaticID())
-      HandleMessage(dynamic_cast<Message_GUI_PointerUp *>(a_pMsg));
-    else if (a_pMsg->GetID() == Message_GUI_PointerDown::GetStaticID())
-      HandleMessage(dynamic_cast<Message_GUI_PointerDown *>(a_pMsg));
-    else if (a_pMsg->GetID() == Message_GUI_PointerMove::GetStaticID())
-      HandleMessage(dynamic_cast<Message_GUI_PointerMove *>(a_pMsg));
-    else if (a_pMsg->GetID() == Message_GUI_Text::GetStaticID())
-      HandleMessage(dynamic_cast<Message_GUI_Text *>(a_pMsg));
+
+    DISPATCH_MESSAGE(Message_GUI_Up);
+    DISPATCH_MESSAGE(Message_GUI_Down);
+    DISPATCH_MESSAGE(Message_GUI_Left);
+    DISPATCH_MESSAGE(Message_GUI_Right);
+    DISPATCH_MESSAGE(Message_GUI_PointerUp);
+    DISPATCH_MESSAGE(Message_GUI_PointerDown);
+    DISPATCH_MESSAGE(Message_GUI_PointerMove);
+    DISPATCH_MESSAGE(Message_GUI_Text);
   }
 
   ADD_MSG_HANDLER(Message_GUI_Up)

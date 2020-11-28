@@ -131,13 +131,13 @@ namespace Engine
     m_pimpl->renBox.material->SetUniform("windowSize", a_size.GetData(), sizeof(a_size));
   }
 
-  void UIRenderer::DrawBox(vec2 const & a_position, vec2 const & a_size, Colour a_colour)
+  void UIRenderer::DrawBox(UIAABB const & a_aabb, Colour a_colour)
   {
     float clr[4] = {a_colour.fr(), a_colour.fg(), a_colour.fb(), a_colour.fa()};
 
     m_pimpl->renBox.material->SetUniform("colour", clr, sizeof(clr));
-    m_pimpl->renBox.material->SetUniform("buttonPos", a_position.GetData(), sizeof(a_position));
-    m_pimpl->renBox.material->SetUniform("buttonSize", a_size.GetData(), sizeof(a_size));
+    m_pimpl->renBox.material->SetUniform("buttonPos", a_aabb.position.GetData(), sizeof(a_aabb.position));
+    m_pimpl->renBox.material->SetUniform("buttonSize", a_aabb.size.GetData(), sizeof(a_aabb.size));
 
     m_pimpl->renBox.material->Bind();
     m_pimpl->renBox.va->Bind();
@@ -145,7 +145,7 @@ namespace Engine
     Renderer::DrawIndexed(6, false);
   }
 
-  void UIRenderer::DrawCorner(vec2 const & a_position, vec2 const & a_size, Colour a_colour)
+  /*void UIRenderer::DrawCorner(vec2 const & a_position, vec2 const & a_size, Colour a_colour)
   {
     float clr[4] ={a_colour.fr(), a_colour.fg(), a_colour.fb(), a_colour.fa()};
 
@@ -162,26 +162,26 @@ namespace Engine
   void UIRenderer::DrawRoundedBox(vec2 const & a_position, vec2 const & a_size, Colour a_colour, float a_radius)
   {
   
-  }
+  }*/
 
-  bool UIIntersection(vec2 const & posA, vec2 const & sizeA,
-                      vec2 const & posB, vec2 const & sizeB,
-                      vec2 & posOut, vec2 & sizeOut)
+  bool UIIntersection(UIAABB const & A,
+                      UIAABB const & B,
+                      UIAABB & out)
   {
-    float xMin = std::max(posA.x(), posB.x());
-    float xMax = std::min(posA.x() + sizeA.x(), posB.x() + sizeB.x());
+    float xMin = std::max(A.position.x(), B.position.x());
+    float xMax = std::min(A.position.x() + A.size.x(), B.position.x() + B.size.x());
 
     if (xMin >= xMax)
       return false;
 
-    float yMin = std::max(posA.y(), posB.y());
-    float yMax = std::min(posA.y() + sizeA.y(), posB.y() + sizeB.y());
+    float yMin = std::max(A.position.y(), B.position.y());
+    float yMax = std::min(A.position.y() + A.size.y(), B.position.y() + B.size.y());
 
     if (yMin >= yMax)
       return false;
 
-    posOut = vec2(xMin, yMin);
-    sizeOut = vec2(xMax - xMin, yMax - yMin);
+    out.position = vec2(xMin, yMin);
+    out.size = vec2(xMax - xMin, yMax - yMin);
 
     return true;
   }

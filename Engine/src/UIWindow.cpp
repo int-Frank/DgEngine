@@ -5,6 +5,7 @@
 #include "UICommon.h"
 #include "UI_Internal.h"
 #include "UIButton.h"
+#include "Renderer.h"
 
 namespace Engine
 {
@@ -21,8 +22,7 @@ namespace Engine
 
       UIWindow * pWindow;
       UIWidget * pParent;
-      vec2 position;
-      vec2 size;
+      UIAABB aabb;
       UIButton * pGrab;
       bool grabPressed;
       bool grabHover;
@@ -152,7 +152,7 @@ namespace Engine
 
   vec2 UIWindowState::GetSize() const
   {
-    return m_pData->size;
+    return m_pData->aabb.size;
   }
 
   void UIWindowState::Clear()
@@ -182,11 +182,22 @@ namespace Engine
 
   void UIWindowState::Draw()
   {
-    vec2 pos, size;
-    if (!m_pData->pWindow->GetGlobalAABB(pos, size))
+    UIAABB aabb;
+    UIAABBType t = m_pData->pWindow->GetGlobalAABB(aabb);
+    if (t == UIAABBType::None)
       return;
 
-    UIRenderer::Instance()->DrawBox(pos, size, m_pData->clrBackground);
+    if (t == UIAABBType::Window)
+    {
+      Renderer::Enable(RenderFeature::Sissor);
+      Renderer::SetSissorBox((int)aabb.position.x(), (int)aabb.position.y(), (int)aabb.size.x(), (int)aabb.size.y());
+      UIRenderer::Instance()->DrawBox({m_pData->pWindow->GetGlobalPosition(), m_pData->pWindow->GetSize()}, m_pData->clrBackground);
+      Renderer::Disable(RenderFeature::Sissor);
+    }
+    else
+    {
+      UIRenderer::Instance()->DrawBox(m_pData->aabb, m_pData->clrBackground);
+    }
 
     for (UIWidget * pWgt : m_pData->children)
       pWgt->Draw();
@@ -202,17 +213,17 @@ namespace Engine
 
   vec2 UIWindowState::GetLocalPosition() const
   {
-    return m_pData->position;
+    return m_pData->aabb.position;
   }
 
   void UIWindowState::SetPosition(vec2 const & a_position)
   {
-    m_pData->position = a_position;
+    m_pData->aabb.position = a_position;
   }
 
   void UIWindowState::SetSize(vec2 const & a_size)
   {
-    m_pData->size = a_size;
+    m_pData->aabb.size = a_size;
   }
 
   //------------------------------------------------------------------------------------
@@ -272,13 +283,13 @@ namespace Engine
 
   UIWindowState * StaticState::HandleMessage(Message_GUI_PointerDown * a_pMsg)
   {
-    vec2 pos, size;
-    if (!m_pData->pWindow->GetGlobalAABB(pos, size))
+    UIAABB aabb;
+    if (m_pData->pWindow->GetGlobalAABB(aabb) == UIAABBType::None)
       return nullptr;
 
     vec2 point((float)a_pMsg->x, (float)a_pMsg->y);
 
-    if (!UIPointInBox(pos, size, point))
+    if (!UIPointInBox(point, aabb))
       return nullptr;
 
     if (m_pData->pGrab != nullptr)
@@ -305,7 +316,7 @@ namespace Engine
       }
     }
 
-    if (HasFlag(UIWindow::Movable) && UIPointInBox(pos, size, point))
+    if (HasFlag(UIWindow::Movable) && UIPointInBox(point, aabb))
     {
       a_pMsg->SetFlag(Message::Flag::Handled, true);
       return new MoveState(m_pData, point);
@@ -373,7 +384,7 @@ namespace Engine
   MoveState::MoveState(Data * a_pData, vec2 const & a_controlAnchor)
     : UIWindowState(a_pData)
     , m_controlAnchor(a_controlAnchor)
-    , m_positionAnchor(a_pData->position)
+    , m_positionAnchor(a_pData->aabb.position)
   {
     
   }
@@ -408,7 +419,7 @@ namespace Engine
   UIWindowState * MoveState::HandleMessage(Message_GUI_PointerMove * a_pMsg)
   {
     vec2 point((float)a_pMsg->x, (float)a_pMsg->y);
-    m_pData->position = m_positionAnchor + (point - m_controlAnchor);
+    m_pData->aabb.position = m_positionAnchor + (point - m_controlAnchor);
     a_pMsg->SetFlag(Message::Flag::Handled, true);
     return nullptr;
   }
@@ -420,7 +431,7 @@ namespace Engine
   ResizeState::ResizeState(Data * a_pData, vec2 const & a_controlAnchor)
     : UIWindowState(a_pData)
     , m_controlAnchor(a_controlAnchor)
-    , m_sizeAnchor(a_pData->size)
+    , m_sizeAnchor(a_pData->aabb.size)
   {
 
   }
@@ -463,11 +474,11 @@ namespace Engine
     if (newSize.y() < UIWindow::s_minSize.y())
       newSize.y() = UIWindow::s_minSize.y();
 
-    m_pData->size = newSize;
+    m_pData->aabb.size = newSize;
     a_pMsg->SetFlag(Message::Flag::Handled, true);
 
     if (m_pData->pGrab != nullptr)
-      m_pData->pGrab->SetPosition(m_pData->size - m_pData->pGrab->GetSize());
+      m_pData->pGrab->SetPosition(m_pData->aabb.size - m_pData->pGrab->GetSize());
 
     return nullptr;
   }
@@ -485,8 +496,7 @@ namespace Engine
     pData->clrBackground = 0xBB000000;
     pData->pParent = a_pParent;
     pData->pWindow = this;
-    pData->position = a_position;
-    pData->size = a_size;
+    pData->aabb = {a_position, a_size};
     pData->flags = a_flags;
 
     vec2 grabSize(16.f, 16.f);
@@ -499,6 +509,8 @@ namespace Engine
       pData->pGrab->BindSelect([pBool = &pData->grabPressed](){*pBool = true; });
       pData->pGrab->BindHoverOn([pBool = &pData->grabHover](){*pBool = true; });
       pData->pGrab->BindHoverOff([pBool = &pData->grabHover](){*pBool = false; });
+      pData->pGrab->SetBackgroundColour(Colour(43, 145, 175, 255));
+      pData->pGrab->SetHoverOnBackgroundColour(Colour(63, 195, 225, 255));
     }
 
     m_pState = new StaticState(pData);

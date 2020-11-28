@@ -110,6 +110,49 @@ namespace Engine
       });
   }
 
+  void Renderer::SetSissorBox(int a_x, int a_y, int a_w, int a_h)
+  {
+    Engine::RenderState state = Engine::RenderState::Create();
+    state.Set<Engine::RenderState::Attr::Type>(Engine::RenderState::Type::Command);
+    state.Set<Engine::RenderState::Attr::Command>(Engine::RenderState::Command::SetClearColor);
+
+    RENDER_SUBMIT(state, [x = a_x, y = a_y, w = a_w, h = a_h]()
+      {
+        RendererAPI::SetSissorBox(x, y, w, h);
+      });
+  }
+
+  void Renderer::Enable(RenderFeature a_feature)
+  {
+    Engine::RenderState state = Engine::RenderState::Create();
+    state.Set<Engine::RenderState::Attr::Type>(Engine::RenderState::Type::Command);
+    state.Set<Engine::RenderState::Attr::Command>(Engine::RenderState::Command::EnableFeature);
+
+    switch (a_feature)
+    {
+      case RenderFeature::Sissor:
+      {
+        RENDER_SUBMIT(state, [a_feature]() { RendererAPI::Enable(a_feature); });
+        break;
+      }
+    }
+  }
+
+  void Renderer::Disable(RenderFeature a_feature)
+  {
+    Engine::RenderState state = Engine::RenderState::Create();
+    state.Set<Engine::RenderState::Attr::Type>(Engine::RenderState::Type::Command);
+    state.Set<Engine::RenderState::Attr::Command>(Engine::RenderState::Command::DisableFeature);
+
+    switch (a_feature)
+    {
+      case RenderFeature::Sissor:
+      {
+        RENDER_SUBMIT(state, [a_feature]() { RendererAPI::Disable(a_feature); });
+        break;
+      }
+    }
+  }
 
   void Renderer::BeginScene()
   {

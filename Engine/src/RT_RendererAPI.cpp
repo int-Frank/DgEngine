@@ -20,6 +20,7 @@
 #include "RT_RendererAPI.h"
 #include "core_Log.h"
 #include "core_Assert.h"
+#include "Framework.h"
 
 namespace Engine
 {
@@ -120,5 +121,40 @@ namespace Engine
 
     if (!depthTest)
       glEnable(GL_DEPTH_TEST);
+  }
+
+  void RendererAPI::SetSissorBox(int x, int y, int w, int h)
+  {
+    // TODO This is a bit awkward. OpenGL screen pixel coords are [0, 0] bottom left,
+    //      but most of our other systems are [0, 0] top left. And so we have to get the 
+    //      window height to flip the y in this call. Is there a better way?
+
+    int wh, ww;
+    Framework::Instance()->GetWindow()->GetDimensions(ww, wh);
+    glScissor(x, wh - y - h, w, h);
+  }
+
+  void RendererAPI::Enable(RenderFeature a_feature)
+  {
+    switch (a_feature)
+    {
+      case RenderFeature::Sissor:
+      {
+        glEnable(GL_SCISSOR_TEST);
+        break;
+      }
+    }
+  }
+
+  void RendererAPI::Disable(RenderFeature a_feature)
+  {
+    switch (a_feature)
+    {
+      case RenderFeature::Sissor:
+      {
+        glDisable(GL_SCISSOR_TEST);
+        break;
+      }
+    }
   }
 }

@@ -87,6 +87,9 @@ namespace Engine
         Resize,
         SwapWindow,
         SetClearColor,
+        SetSissor,
+        EnableFeature,
+        DisableFeature,
         Clear,
         Draw,
 
