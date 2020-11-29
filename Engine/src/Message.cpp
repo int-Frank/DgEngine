@@ -99,6 +99,12 @@ namespace Engine
   MESSAGE_TO_STRING(Input_MouseWheelUp)
   MESSAGE_TO_STRING(Input_MouseWheelDown)
 
+  void Message_GUI_PointerMove::ConsumeHover()
+  {
+    x = -1;
+    y = -1;
+  }
+
   std::string Message_GUI_PointerDown::ToString() const
   {
     std::stringstream ss;

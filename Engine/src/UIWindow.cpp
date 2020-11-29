@@ -25,7 +25,6 @@ namespace Engine
       UIAABB aabb;
       UIButton * pGrab;
       bool grabPressed;
-      bool grabHover;
       Dg::DoublyLinkedList<UIWidget *> children;
       uint32_t flags;
     };
@@ -41,6 +40,7 @@ namespace Engine
 
     void Clear();
 
+    void SetBackgroundColour(Colour);
     void SetPosition(vec2 const &);
     void SetSize(vec2 const &);
 
@@ -164,7 +164,10 @@ namespace Engine
 
   void UIWindowState::Add(UIWidget * a_pWgt)
   {
-    m_pData->children.push_back(a_pWgt);
+    if (a_pWgt->IsWindow())
+      m_pData->children.push_front(a_pWgt);
+    else
+      m_pData->children.push_back(a_pWgt);
   }
 
   void UIWindowState::Remove(UIWidget * a_pWgt)
@@ -202,8 +205,13 @@ namespace Engine
       }
     }
 
-    for (UIWidget * pWgt : m_pData->children)
-      pWgt->Draw();
+    for (auto it = m_pData->children.end();;)
+    {
+      if (it == m_pData->children.begin())
+        break;
+      it--;
+      (*it)->Draw();
+    }
 
     if (m_pData->pGrab != nullptr)
       m_pData->pGrab->Draw();
@@ -227,6 +235,11 @@ namespace Engine
   void UIWindowState::SetSize(vec2 const & a_size)
   {
     m_pData->aabb.size = a_size;
+  }
+
+  void UIWindowState::SetBackgroundColour(Colour a_clr)
+  {
+    m_pData->clrBackground = a_clr;
   }
 
   //------------------------------------------------------------------------------------
@@ -301,19 +314,26 @@ namespace Engine
       if (m_pData->grabPressed)
       {
         m_pData->grabPressed = false;
+        a_pMsg->SetFlag(Message::Flag::Handled, true);
         return new ResizeState(m_pData, point);
       }
     }
 
-    for (UIWidget * pWidget : m_pData->children)
+    for (auto it = m_pData->children.begin(); it != m_pData->children.end(); it++)
     {
-      pWidget->HandleMessage(a_pMsg);
+      (*it)->HandleMessage(a_pMsg);
       if (a_pMsg->QueryFlag(Engine::Message::Flag::Handled))
       {
-        if (pWidget->QueryState() == UIState::HasFocus)
+        if ((*it)->QueryState() == UIState::HasFocus)
         {
-          m_pFocus = pWidget;
+          m_pFocus = (*it);
           m_state = UIState::HasFocus;
+        }
+        if ((*it)->IsWindow())
+        {
+          UIWidget *pWgt = (*it);
+          m_pData->children.erase(it);
+          m_pData->children.push_front(pWgt);
         }
         return nullptr;
       }
@@ -351,17 +371,7 @@ namespace Engine
     vec2 point((float)a_pMsg->x, (float)a_pMsg->y);
 
     if (m_pData->pGrab != nullptr)
-    {
       m_pData->pGrab->HandleMessage((Message*)a_pMsg);
-      if (m_pData->grabHover)
-      {
-        // TODO come up with a better solution for this. The grab has 'consumed' Message_GUI_PointerMove,
-        //      but we still need to pass it on for other UI elements, but with no possibility to interact with 
-        //      another element. We are sort of in a half consumed state.
-        a_pMsg->x = -1;
-        a_pMsg->y = -1;
-      }
-    }
 
     for (UIWidget * pWidget : m_pData->children)
     {
@@ -377,6 +387,14 @@ namespace Engine
       }
     }
 
+    UIAABB aabb;
+    if (m_pData->pWindow->GetGlobalAABB(aabb) != UIAABBType::None)
+    {
+      vec2 point((float)a_pMsg->x, (float)a_pMsg->y);
+
+      if (UIPointInBox(point, aabb))
+        a_pMsg->ConsumeHover();
+    }
     return nullptr;
   }
 
@@ -510,8 +528,6 @@ namespace Engine
     {
       pData->pGrab = UIButton::Create(this, "", 0, a_size - grabSize, grabSize);
       pData->pGrab->BindSelect([pBool = &pData->grabPressed](){*pBool = true; });
-      pData->pGrab->BindHoverOn([pBool = &pData->grabHover](){*pBool = true; });
-      pData->pGrab->BindHoverOff([pBool = &pData->grabHover](){*pBool = false; });
       pData->pGrab->SetBackgroundColour(Colour(43, 145, 175, 255));
       pData->pGrab->SetHoverOnBackgroundColour(Colour(63, 195, 225, 255));
     }
@@ -598,5 +614,15 @@ namespace Engine
   void UIWindow::SetSize(vec2 const & a_size)
   {
     m_pState->SetSize(a_size);
+  }
+
+  void UIWindow::SetBackgroundColour(Colour a_clr)
+  {
+    m_pState->SetBackgroundColour(a_clr);
+  }
+
+  bool UIWindow::IsWindow() const
+  {
+    return true;
   }
 }

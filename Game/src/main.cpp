@@ -249,22 +249,38 @@ public:
     }
     else
     {
-      Engine::UIWindow * pWindow1 = Engine::UIWindow::Create(nullptr, {20.f, 20.f}, {600.f, 400.f});
-      Engine::UIWindow * pWindow2 = Engine::UIWindow::Create(nullptr, {20.f, 20.f}, {200.f, 100.f});
+      Engine::UIWindow * pWindow1a = Engine::UIWindow::Create(nullptr, {20.f, 20.f}, {200.f, 100.f});
+      pWindow1a->SetBackgroundColour(Colour(0, 255, 0, 255));
+      Engine::UIButton * pBtn1a = Engine::UIButton::Create(nullptr, "Hello", 0, {10.f, 20.f}, {50.f, 20.f});
+      pBtn1a->SetBackgroundColour(Colour(64, 0, 128, 255));
+      pBtn1a->SetHoverOnBackgroundColour(Colour(128, 0, 255, 255));
+      pBtn1a->BindSelect([](){LOG_WARN("PRESSED 1a");});
+      pBtn1a->BindHoverOn([](){LOG_DEBUG("HOVER ON 1a");});
+      pBtn1a->BindHoverOff([](){LOG_DEBUG("HOVER OFF 1a");});
 
-      Engine::UIButton *pBtn1 = Engine::UIButton::Create(nullptr, "Hello", 0, {100.f, 200.f}, {200.f, 100.f});
+      Engine::UIWindow * pWindow1b = Engine::UIWindow::Create(nullptr, {400.f, 20.f}, {200.f, 100.f});
+      pWindow1b->SetBackgroundColour(Colour(0, 255, 255, 255));
+      Engine::UIButton * pBtn1b = Engine::UIButton::Create(nullptr, "Hello", 0, {10.f, 20.f}, {50.f, 20.f});
+      pBtn1b->SetBackgroundColour(Colour(64, 64, 128, 255));
+      pBtn1b->SetHoverOnBackgroundColour(Colour(128, 128, 255, 255));
+      pBtn1b->BindSelect([](){LOG_WARN("PRESSED 1b");});
+      pBtn1b->BindHoverOn([](){LOG_DEBUG("HOVER ON 1b");});
+      pBtn1b->BindHoverOff([](){LOG_DEBUG("HOVER OFF 1b");});
+
+      Engine::UIWindow * pWindow1 = Engine::UIWindow::Create(nullptr, {20.f, 20.f}, {800.f, 400.f});
+      pWindow1->SetBackgroundColour(Colour(255, 255, 255, 255));
+      Engine::UIButton * pBtn1 = Engine::UIButton::Create(nullptr, "Hello", 0, {10.f, 20.f}, {50.f, 20.f});
+      pBtn1->SetBackgroundColour(Colour(64, 128, 0, 255));
+      pBtn1->SetHoverOnBackgroundColour(Colour(128, 255, 0, 255));
       pBtn1->BindSelect([](){LOG_WARN("PRESSED 1");});
       pBtn1->BindHoverOn([](){LOG_DEBUG("HOVER ON 1");});
       pBtn1->BindHoverOff([](){LOG_DEBUG("HOVER OFF 1");});
 
-      Engine::UIButton *pBtn2 = Engine::UIButton::Create(nullptr, "Hello", 0, {20.f, 20.f}, {100.f, 50.f});
-      pBtn2->BindSelect([](){LOG_WARN("PRESSED 2");});
-      pBtn2->BindHoverOn([](){LOG_DEBUG("HOVER ON 2");});
-      pBtn2->BindHoverOff([](){LOG_DEBUG("HOVER OFF 2");});
-
-      pWindow2->Add(pBtn2);
+      pWindow1a->Add(pBtn1a);
+      pWindow1b->Add(pBtn1b);
       pWindow1->Add(pBtn1);
-      pWindow1->Add(pWindow2);
+      pWindow1->Add(pWindow1a);
+      pWindow1->Add(pWindow1b);
 
       pSysUI->AddWidget(pWindow1);
     }

@@ -60,6 +60,7 @@ namespace Engine
     vec2 GetGlobalPosition() const;
     virtual vec2 GetLocalPosition() const = 0;
     virtual vec2 GetSize() const = 0;
+    virtual bool IsWindow() const;
   };
 }
 

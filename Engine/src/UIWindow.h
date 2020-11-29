@@ -33,7 +33,7 @@ namespace Engine
     void SetPosition(vec2 const &) override;
     void SetSize(vec2 const &) override;
 
-    //void SetBackgroundColour(Colour);
+    void SetBackgroundColour(Colour);
     //void SetHoverOnBackgroundColour(Colour);
 
     void Clear();
@@ -49,6 +49,8 @@ namespace Engine
     void SetParent(UIWidget *) override;
     vec2 GetLocalPosition() const override;
     vec2 GetSize() const override;
+
+    bool IsWindow() const override;
 
   private:
 

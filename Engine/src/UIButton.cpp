@@ -76,6 +76,9 @@ namespace Engine
       return;
 
     bool isInside = UIPointInBox(vec2((float)a_pMsg->x, (float)a_pMsg->y), aabb);
+    if (isInside)
+      a_pMsg->ConsumeHover();
+
     if (isInside && m_state == UIState::None)
     {
       m_state = UIState::HoverOn;

@@ -37,4 +37,9 @@ namespace Engine
       return UIAABBType::None;
     return UIAABBType::Window;
   }
+
+  bool UIWidget::IsWindow() const
+  {
+    return false;
+  }
 }

@@ -75,6 +75,7 @@ namespace Engine
   };
 
   MESSAGE_CLASS_HEADER(GUI_PointerMove)
+    void ConsumeHover(); // Call this instead of setting the message flag to 'Handled'
     int32_t x;
     int32_t y;
   };
