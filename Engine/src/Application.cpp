@@ -17,12 +17,12 @@
 #include "Memory.h"
 #include "Renderer.h"
 #include "ResourceManager.h"
-#include "UI_Internal.h"
+#include "GUI_Internal.h"
 
 #include "System_Console.h"
 #include "System_Input.h"
 #include "System_Window.h"
-#include "System_UI.h"
+#include "System_GUI.h"
 #include "System_Application.h"
 
 namespace Engine
@@ -101,14 +101,14 @@ namespace Engine
     int windowWidth, windowHeight;
     m_pimpl->pWindow->GetDimensions(windowWidth, windowHeight);
 
-    UIRenderer::Init();
-    UIRenderer::Instance()->SetScreenSize(vec2((float)windowWidth, (float)windowHeight));
+    GUI::Renderer::Init();
+    GUI::Renderer::Instance()->SetScreenSize(vec2((float)windowWidth, (float)windowHeight));
 
     m_pimpl->systemStack.PushSystem(new System_Application(), System_Application::GetStaticID());
     m_pimpl->systemStack.PushSystem(new System_Input(), System_Input::GetStaticID());
     m_pimpl->systemStack.PushSystem(new System_Window(m_pimpl->pWindow), System_Window::GetStaticID());
     m_pimpl->systemStack.PushSystem(new System_Console(), System_Console::GetStaticID());
-    m_pimpl->systemStack.PushSystem(new System_UI(windowWidth, windowHeight), System_UI::GetStaticID());
+    m_pimpl->systemStack.PushSystem(new System_GUI(windowWidth, windowHeight), System_GUI::GetStaticID());
 
     LOG_TRACE("Application initialised!");
   }

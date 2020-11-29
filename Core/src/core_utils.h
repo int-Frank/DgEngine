@@ -21,6 +21,12 @@ typedef Dg::R3::Vector<float>           vec4;
 typedef Dg::R2::Matrix<float>           mat3;
 typedef Dg::R3::Matrix<float>           mat4;
 
+struct UIAABB
+{
+  vec2 position;
+  vec2 size;
+};
+
 //typedef uint32_t Colour;
 //#define SET_R(c, r) do{c = ((c & 0xFFFFFF00) | (r & 0xFF))} while(false)
 //#define SET_G(c, g) do{c = ((c & 0xFFFF00FF) | ((g & 0xFF) << 8))} while(false)

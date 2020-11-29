@@ -5,18 +5,18 @@
 
 #include "EngineMessages.h"
 #include "System.h"
-#include "UIWindow.h"
+#include "GUI_Window.h"
 
 namespace Engine
 {
-  class System_UI : public System
+  class System_GUI : public System
   {
   public:
 
     ASSIGN_ID(static_cast<ID>(DefaultSystem::UI))
     
-    System_UI(int windowW, int windowH);
-    ~System_UI();
+    System_GUI(int windowW, int windowH);
+    ~System_GUI();
 
     void HandleMessage(Message *) override;
 
@@ -24,7 +24,7 @@ namespace Engine
     void Render();
 
     void ClearFrame();
-    void AddWidget(UIWidget *);
+    void AddWidget(GUI::Widget *);
 
   private:
 
@@ -32,7 +32,7 @@ namespace Engine
 
   private:
 
-    UIWindow * m_pScreen;
+    GUI::Window * m_pScreen;
     float m_dt;
   };
 }

@@ -1,26 +1,26 @@
 //@group Systems
 
-#include "System_UI.h"
+#include "System_GUI.h"
 #include "InputCodes.h"
 #include "Options.h"
 #include "core_Assert.h"
-#include "UI_Internal.h"
+#include "GUI_Internal.h"
 
 namespace Engine
 {
-  System_UI::System_UI(int a_windowW, int a_windowH)
+  System_GUI::System_GUI(int a_windowW, int a_windowH)
     : m_dt(1.0f / 60.0f)
     , m_pScreen(nullptr)
   {
-    m_pScreen = UIWindow::Create(nullptr, {0.f, 0.f}, {(float)a_windowW, (float)a_windowH}, UIWindow::NoBackground);
+    m_pScreen = GUI::Window::Create(nullptr, {0.f, 0.f}, {(float)a_windowW, (float)a_windowH}, GUI::Window::NoBackground);
   }
 
-  System_UI::~System_UI()
+  System_GUI::~System_GUI()
   {
     delete m_pScreen;
   }
 
-  void System_UI::HandleMessage(Message * a_pMsg)
+  void System_GUI::HandleMessage(Message * a_pMsg)
   {
     DISPATCH_MESSAGE(Message_Window_Resized);
 
@@ -32,29 +32,29 @@ namespace Engine
     a_pMsg->SetFlag(Message::Flag::Handled, true);
   }
 
-  void System_UI::HandleMessage(Message_Window_Resized * a_pMsg)
+  void System_GUI::HandleMessage(Message_Window_Resized * a_pMsg)
   {
     vec2 size((float)a_pMsg->w, (float)a_pMsg->h);
-    UIRenderer::Instance()->SetScreenSize(size);
+    GUI::Renderer::Instance()->SetScreenSize(size);
     m_pScreen->SetSize(size);
   }
 
-  void System_UI::Update(float a_dt)
+  void System_GUI::Update(float a_dt)
   {
     m_dt = a_dt;
   }
 
-  void System_UI::Render()
+  void System_GUI::Render()
   {
     m_pScreen->Draw();
   }
 
-  void System_UI::ClearFrame()
+  void System_GUI::ClearFrame()
   {
     m_pScreen->Clear();
   }
 
-  void System_UI::AddWidget(UIWidget * a_pWgt)
+  void System_GUI::AddWidget(GUI::Widget * a_pWgt)
   {
     m_pScreen->Add(a_pWgt);
   }

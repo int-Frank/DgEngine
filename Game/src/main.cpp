@@ -4,7 +4,7 @@
 
 #include "Engine.h"
 #include "System_Input.h"
-#include "System_UI.h"
+#include "System_GUI.h"
 #include "Renderer.h"
 #include "RT_RendererAPI.h"
 #include "Buffer.h"
@@ -14,8 +14,8 @@
 #include "Texture.h"
 #include "InputCodes.h"
 
-#include "UIButton.h"
-#include "UIWindow.h"
+#include "GUI_Button.h"
+#include "GUI_Window.h"
 #include "EngineMessages.h"
 #include "DgBinPacker.h"
 #include "DgRNG_Local.h"
@@ -242,34 +242,34 @@ public:
   {
     PushSystem(new GameSystem());
 
-    Engine::System_UI * pSysUI = static_cast<Engine::System_UI *>(GetSystem(Engine::System_UI::GetStaticID()));
+    Engine::System_GUI * pSysUI = static_cast<Engine::System_GUI *>(GetSystem(Engine::System_GUI::GetStaticID()));
     if (!pSysUI)
     {
       LOG_ERROR("Couldn't find input layer!");
     }
     else
     {
-      Engine::UIWindow * pWindow1a = Engine::UIWindow::Create(nullptr, {20.f, 20.f}, {200.f, 100.f});
+      Engine::GUI::Window * pWindow1a = Engine::GUI::Window::Create(nullptr, {20.f, 20.f}, {200.f, 100.f});
       pWindow1a->SetBackgroundColour(Colour(0, 255, 0, 255));
-      Engine::UIButton * pBtn1a = Engine::UIButton::Create(nullptr, "Hello", 0, {10.f, 20.f}, {50.f, 20.f});
+      Engine::GUI::Button * pBtn1a = Engine::GUI::Button::Create(nullptr, "Hello", 0, {10.f, 20.f}, {50.f, 20.f});
       pBtn1a->SetBackgroundColour(Colour(64, 0, 128, 255));
       pBtn1a->SetHoverOnBackgroundColour(Colour(128, 0, 255, 255));
       pBtn1a->BindSelect([](){LOG_WARN("PRESSED 1a");});
       pBtn1a->BindHoverOn([](){LOG_DEBUG("HOVER ON 1a");});
       pBtn1a->BindHoverOff([](){LOG_DEBUG("HOVER OFF 1a");});
 
-      Engine::UIWindow * pWindow1b = Engine::UIWindow::Create(nullptr, {400.f, 20.f}, {200.f, 100.f});
+      Engine::GUI::Window * pWindow1b = Engine::GUI::Window::Create(nullptr, {400.f, 20.f}, {200.f, 100.f});
       pWindow1b->SetBackgroundColour(Colour(0, 255, 255, 255));
-      Engine::UIButton * pBtn1b = Engine::UIButton::Create(nullptr, "Hello", 0, {10.f, 20.f}, {50.f, 20.f});
+      Engine::GUI::Button * pBtn1b = Engine::GUI::Button::Create(nullptr, "Hello", 0, {10.f, 20.f}, {50.f, 20.f});
       pBtn1b->SetBackgroundColour(Colour(64, 64, 128, 255));
       pBtn1b->SetHoverOnBackgroundColour(Colour(128, 128, 255, 255));
       pBtn1b->BindSelect([](){LOG_WARN("PRESSED 1b");});
       pBtn1b->BindHoverOn([](){LOG_DEBUG("HOVER ON 1b");});
       pBtn1b->BindHoverOff([](){LOG_DEBUG("HOVER OFF 1b");});
 
-      Engine::UIWindow * pWindow1 = Engine::UIWindow::Create(nullptr, {20.f, 20.f}, {800.f, 400.f});
+      Engine::GUI::Window * pWindow1 = Engine::GUI::Window::Create(nullptr, {20.f, 20.f}, {800.f, 400.f});
       pWindow1->SetBackgroundColour(Colour(255, 255, 255, 255));
-      Engine::UIButton * pBtn1 = Engine::UIButton::Create(nullptr, "Hello", 0, {10.f, 20.f}, {50.f, 20.f});
+      Engine::GUI::Button * pBtn1 = Engine::GUI::Button::Create(nullptr, "Hello", 0, {10.f, 20.f}, {50.f, 20.f});
       pBtn1->SetBackgroundColour(Colour(64, 128, 0, 255));
       pBtn1->SetHoverOnBackgroundColour(Colour(128, 255, 0, 255));
       pBtn1->BindSelect([](){LOG_WARN("PRESSED 1");});
