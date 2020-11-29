@@ -441,7 +441,18 @@ namespace Engine
     WindowState * MoveState::HandleMessage(Message_GUI_PointerMove * a_pMsg)
     {
       vec2 point((float)a_pMsg->x, (float)a_pMsg->y);
-      m_pData->aabb.position = m_positionAnchor + (point - m_controlAnchor);
+
+      if (m_pData->pParent)
+      {
+        UIAABB aabb = {m_pData->pParent->GetGlobalPosition(), m_pData->pParent->GetSize()};
+        if (PointInBox(point, aabb))
+          m_pData->aabb.position = m_positionAnchor + (point - m_controlAnchor);
+      }
+      else
+      {
+        m_pData->aabb.position = m_positionAnchor + (point - m_controlAnchor);
+      }
+
       a_pMsg->SetFlag(Message::Flag::Handled, true);
       return nullptr;
     }
