@@ -102,8 +102,8 @@ group "Depenencies"
     
     files 
     {
-      "Vendor/cppunitlite/src/**.h",
-      "Vendor/cppunitlite/src/**.cpp",
+      "Vendor/cppunitlite/**.h",
+      "Vendor/cppunitlite/**.cpp",
     }
     
     filter "configurations:Debug"
