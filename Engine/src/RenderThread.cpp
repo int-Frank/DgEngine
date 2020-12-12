@@ -8,8 +8,6 @@
 #include "RT_BindingPoint.h"
 #include "Renderer.h"
 
-#define OTHER(index) ((index + 1) % 2)
-
 namespace Engine
 {
   //-----------------------------------------------------------------------------------------------
@@ -49,10 +47,9 @@ namespace Engine
   RenderThread * RenderThread::s_instance = nullptr;
 
   RenderThread::RenderThread()
-    : m_index(0)
+    : m_renderDone(false)
     , m_returnCode(ReturnCode::None)
     , m_shouldStop(false)
-    , m_locks{Locked, Locked}
   {
 
   }
@@ -79,68 +76,50 @@ namespace Engine
 
   bool RenderThread::Start()
   {
+    m_renderDone = false;
     m_renderThread = std::thread(RenderThreadWorker);
-    WaitAndLock(m_index);
+
+    while (!m_renderDone)
+      std::this_thread::yield();
+
     return m_returnCode == ReturnCode::Ready;
   }
 
   void RenderThread::Stop()
   {
-    Sync();
+    while (!m_renderDone)
+      std::this_thread::yield();
+
     m_shouldStop = true;
-    Continue();
+    m_renderDone = false;
 
     m_renderThread.join();
   }
 
-  void RenderThread::WaitAndLock(int a_index)
-  {
-    while (m_locks[a_index] == Locked)
-      std::this_thread::yield();
-    m_locks[a_index] = Locked;
-  }
-
-  void RenderThread::WaitForLock(int a_index)
-  {
-    while (m_locks[a_index] != Locked)
-      std::this_thread::yield();
-  }
-
-  void RenderThread::Unlock(int a_index)
-  {
-    m_locks[a_index] = Unlocked;
-  }
-
   void RenderThread::Sync()
   {
-    int renderInd = OTHER(m_index);
-    // It might be the case the main thread might do a complete pass before the 
-    // render thread has even locked this. This might happen if the render thread
-    // stalled for some reason while waiting at the end of a frame.
-    WaitForLock(m_index); 
-    WaitAndLock(renderInd);
+    while (!m_renderDone)
+      std::this_thread::yield();
   }
 
   void RenderThread::Continue()
   {
-    int mainInd = m_index;
-    int renderInd = OTHER(m_index);
-    m_index = renderInd;
-    Unlock(mainInd);
+    m_renderDone = false;
   }
 
   void RenderThread::RenderThreadInitFinished()
   {
-    int renderInd = OTHER(m_index);
     m_returnCode = ReturnCode::Ready;
-    Unlock(m_index);
-    WaitForLock(m_index); //Wait for the main thread to lock this
+    m_renderDone = true;
+
+    while (m_renderDone)
+      std::this_thread::yield();
   }
 
   void RenderThread::RenderThreadInitFailed()
   {
     m_returnCode = ReturnCode::Fail;
-    Unlock(m_index);
+    m_renderDone = true;
   }
 
   void RenderThread::RenderThreadShutDownFinished()
@@ -150,10 +129,9 @@ namespace Engine
 
   void RenderThread::RenderThreadFrameFinished()
   {
-    int mainInd = m_index;
-    int renderInd = OTHER(m_index);
-    Unlock(renderInd);
-    WaitAndLock(mainInd);
+    m_renderDone = true;
+    while (m_renderDone)
+      std::this_thread::yield();
   }
 
   bool RenderThread::ShouldExit()

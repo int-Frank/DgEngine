@@ -41,18 +41,7 @@ namespace Engine
 
   private:
 
-    void WaitAndLock(int);
-    void WaitForLock(int);
-    void Unlock(int);
-
-    enum LockState
-    {
-      Locked,
-      Unlocked
-    };
-
-    int m_index;
-    LockState m_locks[2]; //Do these need to be atomic??
+    std::atomic<bool> m_renderDone;
     std::atomic<ReturnCode> m_returnCode;
     std::atomic<bool> m_shouldStop;
 
