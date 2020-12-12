@@ -537,7 +537,6 @@ namespace Engine
     m_source.Init(a_data);
     Parse();
     PostProcess();
-    Log();
   }
 
   void ShaderData::Log()

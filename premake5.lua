@@ -90,76 +90,7 @@ group "Depenencies"
 	  filter "configurations:Dist"
 		  runtime "Release"
 		  optimize "on"
-  
-  project "cppunitlite"
-    location "Vendor/cppunitlite"
-    kind "StaticLib"
-    targetdir (projOutput)
-    objdir (projOutputInt)
-    systemversion "latest"
-    language "C++"
-    cppdialect "C++17"
-    
-    files 
-    {
-      "Vendor/cppunitlite/**.h",
-      "Vendor/cppunitlite/**.cpp",
-    }
-    
-    filter "configurations:Debug"
-		  runtime "Debug"
-		  symbols "on"
-
-	  filter "configurations:Release"
-		  runtime "Release"
-		  optimize "on"
-
-	  filter "configurations:Dist"
-		  runtime "Release"
-		  optimize "on"
 group ""
-
-project "Tests"
-  location "Tests"
-  kind "ConsoleApp"
-  targetdir (projOutput)
-  objdir (projOutputInt)
-  systemversion "latest"
-  language "C++"
-  cppdialect "C++17"
-  
-  files 
-  {
-    "Tests/**.h",
-    "Tests/**.cpp",
-  }
-
-  links
-  {
-    "cppunitlite",
-    "DgLib",
-    "Engine"
-  }
-
-  includedirs
-  {
-    "%{IncludeDir.cppunitlite}",
-		"%{IncludeDir.spdlog}",
-		"%{IncludeDir.DgLib}",
-    "%{wks.location}/Engine/src"
-  }
-
-  filter "configurations:Debug"
-	 runtime "Debug"
-	 symbols "on"
-
-	filter "configurations:Release"
-	 runtime "Release"
-	 optimize "on"
-
-	filter "configurations:Dist"
-	 runtime "Release"
-	 optimize "on"
 
 project "Engine"
   location "Engine"

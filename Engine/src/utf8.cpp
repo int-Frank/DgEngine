@@ -73,6 +73,9 @@ namespace Engine
 
   UTF8CodePoint UTF8Parser::Next()
   {
+    if (Done())
+      return INVALID_CHAR;
+
     uint32_t codePoint = 0;
     uint32_t state = 0;
     size_t byteMin = m_remaining > 4 ? m_remaining - 4 : 0;
@@ -83,8 +86,17 @@ namespace Engine
         break;
     }
 
-    if (m_remaining == 0)
+    if (state == UTF8_ACCEPT)
+    {
+      m_remaining--;
+      m_pText++;
+    }
+
+    if (m_remaining == 0 || state != UTF8_ACCEPT)
+    {
+      m_remaining = 0;
       m_pText = nullptr;
+    }
 
     return state == UTF8_ACCEPT ? codePoint : INVALID_CHAR;
   }

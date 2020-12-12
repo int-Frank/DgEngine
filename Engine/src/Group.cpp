@@ -1,3 +1,5 @@
+//@group Core
+
 #include "Group.h"
 #include "BSR_Assert.h"
 

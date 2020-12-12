@@ -173,8 +173,6 @@ namespace Engine
 
     m_rendererID = program;
 
-    LOG_DEBUG("Successfully created program");
-
     return result;
   }
 

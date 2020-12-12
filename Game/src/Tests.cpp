@@ -1,7 +1,11 @@
-#include "TestHarness.h"
-#include "Buffer.h"
+#include "Log.h"
 
-TEST(Stack_BufferLayout, creation_BufferLayout)
+#include "Buffer.h"
+#include "utf8.h"
+
+#define CHECK(val) do { if (!(val)) LOG_ERROR("TEST FAILED! Line: {}", __LINE__); } while(false)
+
+void TEST_BufferLayout()
 {
   Engine::BufferLayout layout(
     {
@@ -43,4 +47,25 @@ TEST(Stack_BufferLayout, creation_BufferLayout)
   CHECK(layout.GetElements()[3].normalized == output.GetElements()[3].normalized);
 
   delete[] buf;
+}
+
+void TEST_UTF8()
+{
+  uint8_t const utf8Str[] = {0x61, 0x73, 0x64, 0x66, 0x00};
+
+  Engine::UTF8Parser parser((char*)utf8Str);
+
+  CHECK(parser.Next() == 0x61);
+  CHECK(parser.Next() == 0x73);
+  CHECK(parser.Next() == 0x64);
+  CHECK(parser.Next() == 0x66);
+  CHECK(parser.Done());
+}
+
+void RunTests()
+{
+  TEST_BufferLayout();
+  TEST_UTF8();
+
+  LOG_INFO("Finished running tests.");
 }

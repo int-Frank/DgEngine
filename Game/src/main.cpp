@@ -240,6 +240,12 @@ public:
   Game(Opts const & a_opts)
     : Application(a_opts)
   {
+#define COMPILE_TESTS
+#ifdef COMPILE_TESTS
+    void RunTests();
+    RunTests();
+#endif
+
     PushSystem(new GameSystem());
 
     Engine::System_GUI * pSysUI = static_cast<Engine::System_GUI *>(GetSystem(Engine::System_GUI::GetStaticID()));

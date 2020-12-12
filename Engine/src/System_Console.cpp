@@ -25,7 +25,7 @@ namespace Engine
 
   void System_Console::HandleMessage(Message * a_pMsg)
   {
-    IGNORE_MESSAGE(Message_GUI_PointerMove);
-    LOG_MESSAGE("MSG: {}", a_pMsg->ToString());
+    //IGNORE_MESSAGE(Message_GUI_PointerMove);
+    //LOG_MESSAGE("MSG: {}", a_pMsg->ToString());
   }
 }
