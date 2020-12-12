@@ -1,7 +1,7 @@
 #include "Group.h"
-#include "core_Assert.h"
+#include "BSR_Assert.h"
 
-namespace Core
+namespace Engine
 {
   Group::Group()
     : m_currentID(NONE)

@@ -6,9 +6,9 @@
 
 #include "Framework.h"
 #include "Options.h"
-#include "core_Log.h"
+#include "Log.h"
 #include "IWindow.h"
-#include "core_Assert.h"
+#include "BSR_Assert.h"
 #include "OpenGLContext.h"
 
 #define OPENGL_MAJOR 4
@@ -30,7 +30,7 @@ namespace Engine
     bool IsVSync() const override;
 
     bool IsInit() const override;
-    Core::ErrorCode Init(WindowProps const & props = WindowProps());
+    ErrorCode Init(WindowProps const & props = WindowProps());
     void Destroy() override;
 
     void GetDimensions(int & w, int & h) override;
@@ -84,7 +84,7 @@ namespace Engine
     return m_pWindow != nullptr;
   }
 
-  Core::ErrorCode FW_SDLWindow::Init(WindowProps const & a_props)
+  ErrorCode FW_SDLWindow::Init(WindowProps const & a_props)
   {
     BSR_ASSERT(m_pWindow == nullptr, "FW_SDLWindow already initialised!");
 
@@ -101,7 +101,7 @@ namespace Engine
     if(m_pWindow == nullptr)
     {
       LOG_ERROR("Failed to create window!");
-      return Core::EC_Error;
+      return EC_Error;
     }
 
     OpenGLContext * pContext = dynamic_cast<OpenGLContext*>
@@ -111,7 +111,7 @@ namespace Engine
 
     pContext->SetSDLWindow(m_pWindow);
 
-    return Core::EC_None;
+    return EC_None;
   }
 
   void FW_SDLWindow::Destroy()

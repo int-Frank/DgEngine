@@ -6,7 +6,7 @@
 #include <typeinfo>
 #include <stdint.h>
 #include "DgOpenHashMap.h"
-#include "core_Log.h"
+#include "Log.h"
 
 namespace Engine
 {

@@ -1,11 +1,12 @@
+//@group Core
 
 #include <cstring>
 #include <fstream>
 
-#include "core_utils.h"
+#include "Utils.h"
 #include "Serialize.h"
 
-namespace Core
+namespace Engine
 {
   void* AdvancePtr(void* a_ptr, size_t a_increment)
   {

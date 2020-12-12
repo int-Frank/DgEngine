@@ -19,8 +19,8 @@ namespace Engine
     ~OpenGLContext();
     OpenGLContext();
 
-    Core::ErrorCode Init() override;
-    Core::ErrorCode ShutDown() override;
+    ErrorCode Init() override;
+    ErrorCode ShutDown() override;
     void SetSDLWindow(SDL_Window *);
     void SwapBuffers() override;
     void Resize(uint32_t w, uint32_t h) override;

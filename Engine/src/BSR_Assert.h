@@ -1,3 +1,5 @@
+//@group Core
+
 #ifndef BSR_ASSERT_H
 #define BSR_ASSERT_H
 

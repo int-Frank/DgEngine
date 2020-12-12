@@ -1,7 +1,7 @@
 //@group Systems
 
 #include "System_Console.h"
-#include "core_Log.h"
+#include "Log.h"
 
 #define IGNORE_MESSAGE(TYPE) if (a_pMsg->GetID() == TYPE::GetStaticID()) return
 #define LOG_MESSAGE(...) LOG_DEBUG(__VA_ARGS__)

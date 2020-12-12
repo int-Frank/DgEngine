@@ -3,7 +3,7 @@
 #include <glad/glad.h>
 
 #include "ShaderUtils.h"
-#include "core_Assert.h"
+#include "BSR_Assert.h"
 
 namespace Engine
 {

@@ -3,7 +3,7 @@
 #ifndef UI_INTERNAL_H
 #define UI_INTERNAL_H
 
-#include "core_utils.h"
+#include "Utils.h"
 
 namespace Engine
 {

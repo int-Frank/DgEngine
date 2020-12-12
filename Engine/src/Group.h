@@ -4,7 +4,7 @@
 #include <stdint.h>
 #include "PODArray.h"
 
-namespace Core
+namespace Engine
 {
   class Group
   {

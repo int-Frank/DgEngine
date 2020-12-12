@@ -22,7 +22,7 @@
 
 #define TEXTURE_XY 512
 
-Colour * GenerateBinTexture()
+Engine::Colour * GenerateBinTexture()
 {
   int itemMin = 8;
   int itemMax = 64;
@@ -75,7 +75,7 @@ Colour * GenerateBinTexture()
 
   LOG_INFO("Item count: {}", items.size());
 
-  Colour * pPixels = new Colour[TEXTURE_XY * TEXTURE_XY];
+  Engine::Colour * pPixels = new Engine::Colour[TEXTURE_XY * TEXTURE_XY];
 
   for (int i = 0; i < TEXTURE_XY * TEXTURE_XY; i++)
   {
@@ -117,9 +117,9 @@ Colour * GenerateBinTexture()
   return pPixels;
 }
 
-Colour * GenerateTexture(uint32_t a_width, uint32_t a_height)
+Engine::Colour * GenerateTexture(uint32_t a_width, uint32_t a_height)
 {
-  Colour * pixels = new Colour[a_width * a_height];
+  Engine::Colour * pixels = new Engine::Colour[a_width * a_height];
 
   for (uint32_t y = 0; y < a_height; y++)
   {
@@ -250,28 +250,28 @@ public:
     else
     {
       Engine::GUI::Window * pWindow1a = Engine::GUI::Window::Create(nullptr, {20.f, 20.f}, {200.f, 100.f});
-      pWindow1a->SetBackgroundColour(Colour(0, 255, 0, 255));
+      pWindow1a->SetBackgroundColour(Engine::Colour(0, 255, 0, 255));
       Engine::GUI::Button * pBtn1a = Engine::GUI::Button::Create(nullptr, "Hello", 0, {10.f, 20.f}, {50.f, 20.f});
-      pBtn1a->SetBackgroundColour(Colour(64, 0, 128, 255));
-      pBtn1a->SetHoverOnBackgroundColour(Colour(128, 0, 255, 255));
+      pBtn1a->SetBackgroundColour(Engine::Colour(64, 0, 128, 255));
+      pBtn1a->SetHoverOnBackgroundColour(Engine::Colour(128, 0, 255, 255));
       pBtn1a->BindSelect([](){LOG_WARN("PRESSED 1a");});
       pBtn1a->BindHoverOn([](){LOG_DEBUG("HOVER ON 1a");});
       pBtn1a->BindHoverOff([](){LOG_DEBUG("HOVER OFF 1a");});
 
       Engine::GUI::Window * pWindow1b = Engine::GUI::Window::Create(nullptr, {400.f, 20.f}, {200.f, 100.f});
-      pWindow1b->SetBackgroundColour(Colour(0, 255, 255, 255));
+      pWindow1b->SetBackgroundColour(Engine::Colour(0, 255, 255, 255));
       Engine::GUI::Button * pBtn1b = Engine::GUI::Button::Create(nullptr, "Hello", 0, {10.f, 20.f}, {50.f, 20.f});
-      pBtn1b->SetBackgroundColour(Colour(64, 64, 128, 255));
-      pBtn1b->SetHoverOnBackgroundColour(Colour(128, 128, 255, 255));
+      pBtn1b->SetBackgroundColour(Engine::Colour(64, 64, 128, 255));
+      pBtn1b->SetHoverOnBackgroundColour(Engine::Colour(128, 128, 255, 255));
       pBtn1b->BindSelect([](){LOG_WARN("PRESSED 1b");});
       pBtn1b->BindHoverOn([](){LOG_DEBUG("HOVER ON 1b");});
       pBtn1b->BindHoverOff([](){LOG_DEBUG("HOVER OFF 1b");});
 
       Engine::GUI::Window * pWindow1 = Engine::GUI::Window::Create(nullptr, {20.f, 20.f}, {800.f, 400.f});
-      pWindow1->SetBackgroundColour(Colour(255, 255, 255, 255));
+      pWindow1->SetBackgroundColour(Engine::Colour(255, 255, 255, 255));
       Engine::GUI::Button * pBtn1 = Engine::GUI::Button::Create(nullptr, "Hello", 0, {10.f, 20.f}, {50.f, 20.f});
-      pBtn1->SetBackgroundColour(Colour(64, 128, 0, 255));
-      pBtn1->SetHoverOnBackgroundColour(Colour(128, 255, 0, 255));
+      pBtn1->SetBackgroundColour(Engine::Colour(64, 128, 0, 255));
+      pBtn1->SetHoverOnBackgroundColour(Engine::Colour(128, 255, 0, 255));
       pBtn1->BindSelect([](){LOG_WARN("PRESSED 1");});
       pBtn1->BindHoverOn([](){LOG_DEBUG("HOVER ON 1");});
       pBtn1->BindHoverOff([](){LOG_DEBUG("HOVER OFF 1");});

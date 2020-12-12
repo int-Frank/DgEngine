@@ -21,7 +21,7 @@
 
 #include <stdint.h>
 #include "MemBuffer.h"
-#include "core_utils.h"
+#include "Utils.h"
 #include "ShaderUniform.h"
 #include "RT_RendererAPI.h"
 #include "ShaderSource.h"

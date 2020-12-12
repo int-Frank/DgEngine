@@ -5,7 +5,7 @@
 
 #include "ShaderSource.h"
 #include "Serialize.h"
-#include "core_Log.h"
+#include "Log.h"
 
 namespace Engine
 {

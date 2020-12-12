@@ -1,10 +1,11 @@
+//@group Core
 
 #include <cstring>
 #include <stdint.h>
 
 #include "Serialize.h"
 
-namespace Core
+namespace Engine
 {
   template<>
   void* Serialize<byte>(void* a_dest, byte const* a_ptr, size_t a_count)

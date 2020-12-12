@@ -101,7 +101,7 @@ namespace Engine
     };
 
     RenderCommandQueue m_commandQueue;
-    Core::Group m_group;
+    Group m_group;
   };
 
 }

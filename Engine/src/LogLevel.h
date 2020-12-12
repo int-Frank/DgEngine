@@ -1,3 +1,5 @@
+//@group Core
+
 #ifndef LOGLEVEL_H
 #define LOGLEVEL_H
 

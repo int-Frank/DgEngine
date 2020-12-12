@@ -6,8 +6,8 @@
 #include <memory>
 #include <type_traits>
 #include <stdint.h>
-#include "core_Log.h"
-#include "core_Assert.h"
+#include "Log.h"
+#include "BSR_Assert.h"
 
 namespace Engine
 {

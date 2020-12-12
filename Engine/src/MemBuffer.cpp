@@ -1,5 +1,6 @@
-#include "MemBuffer.h"
+//@group Core
 
+#include "MemBuffer.h"
 
 //--------------------------------------------------------------------------------------------
 // MemBufferDynamic

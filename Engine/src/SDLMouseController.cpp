@@ -11,8 +11,8 @@ namespace Engine
   {
   public:
 
-    Core::ErrorCode Grab();
-    Core::ErrorCode Release();
+    ErrorCode Grab();
+    ErrorCode Release();
 
     void GetPos(int & x, int & y);
     void MoveToPos(int x, int y);
@@ -26,14 +26,14 @@ namespace Engine
     SetMouseController(new FW_SDLMouseController());
   }
 
-  Core::ErrorCode FW_SDLMouseController::Grab()
+  ErrorCode FW_SDLMouseController::Grab()
   {
-    return SDL_SetRelativeMouseMode(SDL_TRUE) == 0 ? Core::EC_None : Core::EC_Error;
+    return SDL_SetRelativeMouseMode(SDL_TRUE) == 0 ? EC_None : EC_Error;
   }
 
-  Core::ErrorCode FW_SDLMouseController::Release()
+  ErrorCode FW_SDLMouseController::Release()
   {
-    return SDL_SetRelativeMouseMode(SDL_FALSE) == 0 ? Core::EC_None : Core::EC_Error;
+    return SDL_SetRelativeMouseMode(SDL_FALSE) == 0 ? EC_None : EC_Error;
   }
 
   void FW_SDLMouseController::GetPos(int & a_x, int & a_y)

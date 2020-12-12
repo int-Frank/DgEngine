@@ -20,7 +20,7 @@
 #include "Renderer.h"
 #include "RT_RendererAPI.h"
 #include "VertexArray.h"
-#include "core_Assert.h"
+#include "BSR_Assert.h"
 #include "Memory.h"
 #include "Message.h"
 #include "MessageBus.h"

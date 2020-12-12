@@ -6,7 +6,7 @@
 #include "Framework.h"
 #include "EngineMessages.h"
 #include "InputCodes.h"
-#include "core_Log.h"
+#include "Log.h"
 #include "Memory.h"
 
 #include "SDL_events.h"

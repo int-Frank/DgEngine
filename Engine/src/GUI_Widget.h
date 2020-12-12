@@ -6,7 +6,7 @@
 #include <string>
 #include <functional>
 
-#include "core_utils.h"
+#include "Utils.h"
 #include "EngineMessages.h"
 
 /*
@@ -21,6 +21,8 @@
   - Text Input
   - Text display
   - Text window (logging window)
+  - Image display
+  - Interactive area, overlays on top of say an Image Display, and captues events
 */
 
 namespace Engine

@@ -1,3 +1,5 @@
+//@group Core
+
 #ifndef SERIALIZE_H
 #define SERIALIZE_H
 
@@ -5,10 +7,10 @@
 #include <type_traits>
 #include <new>
 
-#include "core_utils.h"
-#include "core_Assert.h"
+#include "Utils.h"
+#include "BSR_Assert.h"
 
-namespace Core
+namespace Engine
 {
   template<typename T>
   void * Serialize(void * a_dest, T const * a_ptr, size_t a_count = 1)

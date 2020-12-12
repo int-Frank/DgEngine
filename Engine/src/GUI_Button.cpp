@@ -110,8 +110,6 @@ namespace Engine
       if (t == AABBType::None)
         return;
 
-      //UIAABB aabb = {GetGlobalPosition(), GetSize()};
-
       if (t == AABBType::Window)
       {
         ::Engine::Renderer::Enable(RenderFeature::Sissor);

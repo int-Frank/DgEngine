@@ -3,7 +3,7 @@
 #include "RendererProgram.h"
 #include "RT_RendererProgram.h"
 #include "Renderer.h"
-#include  "core_Log.h"
+#include  "Log.h"
 #include "Serialize.h"
 #include "RenderThreadData.h"
 #include "ResourceManager.h"
@@ -172,9 +172,9 @@ namespace Engine
     state.Set<RenderState::Attr::Type>(RenderState::Type::Command);
     state.Set<RenderState::Attr::Command>(RenderState::Command::RendererProgramUploadUniform);
 
-    uint32_t sze_name = Core::SerializedSize(a_name);
+    uint32_t sze_name = SerializedSize(a_name);
     void* buf_name = RENDER_ALLOCATE(sze_name);
-    Core::Serialize(buf_name, &a_name);
+    Serialize(buf_name, &a_name);
 
     void* buf_data = RENDER_ALLOCATE(a_size);
     memcpy(buf_data, a_buf, a_size);
@@ -189,7 +189,7 @@ namespace Engine
       }
       std::string name;
 
-      Core::Deserialize(buf_name, &name, 1);
+      Deserialize(buf_name, &name, 1);
       (*ppRP)->UploadUniform(name, buf_data, size);
     });
   }
@@ -200,9 +200,9 @@ namespace Engine
     state.Set<RenderState::Attr::Type>(RenderState::Type::Command);
     state.Set<RenderState::Attr::Command>(RenderState::Command::RendererProgramUploadUniform);
 
-    uint32_t sze_name = Core::SerializedSize(a_name);
+    uint32_t sze_name = SerializedSize(a_name);
     void* buf_name = RENDER_ALLOCATE(sze_name);
-    Core::Serialize(buf_name, &a_name);
+    Serialize(buf_name, &a_name);
 
     RENDER_SUBMIT(state, [resID = m_id, size = a_size, buf_name = buf_name, buf_data = a_buf]()
     {
@@ -214,7 +214,7 @@ namespace Engine
       }
       std::string name;
 
-      Core::Deserialize(buf_name, &name, 1);
+      Deserialize(buf_name, &name, 1);
       pRP->UploadUniform(name, buf_data, size);
     });
   }*/

@@ -2,10 +2,10 @@
 
 #include "SDL.h"
 #include "Options.h"
-#include "core_Log.h"
+#include "Log.h"
 #include "Framework.h"
 #include "InputCodes.h"
-#include "core_Assert.h"
+#include "BSR_Assert.h"
 
 namespace Engine
 {
@@ -60,11 +60,11 @@ namespace Engine
     return s_instance;
   }
 
-  Core::ErrorCode Framework::Init()
+  ErrorCode Framework::Init()
   {
     BSR_ASSERT(s_instance == nullptr, "Framework already initialized!");
     s_instance = new Framework();
-    Core::ErrorCode result = Core::EC_None;
+    ErrorCode result = EC_None;
     do
     {
       //-----------------------------------------------------------------------------------------
@@ -75,7 +75,7 @@ namespace Engine
       if (SDL_Init(SDL_INIT_EVERYTHING) != 0) 
       {
         LOG_ERROR("Unable to initialize SDL: {}", SDL_GetError());
-        result = Core::EC_Error;
+        result = EC_Error;
         break;
       }
 
@@ -92,9 +92,9 @@ namespace Engine
     return result;
   }
 
-  Core::ErrorCode Framework::ShutDown()
+  ErrorCode Framework::ShutDown()
   {
-    Core::ErrorCode result = Core::EC_None;
+    ErrorCode result = EC_None;
 
     delete s_instance;
     s_instance = nullptr;

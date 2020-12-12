@@ -3,9 +3,9 @@
 #include "OpenGLContext.h"
 #include "Framework.h"
 #include "glad/glad.h"
-#include "core_Log.h"
-#include "core_ErrorCodes.h"
-#include "core_Assert.h"
+#include "Log.h"
+#include "ErrorCodes.h"
+#include "BSR_Assert.h"
 #include "SDL.h"
 
 namespace Engine
@@ -27,14 +27,14 @@ namespace Engine
 
   }
 
-  Core::ErrorCode OpenGLContext::ShutDown()
+  ErrorCode OpenGLContext::ShutDown()
   {
     SDL_GL_DeleteContext(m_context);
     m_context = nullptr;
-    return Core::ErrorCode::EC_None;
+    return ErrorCode::EC_None;
   }
 
-  Core::ErrorCode OpenGLContext::Init()
+  ErrorCode OpenGLContext::Init()
   {
     BSR_ASSERT(m_pWindow != nullptr, "Render context does not have a window! Make sure you set the window first!");
 
@@ -43,21 +43,21 @@ namespace Engine
     if (m_context == nullptr)
     {
       LOG_ERROR("SDL_GL_CreateContext() Failed!");
-      return Core::EC_Error;
+      return EC_Error;
     }
     LOG_TRACE("Opengl loaded");
 
     if (gladLoadGLLoader(SDL_GL_GetProcAddress) == 0)
     {
       LOG_ERROR("Glad failed to log");
-      return Core::EC_Error;
+      return EC_Error;
     }
 
     LOG_TRACE("Vendor:   {}", glGetString(GL_VENDOR));
     LOG_TRACE("Renderer: {}", glGetString(GL_RENDERER));
     LOG_TRACE("Version:  {}", glGetString(GL_VERSION));
 
-    return Core::EC_None;
+    return EC_None;
   }
 
   void OpenGLContext::SetSDLWindow(SDL_Window* a_pWindow)

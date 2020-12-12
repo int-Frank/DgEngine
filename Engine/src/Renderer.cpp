@@ -17,10 +17,10 @@
 */
 
 #include "Renderer.h"
-#include "core_Log.h"
-#include "core_Assert.h"
+#include "Log.h"
+#include "BSR_Assert.h"
 #include "Framework.h"
-#include "core_Log.h"
+#include "Log.h"
 #include "RT_RendererAPI.h"
 #include "RenderThread.h"
 

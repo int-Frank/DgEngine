@@ -21,7 +21,7 @@
 
 #include <stdint.h>
 #include "TextureData.h"
-#include "core_utils.h"
+#include "Utils.h"
 #include "RenderResource.h"
 #include "Memory.h"
 

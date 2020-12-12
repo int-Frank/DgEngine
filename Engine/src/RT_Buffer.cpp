@@ -17,7 +17,7 @@
 */
 
 #include <glad/glad.h>
-#include "core_Assert.h"
+#include "BSR_Assert.h"
 #include "RT_Buffer.h"
 #include "RT_RendererAPI.h"
 #include "RT_BindingPoint.h"

@@ -18,8 +18,8 @@
 
 #include <glad/glad.h>
 #include "RT_RendererAPI.h"
-#include "core_Log.h"
-#include "core_Assert.h"
+#include "Log.h"
+#include "BSR_Assert.h"
 #include "Framework.h"
 
 namespace Engine

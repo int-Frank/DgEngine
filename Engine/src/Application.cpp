@@ -7,12 +7,12 @@
 #include "Framework.h"
 #include "RenderThread.h"
 
-#include "core_ErrorCodes.h"
+#include "ErrorCodes.h"
 #include "Application.h"
 #include "Options.h"
-#include "core_Log.h"
+#include "Log.h"
 #include "IWindow.h"
-#include "core_Assert.h"
+#include "BSR_Assert.h"
 #include "Message.h"
 #include "Memory.h"
 #include "Renderer.h"
@@ -54,7 +54,7 @@ namespace Engine
     if (m_pimpl->pWindow == nullptr)
       throw std::runtime_error("GetWindow() has returned a null pointer!");
 
-    if (m_pimpl->pWindow->Init() != Core::EC_None)
+    if (m_pimpl->pWindow->Init() != EC_None)
       throw std::runtime_error("Failed to initialise window!");
   }
 
@@ -83,11 +83,11 @@ namespace Engine
     MessageBus::Init(m_pimpl->systemStack);
 
     if (a_opts.loggerType == E_UseFileLogger)
-      Core::impl::Logger::Init_file(a_opts.loggerName.c_str(), a_opts.logFile.c_str());
+      impl::Logger::Init_file(a_opts.loggerName.c_str(), a_opts.logFile.c_str());
     else
-      Core::impl::Logger::Init_stdout(a_opts.loggerName.c_str());
+      impl::Logger::Init_stdout(a_opts.loggerName.c_str());
 
-    if (Framework::Init() != Core::EC_None)
+    if (Framework::Init() != EC_None)
       throw std::runtime_error("Failed to initialise framework!");
 
     InitWindow();
@@ -118,7 +118,7 @@ namespace Engine
     RenderThread::ShutDown();
     Renderer::ShutDown();
 
-    if (Framework::ShutDown() != Core::EC_None)
+    if (Framework::ShutDown() != EC_None)
       LOG_ERROR("Failed to shut down framework!");
 
     s_instance = nullptr;

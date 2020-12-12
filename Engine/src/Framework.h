@@ -5,7 +5,7 @@
 
 #include <string>
 
-#include "core_ErrorCodes.h"
+#include "ErrorCodes.h"
 
 #include "IWindow.h"
 #include "IEventPoller.h"
@@ -34,8 +34,8 @@ namespace Engine
     ~Framework();
 
     static Framework * Instance();
-    static Core::ErrorCode Init();
-    static Core::ErrorCode ShutDown();
+    static ErrorCode Init();
+    static ErrorCode ShutDown();
 
     UNROLL_FRAMEWORK_CLASSES
 

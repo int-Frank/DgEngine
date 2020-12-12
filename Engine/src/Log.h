@@ -1,13 +1,15 @@
+//@group Core
+
 #ifndef LOG_H
 #define LOG_H
 
 #include <memory>
 
 #include "spdlog/spdlog.h"
-#include "core_LogLevel.h"
+#include "LogLevel.h"
 
 // TODO do not use spdlog. Write your own
-namespace Core
+namespace Engine
 {
   namespace impl
   {
@@ -24,37 +26,37 @@ namespace Core
   }
 
 #if LL_CRITICAL >= LOGLEVEL
-#define LOG_CRITICAL(...) ::Core::impl::Logger::GetLogger()->critical(__VA_ARGS__)
+#define LOG_CRITICAL(...) ::Engine::impl::Logger::GetLogger()->critical(__VA_ARGS__)
 #else
 #define LOG_CRITICAL(...)
 #endif
 
 #if LL_ERROR >= LOGLEVEL
-#define LOG_ERROR(...) ::Core::impl::Logger::GetLogger()->error(__VA_ARGS__)
+#define LOG_ERROR(...) ::Engine::impl::Logger::GetLogger()->error(__VA_ARGS__)
 #else
 #define LOG_ERROR(...)
 #endif
 
 #if LL_WARN >= LOGLEVEL
-#define LOG_WARN(...) ::Core::impl::Logger::GetLogger()->warn(__VA_ARGS__)
+#define LOG_WARN(...) ::Engine::impl::Logger::GetLogger()->warn(__VA_ARGS__)
 #else
 #define LOG_WARN(...)
 #endif
 
 #if LL_INFO >= LOGLEVEL
-#define LOG_INFO(...) ::Core::impl::Logger::GetLogger()->info(__VA_ARGS__)
+#define LOG_INFO(...) ::Engine::impl::Logger::GetLogger()->info(__VA_ARGS__)
 #else
 #define LOG_INFO(...)
 #endif
 
 #if LL_DEBUG >= LOGLEVEL
-#define LOG_DEBUG(...) ::Core::impl::Logger::GetLogger()->debug(__VA_ARGS__)
+#define LOG_DEBUG(...) ::Engine::impl::Logger::GetLogger()->debug(__VA_ARGS__)
 #else
 #define LOG_DEBUG(...)
 #endif
 
 #if LL_TRACE >= LOGLEVEL
-#define LOG_TRACE(...) ::Core::impl::Logger::GetLogger()->trace(__VA_ARGS__)
+#define LOG_TRACE(...) ::Engine::impl::Logger::GetLogger()->trace(__VA_ARGS__)
 #else
 #define LOG_TRACE(...)
 #endif

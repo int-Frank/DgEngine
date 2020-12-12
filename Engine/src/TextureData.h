@@ -4,7 +4,7 @@
 #define TEXTUREDATA_H
 
 #include <stdint.h>
-#include "core_utils.h"
+#include "Utils.h"
 
 namespace Engine
 {

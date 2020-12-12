@@ -23,7 +23,7 @@
 #include <stdint.h>
 
 #include "DgDynamicArray.h"
-#include "core_Assert.h"
+#include "BSR_Assert.h"
 #include "Memory.h"
 #include "RenderResource.h"
 #include "ShaderUtils.h"

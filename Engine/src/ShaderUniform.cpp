@@ -26,11 +26,11 @@
 #include "RenderThreadData.h"
 #include "ResourceManager.h"
 
-#include "core_Log.h"
+#include "Log.h"
 #include "DgMath.h"
-#include "core_utils.h"
+#include "Utils.h"
 #include "Serialize.h"
-#include "core_Assert.h"
+#include "BSR_Assert.h"
 #include "DgBit.h"
 
 #define ALIGN Dg::ForwardAlign<uint32_t>
@@ -89,12 +89,12 @@ namespace Engine
 
   void * UniformBufferElementHeader::Serialize(void * a_buf) const
   {
-    return Core::Serialize(a_buf, &m_data);
+    return ::Engine::Serialize(a_buf, &m_data);
   }
 
   void const * UniformBufferElementHeader::Deserialize(void const * a_buf)
   {
-    return Core::Deserialize(a_buf, &m_data);
+    return ::Engine::Deserialize(a_buf, &m_data);
   }
 
   void UniformBufferElementHeader::SetSize(uint32_t a_count)
@@ -197,7 +197,7 @@ namespace Engine
       return a_buffer;
 
     //align first
-    void * buf = Core::AdvancePtr(a_buffer, m_frontPadding);
+    void * buf = AdvancePtr(a_buffer, m_frontPadding);
 
     //copy data
     if (m_type == ShaderDataType::STRUCT)
@@ -247,8 +247,8 @@ namespace Engine
     byte const * pSrc = static_cast<byte const *>(a_data);
     for (uint32_t c = 0; c < count; c++)
     {
-      buf = Core::Serialize<byte>(buf, pSrc, dataSize);
-      buf = Core::AdvancePtr(buf, padding);
+      buf = Serialize<byte>(buf, pSrc, dataSize);
+      buf = AdvancePtr(buf, padding);
     }
 
     return buf;

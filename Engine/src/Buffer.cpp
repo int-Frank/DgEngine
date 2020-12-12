@@ -20,7 +20,7 @@
 
 #include "Buffer.h"
 #include "Renderer.h"
-#include  "core_Log.h"
+#include  "Log.h"
 #include "RenderThreadData.h"
 #include "ShaderUtils.h"
 #include "Serialize.h"
@@ -47,22 +47,22 @@ namespace Engine
 
   size_t BufferElement::Size() const
   {
-    return size_t(Core::SerializedSize(name))
-         + size_t(Core::SerializedSize(type))
-         + size_t(Core::SerializedSize(size))
-         + size_t(Core::SerializedSize(offset))
-         + size_t(Core::SerializedSize(normalized));
+    return size_t(SerializedSize(name))
+         + size_t(SerializedSize(type))
+         + size_t(SerializedSize(size))
+         + size_t(SerializedSize(offset))
+         + size_t(SerializedSize(normalized));
   }
 
   void* BufferElement::Serialize(void* a_out) const
   {
     void * pBuf = a_out;
     uint32_t type32 = static_cast<uint32_t>(type);
-    pBuf = Core::Serialize(pBuf, &name);
-    pBuf = Core::Serialize(pBuf, &type32);
-    pBuf = Core::Serialize(pBuf, &size);
-    pBuf = Core::Serialize(pBuf, &offset);
-    pBuf = Core::Serialize(pBuf, &normalized);
+    pBuf = ::Engine::Serialize(pBuf, &name);
+    pBuf = ::Engine::Serialize(pBuf, &type32);
+    pBuf = ::Engine::Serialize(pBuf, &size);
+    pBuf = ::Engine::Serialize(pBuf, &offset);
+    pBuf = ::Engine::Serialize(pBuf, &normalized);
     return pBuf;
   }
 
@@ -70,12 +70,12 @@ namespace Engine
   {
     void const * pBuf = a_buf;
     uint32_t type32(0);
-    pBuf = Core::Deserialize(pBuf, &name);
-    pBuf = Core::Deserialize(pBuf, &type32);
+    pBuf = ::Engine::Deserialize(pBuf, &name);
+    pBuf = ::Engine::Deserialize(pBuf, &type32);
     type = uint_ToShaderDataType(type32);
-    pBuf = Core::Deserialize(pBuf, &size);
-    pBuf = Core::Deserialize(pBuf, &offset);
-    pBuf = Core::Deserialize(pBuf, &normalized);
+    pBuf = ::Engine::Deserialize(pBuf, &size);
+    pBuf = ::Engine::Deserialize(pBuf, &offset);
+    pBuf = ::Engine::Deserialize(pBuf, &normalized);
     return pBuf;
   }
 
@@ -151,8 +151,8 @@ namespace Engine
   {
     uint32_t nElements = static_cast<uint32_t>(m_elements.size());
     void* pBuf = a_out;
-    pBuf = Core::Serialize(pBuf, &m_stride);
-    pBuf = Core::Serialize(pBuf, &nElements);
+    pBuf = ::Engine::Serialize(pBuf, &m_stride);
+    pBuf = ::Engine::Serialize(pBuf, &nElements);
     for (auto const& item : m_elements)
       pBuf = item.Serialize(pBuf);
     return pBuf;
@@ -162,8 +162,8 @@ namespace Engine
   {
     uint32_t nElements = 0;
     void const * pBuf = a_buf;
-    pBuf = Core::Deserialize(pBuf, &m_stride);
-    pBuf = Core::Deserialize(pBuf, &nElements);
+    pBuf = ::Engine::Deserialize(pBuf, &m_stride);
+    pBuf = ::Engine::Deserialize(pBuf, &nElements);
     for (uint32_t i = 0; i < nElements; i++)
     {
       BufferElement ele;

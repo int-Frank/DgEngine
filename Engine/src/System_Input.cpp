@@ -4,7 +4,7 @@
 
 #include "System_Input.h"
 #include "Framework.h"
-#include "core_Log.h"
+#include "Log.h"
 #include "InputCodes.h"
 #include "EngineMessages.h"
 #include "MessageBus.h"

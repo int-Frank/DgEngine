@@ -3,8 +3,8 @@
 #include <glad/glad.h>
 
 #include "RT_BindingPoint.h"
-#include "core_Assert.h"
-#include "core_Log.h"
+#include "BSR_Assert.h"
+#include "Log.h"
 
 namespace Engine
 {

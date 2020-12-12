@@ -167,10 +167,10 @@ namespace Engine
   {
     void* pCurrent = a_pBuf;
     uint32_t flagData = flags.GetData();
-    pCurrent = Core::Serialize(pCurrent, &flagData, 1);
-    pCurrent = Core::Serialize(pCurrent, &width, 1);
-    pCurrent = Core::Serialize(pCurrent, &height, 1);
-    pCurrent = Core::Serialize(pCurrent, &pPixels->data, size_t(width) * height);
+    pCurrent = ::Engine::Serialize(pCurrent, &flagData, 1);
+    pCurrent = ::Engine::Serialize(pCurrent, &width, 1);
+    pCurrent = ::Engine::Serialize(pCurrent, &height, 1);
+    pCurrent = ::Engine::Serialize(pCurrent, &pPixels->data, size_t(width) * height);
     return pCurrent;
   }
 
@@ -178,10 +178,10 @@ namespace Engine
   {
     void const * pCurrent = a_pBuf;
     uint32_t flagData(0);
-    pCurrent = Core::Deserialize(pCurrent, &flagData, 1);
-    pCurrent = Core::Deserialize(pCurrent, &width, 1);
-    pCurrent = Core::Deserialize(pCurrent, &height, 1);
-    pCurrent = Core::Deserialize(pCurrent, &pPixels->data, size_t(width) * height);
+    pCurrent = ::Engine::Deserialize(pCurrent, &flagData, 1);
+    pCurrent = ::Engine::Deserialize(pCurrent, &width, 1);
+    pCurrent = ::Engine::Deserialize(pCurrent, &height, 1);
+    pCurrent = ::Engine::Deserialize(pCurrent, &pPixels->data, size_t(width) * height);
     flags.SetData(flagData);
     return pCurrent;
   }
@@ -209,9 +209,9 @@ namespace Engine
   size_t TextureData::Size() const
   {
     size_t result = 0;
-    result += Core::SerializedSize(flags.GetData());
-    result += Core::SerializedSize(width);
-    result += Core::SerializedSize(height);
+    result += SerializedSize(flags.GetData());
+    result += SerializedSize(width);
+    result += SerializedSize(height);
     result += (sizeof(Colour::DataType) * width * height);
     return result;
   }

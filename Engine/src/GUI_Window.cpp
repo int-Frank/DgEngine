@@ -13,7 +13,7 @@ namespace Engine
     //------------------------------------------------------------------------------------
     // State class declarations
     //------------------------------------------------------------------------------------
-    class WindowState
+    class Window::WindowState
     {
     public:
 
@@ -61,7 +61,7 @@ namespace Engine
       Data * m_pData;
     };
 
-    class StaticState : public WindowState
+    class StaticState : public Window::WindowState
     {
     public:
 
@@ -81,7 +81,7 @@ namespace Engine
       WidgetState m_state;
     };
 
-    class MoveState : public WindowState
+    class MoveState : public Window::WindowState
     {
     public:
 
@@ -99,7 +99,7 @@ namespace Engine
       vec2 m_positionAnchor;
     };
 
-    class ResizeState : public WindowState
+    class ResizeState : public Window::WindowState
     {
     public:
 
@@ -121,18 +121,18 @@ namespace Engine
     // WindowState
     //------------------------------------------------------------------------------------
 
-    WindowState::WindowState(Data * a_pData)
+    Window::WindowState::WindowState(Data * a_pData)
       : m_pData(a_pData)
     {
 
     }
 
-    WindowState::~WindowState()
+    Window::WindowState::~WindowState()
     {
 
     }
 
-    void WindowState::Destroy()
+    void Window::WindowState::Destroy()
     {
       Clear();
 
@@ -141,29 +141,29 @@ namespace Engine
       m_pData = nullptr;
     }
 
-    Widget * WindowState::GetParent() const
+    Widget * Window::WindowState::GetParent() const
     {
       return m_pData->pParent;
     }
 
-    void WindowState::SetParent(Widget * a_pParent)
+    void Window::WindowState::SetParent(Widget * a_pParent)
     {
       m_pData->pParent = a_pParent;
     }
 
-    vec2 WindowState::GetSize() const
+    vec2 Window::WindowState::GetSize() const
     {
       return m_pData->aabb.size;
     }
 
-    void WindowState::Clear()
+    void Window::WindowState::Clear()
     {
       for (auto pWgt : m_pData->children)
         delete pWgt;
       m_pData->children.clear();
     }
 
-    void WindowState::Add(Widget * a_pWgt)
+    void Window::WindowState::Add(Widget * a_pWgt)
     {
       if (a_pWgt->IsWindow())
         m_pData->children.push_front(a_pWgt);
@@ -171,7 +171,7 @@ namespace Engine
         m_pData->children.push_back(a_pWgt);
     }
 
-    void WindowState::Remove(Widget * a_pWgt)
+    void Window::WindowState::Remove(Widget * a_pWgt)
     {
       for (auto it = m_pData->children.begin(); it != m_pData->children.end(); it++)
       {
@@ -184,7 +184,7 @@ namespace Engine
       }
     }
 
-    void WindowState::Draw()
+    void Window::WindowState::Draw()
     {
       if (!HasFlag(Window::Flag::NoBackground))
       {
@@ -218,27 +218,27 @@ namespace Engine
         m_pData->pGrab->Draw();
     }
 
-    bool WindowState::HasFlag(Window::Flag a_flag) const
+    bool Window::WindowState::HasFlag(Window::Flag a_flag) const
     {
       return (m_pData->flags & a_flag) != 0;
     }
 
-    vec2 WindowState::GetLocalPosition() const
+    vec2 Window::WindowState::GetLocalPosition() const
     {
       return m_pData->aabb.position;
     }
 
-    void WindowState::SetPosition(vec2 const & a_position)
+    void Window::WindowState::SetPosition(vec2 const & a_position)
     {
       m_pData->aabb.position = a_position;
     }
 
-    void WindowState::SetSize(vec2 const & a_size)
+    void Window::WindowState::SetSize(vec2 const & a_size)
     {
       m_pData->aabb.size = a_size;
     }
 
-    void WindowState::SetBackgroundColour(Colour a_clr)
+    void Window::WindowState::SetBackgroundColour(Colour a_clr)
     {
       m_pData->clrBackground = a_clr;
     }
@@ -265,7 +265,7 @@ namespace Engine
       return m_state;
     }
 
-    WindowState * StaticState::HandleMessage(Message * a_pMsg)
+    Window::WindowState * StaticState::HandleMessage(Message * a_pMsg)
     {
       if (a_pMsg->GetCategory() != MC_GUI)
         return nullptr;
@@ -298,7 +298,7 @@ namespace Engine
       return pResult;
     }
 
-    WindowState * StaticState::HandleMessage(Message_GUI_PointerDown * a_pMsg)
+    Window::WindowState * StaticState::HandleMessage(Message_GUI_PointerDown * a_pMsg)
     {
       UIAABB aabb;
       if (m_pData->pWindow->GetGlobalAABB(aabb) == AABBType::None)
@@ -349,7 +349,7 @@ namespace Engine
       return nullptr;
     }
 
-    WindowState * StaticState::HandleMessage(Message_GUI_PointerUp * a_pMsg)
+    Window::WindowState * StaticState::HandleMessage(Message_GUI_PointerUp * a_pMsg)
     {
       for (Widget * pWidget : m_pData->children)
       {
@@ -367,7 +367,7 @@ namespace Engine
       return nullptr;
     }
 
-    WindowState * StaticState::HandleMessage(Message_GUI_PointerMove * a_pMsg)
+    Window::WindowState * StaticState::HandleMessage(Message_GUI_PointerMove * a_pMsg)
     {
       vec2 point((float)a_pMsg->x, (float)a_pMsg->y);
 
@@ -421,7 +421,7 @@ namespace Engine
       return WidgetState::HasFocus;
     }
 
-    WindowState * MoveState::HandleMessage(Message * a_pMsg)
+    Window::WindowState * MoveState::HandleMessage(Message * a_pMsg)
     {
       if (a_pMsg->GetCategory() != MC_GUI)
         return nullptr;
@@ -438,7 +438,7 @@ namespace Engine
       return nullptr;
     }
 
-    WindowState * MoveState::HandleMessage(Message_GUI_PointerMove * a_pMsg)
+    Window::WindowState * MoveState::HandleMessage(Message_GUI_PointerMove * a_pMsg)
     {
       vec2 point((float)a_pMsg->x, (float)a_pMsg->y);
 
@@ -479,7 +479,7 @@ namespace Engine
       return WidgetState::HasFocus;
     }
 
-    WindowState * ResizeState::HandleMessage(Message * a_pMsg)
+    Window::WindowState * ResizeState::HandleMessage(Message * a_pMsg)
     {
       if (a_pMsg->GetCategory() != MC_GUI)
         return nullptr;
@@ -496,7 +496,7 @@ namespace Engine
       return nullptr;
     }
 
-    WindowState * ResizeState::HandleMessage(Message_GUI_PointerMove * a_pMsg)
+    Window::WindowState * ResizeState::HandleMessage(Message_GUI_PointerMove * a_pMsg)
     {
       vec2 point((float)a_pMsg->x, (float)a_pMsg->y);
       vec2 newSize = m_sizeAnchor + (point - m_controlAnchor);

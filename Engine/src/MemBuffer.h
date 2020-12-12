@@ -1,12 +1,14 @@
+//@group Core
+
 #ifndef MEMBUFFER_H
 #define MEMBUFFER_H
 
 #include <exception>
 #include <cstdlib>
 #include "DgMath.h"
-#include "core_Assert.h"
+#include "BSR_Assert.h"
 #include "PODArray.h"
-#include "core_utils.h"
+#include "Utils.h"
 
 class MemBufferDynamic
 {
@@ -28,7 +30,7 @@ public:
 
   Index Allocate(size_t);
   void * GetAddress(Index);
-  void Write(byte *, size_t, Index);
+  void Write(Engine::byte *, size_t, Index);
   void clear();
   size_t size() const;
 
@@ -36,7 +38,7 @@ private:
 
   size_t          m_alignment;
   size_t          m_cursor;
-  PODArray<byte>  m_memblock;
+  PODArray<Engine::byte>  m_memblock;
 };
 
 class MemBuffer
@@ -65,7 +67,7 @@ private:
   size_t  m_size;
   size_t  m_alignment;
   size_t  m_cursor;
-  byte *  m_memblock;
+  Engine::byte *  m_memblock;
 };
 
 #endif

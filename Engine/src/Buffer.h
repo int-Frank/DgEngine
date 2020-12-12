@@ -24,7 +24,7 @@
 #include <vector>
 
 #include "Memory.h"
-#include "core_Assert.h"
+#include "BSR_Assert.h"
 #include "RenderResource.h"
 #include "ShaderUniform.h"
 #include "ShaderUtils.h"

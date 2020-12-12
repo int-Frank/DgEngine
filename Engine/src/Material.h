@@ -25,7 +25,7 @@
 #include "Memory.h"
 #include "MemBuffer.h"
 #include "RendererProgram.h"
-#include "core_Assert.h"
+#include "BSR_Assert.h"
 #include "DgDynamicArray.h"
 #include "DgMap_AVL.h"
 #include "Texture.h"

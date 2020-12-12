@@ -1,10 +1,11 @@
+//@group Core
 
-#include "core_Log.h"
+#include "Log.h"
 #include "spdlog/sinks/stdout_color_sinks.h"
 #include "spdlog/sinks/basic_file_sink.h"
 #include "spdlog/fmt/ostr.h"
 
-namespace Core
+namespace Engine
 {
   std::shared_ptr<spdlog::logger> impl::Logger::s_logger;
 

@@ -17,7 +17,7 @@
 */
 
 #include "RenderCommandQueue.h"
-#include "core_Log.h"
+#include "Log.h"
 
 namespace Engine
 {

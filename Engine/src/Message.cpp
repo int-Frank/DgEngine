@@ -224,7 +224,7 @@ namespace Engine
 
   void Message_Command::Clone(void* a_buf) const
   {
-    void* pData = Core::AdvancePtr(a_buf, sizeof(Message_Command));
+    void* pData = AdvancePtr(a_buf, sizeof(Message_Command));
     new (a_buf) Message_Command(pData);
     if (ptr)
     {
@@ -245,10 +245,10 @@ namespace Engine
     if (!ptr)
       return;
 
-    void * _ptr = Core::AdvancePtr(ptr, sizeof(uint64_t));
+    void * _ptr = AdvancePtr(ptr, sizeof(uint64_t));
 
     MessageCommandFn function = *(MessageCommandFn*)_ptr;
-    _ptr = Core::AdvancePtr(_ptr, sizeof(MessageCommandFn));
+    _ptr = AdvancePtr(_ptr, sizeof(MessageCommandFn));
 
     function(_ptr);
   }

@@ -1,7 +1,7 @@
 //@group Renderer
 
 #include "Renderer.h"
-#include "core_Log.h"
+#include "Log.h"
 #include "DgBit.h"
 #include "DgMath.h"
 

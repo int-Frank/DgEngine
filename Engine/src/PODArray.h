@@ -1,3 +1,5 @@
+//@group Core
+
 #ifndef PODARRAY_H
 #define PODARRAY_H
 

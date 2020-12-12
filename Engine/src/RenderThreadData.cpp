@@ -1,7 +1,7 @@
 //@group Renderer/RenderThread
 
 #include "RenderThreadData.h"
-#include "core_Assert.h"
+#include "BSR_Assert.h"
 
 namespace Engine
 {

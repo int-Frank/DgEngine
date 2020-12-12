@@ -4,7 +4,7 @@
 #define EN_INPUTCODES_H
 
 #include <stdint.h>
-#include "core_Utils.h"
+#include "Utils.h"
 
 #define KM_SHIFT (::Engine::KeyMod::KM_LSHIFT | ::Engine::KeyMod::KM_RSHIFT)
 #define KM_CTRL (::Engine::KeyMod::KM_LCTRL | ::Engine::KeyMod::KM_RCTRL)

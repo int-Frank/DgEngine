@@ -2,7 +2,7 @@
 
 #include "GUI_Internal.h"
 
-#include "core_Assert.h"
+#include "BSR_Assert.h"
 #include "Material.h"
 #include "ShaderUniform.h"
 #include "RendererProgram.h"

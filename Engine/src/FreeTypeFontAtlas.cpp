@@ -2,12 +2,21 @@
 
 #include "IFontAtlas.h"
 #include "DgMap_AVL.h"
-#include "DgDynamicArray.h"
+#include <vector>
 #include "DgBinPacker.h"
 #include "Framework.h"
 
 #define FONT_PATH "./fonts/"
 #define FONT_NAME_MAX_SIZE 32
+
+/*
+  GlyphID bits:
+  16: 65536 x
+  16: 65536 y
+  10: 1024  width
+  10: 1024  height
+  12: 4096  texture Index
+*/
 
 namespace Engine
 {
@@ -20,52 +29,28 @@ namespace Engine
 
     void Clear() override;
     void BeginLoad() override;
-    FontID AddFont(std::string const & path, uint32_t size, std::string const & name) override; //Check for FONT_NAME_MAX_SIZE 
+    FontID AddFont(std::string const & path, uint32_t size) override;
     void EndLoad() override;
-    SubBlock GetCharacterID(std::string const & name, uint32_t size, UTF8 c) override;
-    Texture2D const * GetTexture() override;
+    GlyphID GetGlyphID(FontID, UTF8CodePoint c) override;
 
   private:
 
-    struct Font
+    struct InputFont
     {
       std::string path;
-      std::string name;
       uint32_t size;
     };
 
     struct TempData
     {
-      Dg::DynamicArray<Font> fonts;
-      Dg::BinPacker<uint32_t> layout;
+      std::vector<InputFont> fonts;
     };
 
-    class Char
-    {
+    TempData * m_pInputData;
 
-    public:
-
-      bool operator<(Char const & a_other) const
-      {
-        if (c < a_other.c)
-          return true;
-
-        if (size < a_other.size)
-          return true;
-
-        if (nameHash < a_other.nameHash)
-          return true;
-
-        return false;
-      }
-
-      uint64_t nameHash;
-      uint32_t size;
-      UTF8 c;
-    };
-
-    Dg::Map_AVL<Char, SubBlock> m_charMap;
-    Texture2D *m_pTexture;
+    //uint64_t = FontID << 32 | UTF8CodePoint
+    Dg::Map_AVL<uint64_t, GlyphID> m_charMap;
+    Dg::DynamicArray<Ref<Texture2D>> m_textures;
   };
 
   void Framework::InitFontAtlas()
@@ -74,14 +59,13 @@ namespace Engine
   }
 
   FreeTypeFontAtlas::FreeTypeFontAtlas()
-    : m_pTexture(nullptr)
   {
 
   }
 
   FreeTypeFontAtlas::~FreeTypeFontAtlas()
   {
-    delete m_pTexture;
+
   }
 
   void FreeTypeFontAtlas::Clear()
@@ -94,7 +78,7 @@ namespace Engine
 
   }
 
-  FontID FreeTypeFontAtlas::AddFont(std::string const & path, uint32_t size, std::string const & name)
+  FontID FreeTypeFontAtlas::AddFont(std::string const & path, uint32_t size)
   {
     return 0;
   }
@@ -104,13 +88,8 @@ namespace Engine
 
   }
 
-  SubBlock FreeTypeFontAtlas::GetCharacterID(std::string const & name, uint32_t size, UTF8 c)
+  GlyphID FreeTypeFontAtlas::GetGlyphID(FontID, UTF8CodePoint c)
   {
-    return SubBlock();
-  }
-
-  Texture2D const * FreeTypeFontAtlas::GetTexture()
-  {
-    return m_pTexture;
+    return 0;
   }
 }

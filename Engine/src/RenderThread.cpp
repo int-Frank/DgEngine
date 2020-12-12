@@ -1,6 +1,6 @@
 //@group Renderer/RenderThread
 
-#include "core_Assert.h"
+#include "BSR_Assert.h"
 #include "RenderThread.h"
 #include "Framework.h"
 #include "RT_RendererAPI.h"
@@ -15,7 +15,7 @@ namespace Engine
   //-----------------------------------------------------------------------------------------------
   static void RenderThreadWorker()
   {
-    if (Framework::Instance()->GetGraphicsContext()->Init() != Core::ErrorCode::EC_None)
+    if (Framework::Instance()->GetGraphicsContext()->Init() != ErrorCode::EC_None)
     {
       LOG_ERROR("Unable to set rendering context!");
       RenderThread::Instance()->RenderThreadInitFailed();
@@ -35,7 +35,7 @@ namespace Engine
     RenderThreadData::ShutDown();
     RendererAPI::ShutDown();
 
-    if (Framework::Instance()->GetGraphicsContext()->ShutDown() != Core::ErrorCode::EC_None)
+    if (Framework::Instance()->GetGraphicsContext()->ShutDown() != ErrorCode::EC_None)
       LOG_ERROR("Trouble shutting down the rendering context!!");
 
     RenderThread::Instance()->RenderThreadShutDownFinished();

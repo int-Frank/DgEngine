@@ -7,7 +7,7 @@
 #include "ResourceManager.h"
 #include "ShaderUniform.h"
 #include "Memory.h"
-#include "core_utils.h"
+#include "Utils.h"
 
 namespace Engine
 {

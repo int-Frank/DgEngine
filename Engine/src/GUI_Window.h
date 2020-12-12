@@ -3,15 +3,13 @@
 #ifndef UIWINDOW_H
 #define UIWINDOW_H
 
-#include "core_utils.h"
+#include "Utils.h"
 #include "GUI_Widget.h"
 
 namespace Engine
 {
   namespace GUI
   {
-    class WindowState;
-
     class Window : public Widget
     {
       Window(Widget * pParent, vec2 const position, vec2 const & size, uint32_t flags);
@@ -53,12 +51,11 @@ namespace Engine
 
       bool IsWindow() const override;
 
+      class WindowState;
+
     private:
 
       void UpdateState(WindowState *);
-
-    private:
-
       WindowState * m_pState;
     };
   }

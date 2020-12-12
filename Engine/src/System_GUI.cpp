@@ -3,7 +3,7 @@
 #include "System_GUI.h"
 #include "InputCodes.h"
 #include "Options.h"
-#include "core_Assert.h"
+#include "BSR_Assert.h"
 #include "GUI_Internal.h"
 
 namespace Engine
