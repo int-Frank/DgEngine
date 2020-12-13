@@ -20,7 +20,7 @@ IncludeDir["Glad"] = "%{wks.location}/Vendor/GLAD/include"
 IncludeDir["SDL2"] = "%{wks.location}/Vendor/SDL2/include"
 IncludeDir["spdlog"] = "%{wks.location}/Vendor/spdlog/include"
 IncludeDir["DgLib"] = "%{wks.location}/Vendor/DgLib/src"
-IncludeDir["cppunitlite"] = "%{wks.location}/Vendor/cppunitlite"
+IncludeDir["FreeType2"] = "%{wks.location}/Vendor/freetype2/include"
 
 group "Depenencies"
 
@@ -112,7 +112,8 @@ project "Engine"
     "DgLib",
     "Glad",
     "Vendor/SDL2/lib/x64/SDL2.lib",
-    "Vendor/SDL2/lib/x64/SDL2main.lib"
+    "Vendor/SDL2/lib/x64/SDL2main.lib",
+    "Vendor/freetype2/lib/x64/freetype.lib"
   }
 
   includedirs
@@ -120,7 +121,8 @@ project "Engine"
 		"%{IncludeDir.spdlog}",
 		"%{IncludeDir.DgLib}",
 		"%{IncludeDir.Glad}",
-		"%{IncludeDir.SDL2}"
+		"%{IncludeDir.SDL2}",
+		"%{IncludeDir.FreeType2}"
   }
   
   include "./Engine_vpaths.lua"
@@ -169,7 +171,8 @@ project "Engine"
     }
     
     postbuildcommands {
-      "{COPY} %{wks.location}/Vendor/SDL2/lib/x64/SDL2.dll %{cfg.targetdir}"
+      "{COPY} %{wks.location}/Vendor/SDL2/lib/x64/SDL2.dll %{cfg.targetdir}",
+      "{COPY} %{wks.location}/Vendor/FreeType2/lib/x64/freetype.dll %{cfg.targetdir}"
     }
     
     filter "configurations:Debug"

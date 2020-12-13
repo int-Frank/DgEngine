@@ -5,15 +5,15 @@
 
 #include <string>
 
-#include "ErrorCodes.h"
+#include "DgError.h"
 #include "utf8.h"
 #include "Texture.h"
 #include "Memory.h"
 
 namespace Engine
 {
-  typedef uint32_t FontID;
   typedef uint64_t GlyphID;
+  GlyphID const INVALID_GLYPHID = 0xFFFF'FFFF'FFFF'FFFFull;
 
   class IFontAtlas
   {
@@ -21,12 +21,11 @@ namespace Engine
 
     virtual ~IFontAtlas(){}
 
-    virtual void Clear() = 0;
     virtual void BeginLoad() = 0;
-    virtual FontID AddFont(std::string const & fontPath, uint32_t size) = 0;
-    virtual void EndLoad() = 0;
+    virtual GlyphID RegisterGlyph(std::string const & fontPath, uint32_t size, UTF8CodePoint c) = 0;
+    virtual Dg::ErrorCode CommitLoad() = 0;
 
-    virtual GlyphID GetGlyphID(FontID, UTF8CodePoint c) = 0;
+    virtual void Clear() = 0;
     //virtual Texture2D const * GetTexture() = 0;
   };
 }

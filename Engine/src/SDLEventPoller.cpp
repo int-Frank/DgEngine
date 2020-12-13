@@ -73,9 +73,10 @@ namespace Engine
     }
   }
 
-  void Framework::InitEventPoller()
+  Dg::ErrorCode Framework::InitEventPoller()
   {
     SetEventPoller(new FW_EventPoller());
+    return Dg::ErrorCode::None;
   }
 
   FW_EventPoller::FW_EventPoller()

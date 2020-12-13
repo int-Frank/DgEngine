@@ -7,7 +7,7 @@
 #include "Framework.h"
 #include "RenderThread.h"
 
-#include "ErrorCodes.h"
+#include "DgError.h"
 #include "Application.h"
 #include "Options.h"
 #include "Log.h"
@@ -54,7 +54,7 @@ namespace Engine
     if (m_pimpl->pWindow == nullptr)
       throw std::runtime_error("GetWindow() has returned a null pointer!");
 
-    if (m_pimpl->pWindow->Init() != EC_None)
+    if (m_pimpl->pWindow->Init() != Dg::ErrorCode::None)
       throw std::runtime_error("Failed to initialise window!");
   }
 
@@ -87,7 +87,7 @@ namespace Engine
     else
       impl::Logger::Init_stdout(a_opts.loggerName.c_str());
 
-    if (Framework::Init() != EC_None)
+    if (Framework::Init() != Dg::ErrorCode::None)
       throw std::runtime_error("Failed to initialise framework!");
 
     InitWindow();
@@ -118,7 +118,7 @@ namespace Engine
     RenderThread::ShutDown();
     Renderer::ShutDown();
 
-    if (Framework::ShutDown() != EC_None)
+    if (Framework::ShutDown() != Dg::ErrorCode::None)
       LOG_ERROR("Failed to shut down framework!");
 
     s_instance = nullptr;

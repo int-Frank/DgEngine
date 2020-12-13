@@ -7,6 +7,13 @@
 #include "InputCodes.h"
 #include "BSR_Assert.h"
 
+#define INIT_MODULE(m) result = s_instance->Init##m();\
+if (result != Dg::ErrorCode::None)\
+{\
+LOG_ERROR("Failed to Initialise module: " #m);\
+break;\
+}
+
 namespace Engine
 {
   static char*        g_ClipboardTextData = nullptr;
@@ -60,11 +67,11 @@ namespace Engine
     return s_instance;
   }
 
-  ErrorCode Framework::Init()
+  Dg::ErrorCode Framework::Init()
   {
     BSR_ASSERT(s_instance == nullptr, "Framework already initialized!");
     s_instance = new Framework();
-    ErrorCode result = EC_None;
+    Dg::ErrorCode result = Dg::ErrorCode::None;
     do
     {
       //-----------------------------------------------------------------------------------------
@@ -75,26 +82,27 @@ namespace Engine
       if (SDL_Init(SDL_INIT_EVERYTHING) != 0) 
       {
         LOG_ERROR("Unable to initialize SDL: {}", SDL_GetError());
-        result = EC_Error;
+        result = Dg::ErrorCode::Failure;
         break;
       }
 
       //-----------------------------------------------------------------------------------------
       //Init Modules...
       //-----------------------------------------------------------------------------------------
-      s_instance->InitWindow(); //Init window, create OpenGL context, init GLAD
-      s_instance->InitEventPoller();
-      s_instance->InitMouseController();
-      s_instance->InitGraphicsContext();
-      s_instance->InitFontAtlas();
+
+      INIT_MODULE(Window);
+      INIT_MODULE(EventPoller);
+      INIT_MODULE(MouseController);
+      INIT_MODULE(GraphicsContext);
+      INIT_MODULE(FontAtlas);
 
     } while (false);
     return result;
   }
 
-  ErrorCode Framework::ShutDown()
+  Dg::ErrorCode Framework::ShutDown()
   {
-    ErrorCode result = EC_None;
+    Dg::ErrorCode result = Dg::ErrorCode::None;
 
     delete s_instance;
     s_instance = nullptr;

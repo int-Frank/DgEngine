@@ -1,13 +1,14 @@
 //@group Framework
 
+#include <vector>
+
 #include "IFontAtlas.h"
 #include "DgMap_AVL.h"
-#include <vector>
 #include "DgBinPacker.h"
 #include "Framework.h"
 
-#define FONT_PATH "./fonts/"
-#define FONT_NAME_MAX_SIZE 32
+#include <ft2build.h>
+#include FT_FREETYPE_H
 
 /*
   GlyphID bits:
@@ -28,34 +29,44 @@ namespace Engine
     ~FreeTypeFontAtlas();
 
     void Clear() override;
+
     void BeginLoad() override;
-    FontID AddFont(std::string const & path, uint32_t size) override;
-    void EndLoad() override;
-    GlyphID GetGlyphID(FontID, UTF8CodePoint c) override;
+    GlyphID RegisterGlyph(std::string const & fontPath, uint32_t size, UTF8CodePoint c) override;
+    Dg::ErrorCode CommitLoad() override;
 
   private:
 
-    struct InputFont
+    struct GlyphData
     {
-      std::string path;
-      uint32_t size;
+      int32_t Advance;
+      uint16_t textureIndex;
+      int16_t posX;
+      int16_t posY;
+      int16_t width;
+      int16_t height;
+      int16_t bearingX;
+      int16_t bearingY;
     };
 
     struct TempData
     {
-      std::vector<InputFont> fonts;
+      // 16: Font index
+      // 16: size
+      // 32: UTF8CodePoint
+      std::vector<uint64_t> sizedCodePoints;
+      std::vector<std::string> fontPaths;
     };
 
-    TempData * m_pInputData;
+    TempData *pTempData;
 
-    //uint64_t = FontID << 32 | UTF8CodePoint
-    Dg::Map_AVL<uint64_t, GlyphID> m_charMap;
-    Dg::DynamicArray<Ref<Texture2D>> m_textures;
+    Dg::Map_AVL<GlyphID, GlyphData> m_charMap;
+    std::vector<Ref<Texture2D>> m_textures;
   };
 
-  void Framework::InitFontAtlas()
+  Dg::ErrorCode Framework::InitFontAtlas()
   {
     SetFontAtlas(new FreeTypeFontAtlas());
+    return Dg::ErrorCode::None;
   }
 
   FreeTypeFontAtlas::FreeTypeFontAtlas()
@@ -75,21 +86,30 @@ namespace Engine
 
   void FreeTypeFontAtlas::BeginLoad()
   {
-
+    Clear();
   }
 
-  FontID FreeTypeFontAtlas::AddFont(std::string const & path, uint32_t size)
+  GlyphID FreeTypeFontAtlas::RegisterGlyph(std::string const & fontPath, uint32_t size, UTF8CodePoint c)
   {
     return 0;
   }
 
-  void FreeTypeFontAtlas::EndLoad()
+  Dg::ErrorCode FreeTypeFontAtlas::CommitLoad()
   {
+    FT_Library pFT = nullptr;
+    Dg::ErrorCode result = Dg::ErrorCode::None;
 
-  }
+    if (FT_Init_FreeType(&pFT) != 0)
+    {
+      LOG_ERROR("Failed to initialise FreeType library.");
+      DG_ERROR_SET(Dg::ErrorCode::Failure);
+    }
 
-  GlyphID FreeTypeFontAtlas::GetGlyphID(FontID, UTF8CodePoint c)
-  {
-    return 0;
+    // Load glyphs...
+
+
+  epilogue:
+    FT_Done_FreeType(pFT);
+    return result;
   }
 }

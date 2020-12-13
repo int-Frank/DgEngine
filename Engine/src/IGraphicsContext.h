@@ -3,7 +3,7 @@
 #ifndef EN_IGRAPHICSCONTEXT_H
 #define EN_IGRAPHICSCONTEXT_H
 
-#include "ErrorCodes.h"
+#include "DgError.h"
 
 namespace Engine
 {
@@ -13,8 +13,8 @@ namespace Engine
 
     virtual ~IGraphicsContext(){};
 
-    virtual ErrorCode Init() = 0;
-    virtual ErrorCode ShutDown() = 0;
+    virtual Dg::ErrorCode Init() = 0;
+    virtual Dg::ErrorCode ShutDown() = 0;
     virtual void SwapBuffers() = 0;
     virtual void Resize(uint32_t w, uint32_t h) = 0;
 

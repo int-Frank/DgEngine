@@ -30,7 +30,7 @@ namespace Engine
     bool IsVSync() const override;
 
     bool IsInit() const override;
-    ErrorCode Init(WindowProps const & props = WindowProps());
+    Dg::ErrorCode Init(WindowProps const & props = WindowProps());
     void Destroy() override;
 
     void GetDimensions(int & w, int & h) override;
@@ -40,9 +40,10 @@ namespace Engine
     SDL_Window * m_pWindow;
   };
 
-  void Framework::InitWindow()
+  Dg::ErrorCode Framework::InitWindow()
   {
     SetWindow(new FW_SDLWindow());
+    return Dg::ErrorCode::None;
   }
 
   FW_SDLWindow::FW_SDLWindow()
@@ -84,7 +85,7 @@ namespace Engine
     return m_pWindow != nullptr;
   }
 
-  ErrorCode FW_SDLWindow::Init(WindowProps const & a_props)
+  Dg::ErrorCode FW_SDLWindow::Init(WindowProps const & a_props)
   {
     BSR_ASSERT(m_pWindow == nullptr, "FW_SDLWindow already initialised!");
 
@@ -101,7 +102,7 @@ namespace Engine
     if(m_pWindow == nullptr)
     {
       LOG_ERROR("Failed to create window!");
-      return EC_Error;
+      return Dg::ErrorCode::Failure;
     }
 
     OpenGLContext * pContext = dynamic_cast<OpenGLContext*>
@@ -111,7 +112,7 @@ namespace Engine
 
     pContext->SetSDLWindow(m_pWindow);
 
-    return EC_None;
+    return Dg::ErrorCode::None;
   }
 
   void FW_SDLWindow::Destroy()

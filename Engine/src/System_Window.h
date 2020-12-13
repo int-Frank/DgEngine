@@ -5,7 +5,7 @@
 
 #include "Memory.h"
 
-#include "ErrorCodes.h"
+#include "DgError.h"
 #include "System.h"
 #include "Memory.h"
 

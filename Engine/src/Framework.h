@@ -5,7 +5,7 @@
 
 #include <string>
 
-#include "ErrorCodes.h"
+#include "DgError.h"
 
 #include "IWindow.h"
 #include "IEventPoller.h"
@@ -15,7 +15,7 @@
 #include "Buffer.h"
 
 #undef ITEM
-#define ITEM(x) public: I ## x * Get ## x(); void Set ## x(I ## x *); private: void Init ## x();
+#define ITEM(x) public: I ## x * Get ## x(); void Set ## x(I ## x *); private: Dg::ErrorCode Init ## x();
 
 #define UNROLL_FRAMEWORK_CLASSES \
  ITEM(Window)\
@@ -34,8 +34,8 @@ namespace Engine
     ~Framework();
 
     static Framework * Instance();
-    static ErrorCode Init();
-    static ErrorCode ShutDown();
+    static Dg::ErrorCode Init();
+    static Dg::ErrorCode ShutDown();
 
     UNROLL_FRAMEWORK_CLASSES
 

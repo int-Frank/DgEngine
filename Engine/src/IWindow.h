@@ -4,7 +4,7 @@
 #define EN_IWINDOW_H
 
 #include <string>
-#include "ErrorCodes.h"
+#include "DgError.h"
 
 namespace Engine
 {
@@ -36,7 +36,7 @@ namespace Engine
     virtual bool IsVSync() const = 0;
 
     virtual bool IsInit() const = 0;
-    virtual ErrorCode Init(WindowProps const & props = WindowProps()) = 0;
+    virtual Dg::ErrorCode Init(WindowProps const & props = WindowProps()) = 0;
     virtual void Destroy() = 0;
 
     virtual void GetDimensions(int & w, int & h) = 0;

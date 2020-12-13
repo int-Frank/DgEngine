@@ -15,7 +15,7 @@ namespace Engine
   //-----------------------------------------------------------------------------------------------
   static void RenderThreadWorker()
   {
-    if (Framework::Instance()->GetGraphicsContext()->Init() != ErrorCode::EC_None)
+    if (Framework::Instance()->GetGraphicsContext()->Init() != Dg::ErrorCode::None)
     {
       LOG_ERROR("Unable to set rendering context!");
       RenderThread::Instance()->RenderThreadInitFailed();
@@ -35,7 +35,7 @@ namespace Engine
     RenderThreadData::ShutDown();
     RendererAPI::ShutDown();
 
-    if (Framework::Instance()->GetGraphicsContext()->ShutDown() != ErrorCode::EC_None)
+    if (Framework::Instance()->GetGraphicsContext()->ShutDown() != Dg::ErrorCode::None)
       LOG_ERROR("Trouble shutting down the rendering context!!");
 
     RenderThread::Instance()->RenderThreadShutDownFinished();

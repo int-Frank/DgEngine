@@ -21,7 +21,7 @@
 #include "RT_RendererProgram.h"
 #include "RT_Texture.h"
 #include "RenderThreadData.h"
-#include "ErrorCodes.h"
+#include "DgError.h"
 #include "Log.h"
 #include "Utils.h"
 #include "BSR_Assert.h"
