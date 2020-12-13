@@ -37,12 +37,8 @@ namespace Engine
 
     typedef uint32_t DataType;
 
-    Colour() :data(0xFF)
-    {
-    }
-    Colour(uint32_t val) :data(val)
-    {
-    }
+    Colour() :data(0xFF) {}
+    Colour(uint32_t val) :data(val) { }
     Colour(uint32_t a_r, uint32_t a_g, uint32_t a_b, uint32_t a_a) :data(0)
     {
       r(a_r);
@@ -51,56 +47,20 @@ namespace Engine
       a(a_a);
     }
 
-    uint32_t r() const
-    {
-      return Dg::GetSubInt<uint32_t, 0, 8>(data);
-    }
-    uint32_t g() const
-    {
-      return Dg::GetSubInt<uint32_t, 8, 8>(data);
-    }
-    uint32_t b() const
-    {
-      return Dg::GetSubInt<uint32_t, 16, 8>(data);
-    }
-    uint32_t a() const
-    {
-      return Dg::GetSubInt<uint32_t, 24, 8>(data);
-    }
+    uint32_t r() const { return Dg::GetSubInt<uint32_t, 0, 8>(data); }
+    uint32_t g() const { return Dg::GetSubInt<uint32_t, 8, 8>(data); }
+    uint32_t b() const { return Dg::GetSubInt<uint32_t, 16, 8>(data); }
+    uint32_t a() const { return Dg::GetSubInt<uint32_t, 24, 8>(data); }
 
-    float fr() const
-    {
-      return (float)Dg::GetSubInt<uint32_t, 0, 8>(data) / 255.f;
-    }
-    float fg() const
-    {
-      return (float)Dg::GetSubInt<uint32_t, 8, 8>(data) / 255.f;
-    }
-    float fb() const
-    {
-      return (float)Dg::GetSubInt<uint32_t, 16, 8>(data) / 255.f;
-    }
-    float fa() const
-    {
-      return (float)Dg::GetSubInt<uint32_t, 24, 8>(data) / 255.f;
-    }
+    float fr() const { return (float)Dg::GetSubInt<uint32_t, 0, 8>(data) / 255.f; }
+    float fg() const { return (float)Dg::GetSubInt<uint32_t, 8, 8>(data) / 255.f; }
+    float fb() const { return (float)Dg::GetSubInt<uint32_t, 16, 8>(data) / 255.f; }
+    float fa() const { return (float)Dg::GetSubInt<uint32_t, 24, 8>(data) / 255.f; }
 
-    void r(uint32_t val)
-    {
-      data = Dg::SetSubInt<uint32_t, 0, 8>(data, val);
-    }
-    void g(uint32_t val)
-    {
-      data = Dg::SetSubInt<uint32_t, 8, 8>(data, val);
-    }
-    void b(uint32_t val)
-    {
-      data = Dg::SetSubInt<uint32_t, 16, 8>(data, val);
-    }
-    void a(uint32_t val)
-    {
-      data = Dg::SetSubInt<uint32_t, 24, 8>(data, val);
-    }
+    void r(uint32_t val) { data = Dg::SetSubInt<uint32_t, 0, 8>(data, val); }
+    void g(uint32_t val) { data = Dg::SetSubInt<uint32_t, 8, 8>(data, val); }
+    void b(uint32_t val) { data = Dg::SetSubInt<uint32_t, 16, 8>(data, val); }
+    void a(uint32_t val) { data = Dg::SetSubInt<uint32_t, 24, 8>(data, val); }
 
     uint32_t data;
   };

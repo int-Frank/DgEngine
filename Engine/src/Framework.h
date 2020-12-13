@@ -12,17 +12,16 @@
 #include "IMouseController.h"
 #include "IGraphicsContext.h"
 #include "IFontAtlas.h"
+#include "IFileSystem.h"
 #include "Buffer.h"
-
-#undef ITEM
-#define ITEM(x) public: I ## x * Get ## x(); void Set ## x(I ## x *); private: Dg::ErrorCode Init ## x();
 
 #define UNROLL_FRAMEWORK_CLASSES \
  ITEM(Window)\
  ITEM(EventPoller)\
  ITEM(MouseController)\
  ITEM(GraphicsContext)\
- ITEM(FontAtlas)
+ ITEM(FontAtlas)\
+ ITEM(FileSystem)
 
 namespace Engine
 {
@@ -37,6 +36,8 @@ namespace Engine
     static Dg::ErrorCode Init();
     static Dg::ErrorCode ShutDown();
 
+#undef ITEM
+#define ITEM(x) public: I ## x * Get ## x(); void Set ## x(I ## x *); private: Dg::ErrorCode Init ## x();
     UNROLL_FRAMEWORK_CLASSES
 
   private:

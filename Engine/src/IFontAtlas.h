@@ -12,8 +12,21 @@
 
 namespace Engine
 {
-  typedef uint64_t GlyphID;
-  GlyphID const INVALID_GLYPHID = 0xFFFF'FFFF'FFFF'FFFFull;
+  // GlyphID is just the index to the glyph in the charMap
+  typedef uint32_t GlyphID;
+  GlyphID const INVALID_GLYPHID = 0xFFFF'FFFFul;
+
+  struct GlyphData
+  {
+    int32_t Advance;
+    uint16_t textureID;
+    int16_t posX;
+    int16_t posY;
+    int16_t width;
+    int16_t height;
+    int16_t bearingX;
+    int16_t bearingY;
+  };
 
   class IFontAtlas
   {
@@ -26,7 +39,7 @@ namespace Engine
     virtual Dg::ErrorCode CommitLoad() = 0;
 
     virtual void Clear() = 0;
-    //virtual Texture2D const * GetTexture() = 0;
+    //virtual GlyphData * GetGlyphData(GlyphID);
   };
 }
 
