@@ -1,14 +1,14 @@
 //@group Core
 
-#ifndef UTF8_H
-#define UTF8_H
+#ifndef UNICODE_H
+#define UNICODE_H
 
 #include <stdint.h>
 
 namespace Engine
 {
-  typedef uint32_t UTF8CodePoint;
-  UTF8CodePoint const INVALID_CHAR = 0xFFFF'FFFFul;
+  typedef uint32_t CodePoint;
+  CodePoint const INVALID_CHAR = 0xFFFF'FFFFul;
 
   class UTF8Parser
   {
@@ -21,7 +21,7 @@ namespace Engine
     // Does not duplicate string!
     void Init(char const * pText);
     bool Done() const;
-    UTF8CodePoint Next();
+    CodePoint Next();
 
   private:
 

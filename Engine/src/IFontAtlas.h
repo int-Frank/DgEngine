@@ -6,15 +6,13 @@
 #include <string>
 
 #include "DgError.h"
-#include "utf8.h"
+#include "unicode.h"
 #include "Texture.h"
 #include "Memory.h"
 
 namespace Engine
 {
-  // GlyphID is just the index to the glyph in the charMap
-  typedef uint32_t GlyphID;
-  GlyphID const INVALID_GLYPHID = 0xFFFF'FFFFul;
+  typedef uint32_t FontID;
 
   struct GlyphData
   {
@@ -34,12 +32,15 @@ namespace Engine
 
     virtual ~IFontAtlas(){}
 
+    virtual Dg::ErrorCode RegisterFont(std::string const & fontPath, FontID & out) = 0;
+
     virtual void BeginLoad() = 0;
-    virtual GlyphID RegisterGlyph(std::string const & fontPath, uint32_t size, UTF8CodePoint c) = 0;
+    virtual Dg::ErrorCode RegisterGlyph(FontID, uint32_t size, CodePoint c) = 0;
+    virtual Dg::ErrorCode RegisterAllGlyphs(FontID, uint32_t size) = 0;
     virtual Dg::ErrorCode CommitLoad() = 0;
 
     virtual void Clear() = 0;
-    //virtual GlyphData * GetGlyphData(GlyphID);
+    virtual GlyphData * GetGlyphData(FontID, CodePoint cp, uint32_t size) = 0;
   };
 }
 

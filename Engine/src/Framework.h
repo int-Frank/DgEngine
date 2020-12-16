@@ -20,7 +20,6 @@
  ITEM(EventPoller)\
  ITEM(MouseController)\
  ITEM(GraphicsContext)\
- ITEM(FontAtlas)\
  ITEM(FileSystem)
 
 namespace Engine
@@ -35,6 +34,8 @@ namespace Engine
     static Framework * Instance();
     static Dg::ErrorCode Init();
     static Dg::ErrorCode ShutDown();
+
+    Ref<IFontAtlas> CreateFontAtlas();
 
 #undef ITEM
 #define ITEM(x) public: I ## x * Get ## x(); void Set ## x(I ## x *); private: Dg::ErrorCode Init ## x();

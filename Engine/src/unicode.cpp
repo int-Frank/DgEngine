@@ -2,7 +2,7 @@
 
 #include <cstring>
 
-#include "utf8.h"
+#include "unicode.h"
 
 namespace Engine
 {
@@ -71,7 +71,7 @@ namespace Engine
     return m_pText == nullptr;
   }
 
-  UTF8CodePoint UTF8Parser::Next()
+  CodePoint UTF8Parser::Next()
   {
     if (Done())
       return INVALID_CHAR;

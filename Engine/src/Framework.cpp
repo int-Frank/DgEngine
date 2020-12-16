@@ -81,12 +81,7 @@ namespace Engine
       //-----------------------------------------------------------------------------------------
 
 #undef ITEM
-#define ITEM(m) result = s_instance->Init##m();\
-if (result != Dg::ErrorCode::None)\
-{\
-LOG_ERROR("Failed to Initialise module: " #m);\
-break;\
-}
+#define ITEM(m) result = s_instance->Init##m(); if (result != Dg::ErrorCode::None) { LOG_ERROR("Failed to Initialise module: " #m); break; }
       UNROLL_FRAMEWORK_CLASSES
 
     } while (false);
@@ -110,17 +105,10 @@ break;\
   }
 
 #undef ITEM
-#define ITEM(m) I##m * Framework::Get##m()\
-  {\
-    return m_pimpl->p##m;\
-  }
+#define ITEM(m) I##m * Framework::Get##m() { return m_pimpl->p##m;}
   UNROLL_FRAMEWORK_CLASSES
 
 #undef ITEM
-#define ITEM(m) void Framework::Set##m(I##m * a_ptr)\
-  {\
-    BSR_ASSERT(m_pimpl->p##m == nullptr, #m " already exists!");\
-    m_pimpl->p##m = a_ptr;\
-  }
+#define ITEM(m) void Framework::Set##m(I##m * a_ptr) { BSR_ASSERT(m_pimpl->p##m == nullptr, #m " already exists!"); m_pimpl->p##m = a_ptr;}
   UNROLL_FRAMEWORK_CLASSES
 }

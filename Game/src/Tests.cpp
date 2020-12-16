@@ -1,7 +1,7 @@
 #include "Log.h"
 
 #include "Buffer.h"
-#include "utf8.h"
+#include "unicode.h"
 
 #define CHECK(val) do { if (!(val)) LOG_ERROR("TEST FAILED! Line: {}", __LINE__); } while(false)
 
@@ -51,7 +51,7 @@ void TEST_BufferLayout()
 
 void TEST_UTF8()
 {
-  uint8_t const utf8Str[] = {0x61, 0x73, 0x64, 0x66, 0x00};
+  uint8_t const utf8Str[] = {0x61, 0x73, 0x64, 0x66, 0xF3, 0x9A, 0x8D, 0xA0, 0x00};
 
   Engine::UTF8Parser parser((char*)utf8Str);
 
@@ -59,6 +59,7 @@ void TEST_UTF8()
   CHECK(parser.Next() == 0x73);
   CHECK(parser.Next() == 0x64);
   CHECK(parser.Next() == 0x66);
+  CHECK(parser.Next() == 893792);
   CHECK(parser.Done());
 }
 
