@@ -3,6 +3,7 @@
 #include <glad/glad.h>
 #include "RT_Texture.h"
 #include "RT_RendererAPI.h"
+#include "BSR_Assert.h"
 
 namespace Engine
 {
@@ -39,24 +40,50 @@ namespace Engine
 
   RT_Texture2D::RT_Texture2D(TextureData const & a_data)
     : m_rendererID(0)
-    , m_flags(a_data.flags)
+    , m_attrs(a_data.attrs)
   {
     glCreateTextures(GL_TEXTURE_2D, 1, &m_rendererID);
     glBindTexture(GL_TEXTURE_2D, m_rendererID);
 
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GetGL(m_flags.GetWrap()));
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GetGL(m_flags.GetWrap()));
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GetGL(m_flags.GetFilter()));
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GetGL(m_attrs.GetWrap()));
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GetGL(m_attrs.GetWrap()));
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GetGL(m_attrs.GetFilter()));
     glTextureParameterf(m_rendererID, GL_TEXTURE_MAX_ANISOTROPY, RendererAPI::GetCapabilities().maxAnisotropy);
 
-    if (m_flags.IsMipmapped())
-      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GetGL(m_flags.GetMipmapFilter()));
+    if (m_attrs.IsMipmapped())
+      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GetGL(m_attrs.GetMipmapFilter()));
     else
-      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GetGL(m_flags.GetFilter()));
+      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GetGL(m_attrs.GetFilter()));
 
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, a_data.width, a_data.height, 0, GL_RGBA, GL_UNSIGNED_BYTE, (uint8_t *)a_data.pPixels);
+    switch (m_attrs.GetPixelType())
+    {
+      case TexturePixelType::R8:
+      {
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RED, a_data.width, a_data.height, 0, GL_RED, GL_UNSIGNED_BYTE, a_data.pPixels);
+        break;
+      }
+      case TexturePixelType::RG8:
+      {
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RG, a_data.width, a_data.height, 0, GL_RG, GL_UNSIGNED_BYTE, a_data.pPixels);
+        break;
+      }
+      case TexturePixelType::RGB8:
+      {
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, a_data.width, a_data.height, 0, GL_RGB, GL_UNSIGNED_BYTE, a_data.pPixels);
+        break;
+      }
+      case TexturePixelType::RGBA8:
+      {
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, a_data.width, a_data.height, 0, GL_RGBA, GL_UNSIGNED_BYTE, a_data.pPixels);
+        break;
+      }
+      default:
+      {
+        BSR_ASSERT(false, "Pixel type not yet implemented!");
+      }
+    }
 
-    if (m_flags.IsMipmapped())
+    if (m_attrs.IsMipmapped())
       glGenerateMipmap(GL_TEXTURE_2D);
 
     glBindTexture(GL_TEXTURE_2D, 0);

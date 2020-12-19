@@ -31,17 +31,29 @@ namespace Engine
     Linear_Linear
   };
 
-  class TextureFlags
+  enum class TexturePixelType
+  {
+    R8,
+    RG8,
+    RGB8,
+    RGBA8,
+  };
+
+  size_t GetPixelSize(TexturePixelType);
+
+  class TextureAttributes
   {
   public:
 
-    TextureFlags();
+    TextureAttributes();
 
     TextureWrap GetWrap() const;
     TextureFilter GetFilter() const;
     TextureMipmapFilter GetMipmapFilter() const;
+    TexturePixelType GetPixelType() const;
     bool IsMipmapped() const;
 
+    void SetPixelType(TexturePixelType);
     void SetWrap(TextureWrap);
     void SetFilter(TextureFilter);
     void SetMipmapFilter(TextureMipmapFilter);
@@ -63,7 +75,7 @@ namespace Engine
     ~TextureData();
 
     //Takes ownership of a_pixels
-    TextureData(uint32_t a_width, uint32_t a_height, Colour * a_pixels, TextureFlags a_flags);
+    TextureData(uint32_t a_width, uint32_t a_height, void * a_pixels, TextureAttributes a_attrs);
 
     TextureData(TextureData const &);
     TextureData & operator=(TextureData const &);
@@ -72,7 +84,7 @@ namespace Engine
     TextureData & operator=(TextureData &&) noexcept;
 
     //Takes ownership of a_pixels
-    void Set(uint32_t a_width, uint32_t a_height, Colour * a_pixels, TextureFlags a_flags);
+    void Set(uint32_t a_width, uint32_t a_height, void * a_pixels, TextureAttributes a_attrs);
 
     void Duplicate(TextureData const &);
     size_t Size() const;
@@ -82,10 +94,10 @@ namespace Engine
     void const * Deserialize(void const*);
     void Clear();
 
-    TextureFlags  flags;
-    uint32_t      width;
-    uint32_t      height;
-    Colour *      pPixels; // TODO should be uint8_t. The format can change
+    TextureAttributes attrs;
+    uint32_t          width;
+    uint32_t          height;
+    uint8_t *         pPixels;
   };
 }
 

@@ -21,7 +21,7 @@ namespace Engine
 
   private:
     RendererID    m_rendererID;
-    TextureFlags  m_flags;
+    TextureAttributes  m_attrs;
   };
 }
 

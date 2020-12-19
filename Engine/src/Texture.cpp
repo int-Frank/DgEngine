@@ -18,9 +18,9 @@ namespace Engine
     return Ref<Texture2D>(new Texture2D());
   }
 
-  void Texture2D::Set(uint32_t a_width, uint32_t a_height, Colour * a_pPixels, TextureFlags a_flags)
+  void Texture2D::Set(uint32_t a_width, uint32_t a_height, void * a_pPixels, TextureAttributes a_attrs)
   {
-    m_data.Set(a_width, a_height, a_pPixels, a_flags);
+    m_data.Set(a_width, a_height, a_pPixels, a_attrs);
   }
 
   Texture2D::~Texture2D()

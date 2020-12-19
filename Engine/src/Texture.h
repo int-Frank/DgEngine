@@ -38,16 +38,6 @@ namespace Engine
     Texture2D();
   public:
 
-    struct TextData
-    {
-      uint32_t  fontID;
-      float     size;
-      Colour      textColor;
-      Colour      backgroundColor;
-    };
-
-  public:
-
     static Ref<Texture2D> Create();
 
     ~Texture2D();
@@ -57,7 +47,7 @@ namespace Engine
     void Clear();
     void Bind(uint32_t slot = 0) const;
 
-    void Set(uint32_t width, uint32_t height, Colour * pixels, TextureFlags flags);
+    void Set(uint32_t width, uint32_t height, void * pPixels, TextureAttributes attrs);
 
     //Loading...
     //bool LoadFromRawData(uint32_t width, uint32_t height, TextureWrap wrap, Colour* pixels, TextureFlags flags);

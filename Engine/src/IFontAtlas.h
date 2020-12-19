@@ -18,10 +18,10 @@ namespace Engine
   {
     int32_t Advance;
     uint16_t textureID;
-    int16_t posX;
-    int16_t posY;
-    int16_t width;
-    int16_t height;
+    uint16_t posX;
+    uint16_t posY;
+    uint16_t width;
+    uint16_t height;
     int16_t bearingX;
     int16_t bearingY;
   };

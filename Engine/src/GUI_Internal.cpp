@@ -3,12 +3,16 @@
 #include "GUI_Internal.h"
 
 #include "BSR_Assert.h"
+#include "Framework.h"
 #include "Material.h"
 #include "ShaderUniform.h"
 #include "RendererProgram.h"
 #include "VertexArray.h"
 #include "Renderer.h"
 #include <algorithm>
+
+#define DEFAULT_FONT_PATH "../Engine/assets/fonts/NotoSans-Regular.ttf"
+#define DEFAULT_FONT_SIZE 18
 
 namespace Engine
 {
@@ -66,26 +70,74 @@ namespace Engine
     {
     public:
 
-      Renderable renBox;
+      PIMPL();
+      ~PIMPL();
+
+      Dg::ErrorCode Init();
+
+      void SetScreenSize(vec2 const &);
+      void DrawText(std::string const &, UIAABB const &, TextOptions const &);
+      void DrawText(std::string const &, UIAABB const &, TextOptions const &, Ref<IFontAtlas>, FontID);
+      void DrawBox(UIAABB const &, Colour colour);
+
+    private:
 
       void InitBox();
+
+    private:
+
+      FontID m_defaultFont;
+      Ref<IFontAtlas> m_fontAtlas;
+      Renderable m_renBox;
     };
+
+    //------------------------------------------------------------------------
+    // PIMPL
+    //------------------------------------------------------------------------
 
     Renderer * Renderer::s_pInstance = nullptr;
 
+    Renderer::PIMPL::PIMPL()
+      : m_defaultFont(0)
+    {
+
+    }
+
+    Renderer::PIMPL::~PIMPL()
+    {
+
+    }
+
+    Dg::ErrorCode Renderer::PIMPL::Init()
+    {
+      Dg::ErrorCode result;
+
+      InitBox();
+      m_fontAtlas = Framework::Instance()->CreateFontAtlas();
+
+      DG_ERROR_CHECK(m_fontAtlas->RegisterFont(DEFAULT_FONT_PATH, m_defaultFont));
+      m_fontAtlas->BeginLoad();
+      DG_ERROR_CHECK(m_fontAtlas->RegisterAllGlyphs(m_defaultFont, DEFAULT_FONT_SIZE));
+      DG_ERROR_CHECK(m_fontAtlas->CommitLoad());
+
+      result = Dg::ErrorCode::None;
+    epilogue:
+      return result;
+    }
+
     void Renderer::PIMPL::InitBox()
     {
-      renBox.vb = VertexBuffer::Create(g_boxVerts, SIZEOF32(g_boxVerts));
-      renBox.vb->SetLayout(
+      m_renBox.vb = VertexBuffer::Create(g_boxVerts, SIZEOF32(g_boxVerts));
+      m_renBox.vb->SetLayout(
         {
           { Engine::ShaderDataType::VEC2, "inPos" }
         });
 
-      renBox.ib = Engine::IndexBuffer::Create(g_boxIndices, SIZEOF32(g_boxIndices));
-      renBox.va = Engine::VertexArray::Create();
+      m_renBox.ib = Engine::IndexBuffer::Create(g_boxIndices, SIZEOF32(g_boxIndices));
+      m_renBox.va = Engine::VertexArray::Create();
 
-      renBox.va->AddVertexBuffer(renBox.vb);
-      renBox.va->SetIndexBuffer(renBox.ib);
+      m_renBox.va->AddVertexBuffer(m_renBox.vb);
+      m_renBox.va->SetIndexBuffer(m_renBox.ib);
 
       Engine::ShaderData * pSD = new ShaderData({
           { Engine::ShaderDomain::Vertex, Engine::StrType::Source, g_box_vs },
@@ -95,14 +147,47 @@ namespace Engine
       ResourceManager::Instance()->RegisterResource(ir_GUIShaderData, pSD);
       Ref<Engine::RendererProgram> refProg;
       refProg = Engine::RendererProgram::Create(ir_GUIShaderData);
-      renBox.material = Material::Create(refProg);
+      m_renBox.material = Material::Create(refProg);
     }
 
-    bool Renderer::Init()
+    void Renderer::PIMPL::SetScreenSize(vec2 const & a_size)
+    {
+      m_renBox.material->SetUniform("windowSize", a_size.GetData(), sizeof(a_size));
+    }
+
+    void Renderer::PIMPL::DrawBox(UIAABB const & a_aabb, Colour a_colour)
+    {
+      float clr[4] ={a_colour.fr(), a_colour.fg(), a_colour.fb(), a_colour.fa()};
+
+      m_renBox.material->SetUniform("colour", clr, sizeof(clr));
+      m_renBox.material->SetUniform("buttonPos", a_aabb.position.GetData(), sizeof(a_aabb.position));
+      m_renBox.material->SetUniform("buttonSize", a_aabb.size.GetData(), sizeof(a_aabb.size));
+
+      m_renBox.material->Bind();
+      m_renBox.va->Bind();
+
+      ::Engine::Renderer::DrawIndexed(6, false);
+    }
+
+    void Renderer::PIMPL::DrawText(std::string const & a_str, UIAABB const & a_aabb, TextOptions const & a_options)
+    {
+
+    }
+
+    void Renderer::PIMPL::DrawText(std::string const & a_str, UIAABB const & a_aabb, TextOptions const & a_options, Ref<IFontAtlas> a_fontAtlas, FontID a_id)
+    {
+
+    }
+
+    //------------------------------------------------------------------------
+    // Renderer
+    //------------------------------------------------------------------------
+
+    Dg::ErrorCode Renderer::Init()
     {
       BSR_ASSERT(s_pInstance == nullptr, "Renderer already initialised!");
       s_pInstance = new Renderer();
-      return true;
+      return s_pInstance->m_pimpl->Init();
     }
 
     void Renderer::Destroy()
@@ -120,7 +205,7 @@ namespace Engine
     Renderer::Renderer()
       : m_pimpl(new PIMPL())
     {
-      m_pimpl->InitBox();
+
     }
 
     Renderer::~Renderer()
@@ -130,41 +215,27 @@ namespace Engine
 
     void Renderer::SetScreenSize(vec2 const & a_size)
     {
-      m_pimpl->renBox.material->SetUniform("windowSize", a_size.GetData(), sizeof(a_size));
+      m_pimpl->SetScreenSize(a_size);
+    }
+
+    void Renderer::DrawText(std::string const & a_str, UIAABB const & a_aabb, TextOptions const & a_options)
+    {
+      m_pimpl->DrawText(a_str, a_aabb, a_options);
+    }
+
+    void Renderer::DrawText(std::string const & a_str, UIAABB const & a_aabb, TextOptions const & a_options, Ref<IFontAtlas> a_fontAtlas, FontID a_id)
+    {
+      m_pimpl->DrawText(a_str, a_aabb, a_options, a_fontAtlas, a_id);
     }
 
     void Renderer::DrawBox(UIAABB const & a_aabb, Colour a_colour)
     {
-      float clr[4] ={a_colour.fr(), a_colour.fg(), a_colour.fb(), a_colour.fa()};
-
-      m_pimpl->renBox.material->SetUniform("colour", clr, sizeof(clr));
-      m_pimpl->renBox.material->SetUniform("buttonPos", a_aabb.position.GetData(), sizeof(a_aabb.position));
-      m_pimpl->renBox.material->SetUniform("buttonSize", a_aabb.size.GetData(), sizeof(a_aabb.size));
-
-      m_pimpl->renBox.material->Bind();
-      m_pimpl->renBox.va->Bind();
-
-      ::Engine::Renderer::DrawIndexed(6, false);
+      m_pimpl->DrawBox(a_aabb, a_colour);
     }
 
-    /*void Renderer::DrawCorner(vec2 const & a_position, vec2 const & a_size, Colour a_colour)
-    {
-      float clr[4] ={a_colour.fr(), a_colour.fg(), a_colour.fb(), a_colour.fa()};
-
-      m_pimpl->renBox.material->SetUniform("colour", clr, sizeof(clr));
-      m_pimpl->renBox.material->SetUniform("buttonPos", a_position.GetData(), sizeof(a_position));
-      m_pimpl->renBox.material->SetUniform("buttonSize", a_size.GetData(), sizeof(a_size));
-
-      m_pimpl->renBox.material->Bind();
-      m_pimpl->renBox.va->Bind();
-
-      Renderer::DrawIndexed(3, false);
-    }
-
-    void Renderer::DrawRoundedBox(vec2 const & a_position, vec2 const & a_size, Colour a_colour, float a_radius)
-    {
-
-    }*/
+    //------------------------------------------------------------------------
+    // Functions
+    //------------------------------------------------------------------------
 
     bool Intersection(UIAABB const & A,
                       UIAABB const & B,

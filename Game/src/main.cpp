@@ -38,8 +38,8 @@ Engine::Colour * GenerateBinTexture()
     int pos[2];
   };
 
-  Dg::BinPacker<int> rp;
-  std::map<Dg::BinPackerCommon::ItemID, MyItem> itemMap;
+  Dg::BinPacker<int, int> rp;
+  std::map<int, MyItem> itemMap;
 
   for (int i = 0; i < nItems; i++)
   {
@@ -47,11 +47,11 @@ Engine::Colour * GenerateBinTexture()
     item.dim[Dg::Element::width] = rng.GetUintRange(itemMin, itemMax);
     item.dim[Dg::Element::height] = rng.GetUintRange(itemMin, itemMax);
 
-    Dg::BinPackerCommon::ItemID id = rp.RegisterItem(item.dim[Dg::Element::width], item.dim[Dg::Element::height]);
-    itemMap.insert(std::pair<Dg::BinPackerCommon::ItemID, MyItem>(id, item));
+    rp.RegisterItem(i, item.dim[Dg::Element::width], item.dim[Dg::Element::height]);
+    itemMap.insert(std::pair<int, MyItem>(i, item));
   }
 
-  Dg::BinPacker<int>::Bin bin;
+  Dg::BinPacker<int, int>::Bin bin;
   bin.dimensions[0] = itemMax;
   bin.dimensions[1] = itemMax;
   bin.maxDimensions[0] = TEXTURE_XY;
@@ -67,7 +67,7 @@ Engine::Colour * GenerateBinTexture()
 
   for (auto const & item : bin.items)
   {
-    Dg::BinPackerCommon::ItemID id = item.id;
+    int id = item.id;
     itemMap.at(id).pos[Dg::Element::x] = item.xy[Dg::Element::x];
     itemMap.at(id).pos[Dg::Element::y] = item.xy[Dg::Element::y];
     items.push_back(itemMap.at(id));
@@ -184,12 +184,13 @@ public:
     Engine::Ref<Engine::RendererProgram> refProg;
     refProg = Engine::RendererProgram::Create(sdID);
 
-    Engine::TextureFlags flags;
-    flags.SetFilter(Engine::TextureFilter::Linear);
-    flags.SetIsMipmapped(false);
-    flags.SetWrap(Engine::TextureWrap::Clamp);
+    Engine::TextureAttributes attrs;
+    attrs.SetFilter(Engine::TextureFilter::Linear);
+    attrs.SetIsMipmapped(false);
+    attrs.SetWrap(Engine::TextureWrap::Clamp);
+    attrs.SetPixelType(Engine::TexturePixelType::RGBA8);
     m_texture = Engine::Texture2D::Create();
-    m_texture->Set(TEXTURE_XY, TEXTURE_XY, GenerateBinTexture(), flags);
+    m_texture->Set(TEXTURE_XY, TEXTURE_XY, GenerateBinTexture(), attrs);
     m_texture->Upload();
 
     m_material = Engine::Material::Create(refProg);
