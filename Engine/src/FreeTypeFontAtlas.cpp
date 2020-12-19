@@ -370,10 +370,10 @@ epilogue:
 
         for (int xLocal = 0; xLocal < it->second.width; xLocal++)
         {
-          int x = item.xy[Dg::Element::x] + xLocal;
+          int x = item.xy[0] + xLocal;
           for (int yLocal = 0; yLocal < it->second.height; yLocal++)
           {
-            int y = item.xy[Dg::Element::y] + yLocal;
+            int y = item.xy[1] + yLocal;
             uint8_t pixel = fonts[fontID]->glyph->bitmap.buffer[yLocal * fonts[fontID]->glyph->bitmap.width + xLocal];
             pBuffer[y * FONTATLAS_TEXTURE_DIMENSION + x] = pixel;
           }
