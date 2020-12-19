@@ -43,7 +43,7 @@ namespace Engine
     });
   }
 
-  void Texture2D::Upload()
+  void Texture2D::Upload(bool freePixels)
   {
     RenderState state = RenderState::Create();
     state.Set<RenderState::Attr::Type>(RenderState::Type::Command);
@@ -52,6 +52,12 @@ namespace Engine
     TextureData * pData = new TextureData();
     pData->Duplicate(m_data);
     
+    if (freePixels)
+    {
+      delete[] m_data.pPixels;
+      m_data.pPixels = nullptr;
+    }
+
     RENDER_SUBMIT(state, [resID = m_id, pData = pData]() mutable
     {
       // TODO all of these we should check that *ptr != nullptr, but really, nullptrs should not be in RenderThreadData

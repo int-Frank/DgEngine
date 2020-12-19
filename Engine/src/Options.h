@@ -16,9 +16,9 @@
 #define LOG_OUTPUT_FILE "log-output.txt"
 #define CRASH_REPORT_FILE "crash-report.txt"
 
-#define TEMP_BUFFER_SIZE (10 * 1024 * 1024)
+#define TEMP_BUFFER_SIZE (16 * 1024 * 1024)
 #define RENDER_COMMAND_BUFFER_SIZE (1 * 1024 * 1024)
-#define RENDER_COMMAND_BUFFER_MEM_POOL (10 * 1024 * 1024)
+#define RENDER_COMMAND_BUFFER_MEM_POOL (64 * 1024 * 1024)
 #define FONTATLAS_TEXTURE_DIMENSION 2048
 
 //----------------------------------------------------------------------------

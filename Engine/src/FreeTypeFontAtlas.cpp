@@ -362,7 +362,7 @@ epilogue:
           for (int yLocal = 0; yLocal < it->second.height; yLocal++)
           {
             int y = item.xy[Dg::Element::y] + yLocal;
-            uint8_t pixel = fonts[fontID]->glyph->bitmap.buffer[yLocal * fonts[fontID]->glyph->bitmap.width * yLocal + xLocal];
+            uint8_t pixel = fonts[fontID]->glyph->bitmap.buffer[yLocal * fonts[fontID]->glyph->bitmap.width + xLocal];
             pBuffer[y * FONTATLAS_TEXTURE_DIMENSION + x] = pixel;
           }
         }
@@ -376,7 +376,7 @@ epilogue:
       attrs.SetPixelType(TexturePixelType::R8);
 
       texture->Set(FONTATLAS_TEXTURE_DIMENSION, FONTATLAS_TEXTURE_DIMENSION, pBuffer, attrs);
-      texture->Upload();
+      texture->Upload(true);
 
       m_textures.push_back(texture);
 
@@ -398,9 +398,6 @@ epilogue:
   Dg::ErrorCode FreeTypeFontAtlas::CommitLoad()
   {
     Dg::ErrorCode result;
-    FT_Error err;
-    size_t fails = 0;
-    BinPacker binPacker;
 
     DG_ERROR_NULL(m_pTempData, Dg::ErrorCode::NullObject);
     DG_ERROR_CHECK(GenerateCharMap());

@@ -43,7 +43,7 @@ namespace Engine
     ~Texture2D();
 
     //Once we are done loading/manipulating the texture, we need to upload it to the video card.
-    void Upload();
+    void Upload(bool freePixels = false);
     void Clear();
     void Bind(uint32_t slot = 0) const;
 
