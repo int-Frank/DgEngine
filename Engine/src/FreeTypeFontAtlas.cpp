@@ -245,7 +245,6 @@ epilogue:
   {
     Dg::ErrorCode result;
     FT_Error err;
-    size_t fails = 0;
 
     DG_ERROR_NULL(m_pTempData, Dg::ErrorCode::NullObject);
 
@@ -273,7 +272,8 @@ epilogue:
           GlyphID glyphID = PackGlyphID(FontID(i), it->cp, it->size);
 
           GlyphData gData ={};
-          gData.Advance = face->glyph->advance.x;
+          gData.textureID = GLYPH_NOT_RENDERABLE;
+          gData.advance = (int16_t)(face->glyph->advance.x >> 6);
           gData.width = face->glyph->bitmap.width;
           gData.height = face->glyph->bitmap.rows;
           gData.bearingX = face->glyph->bitmap_left;
@@ -291,13 +291,9 @@ epilogue:
         else
         {
           it = m_pTempData->loadFonts[i].glyphs.erase(it);
-          fails++;
         }
       }
     }
-
-    if (fails > 0)
-      LOG_WARN("Failed to generate {} charactes when loading font", fails);
 
     result = Dg::ErrorCode::None;
   epilogue:
@@ -308,7 +304,6 @@ epilogue:
   {
     Dg::ErrorCode result;
     FT_Error err;
-    size_t fails = 0;
     BinPacker binPacker;
     std::vector<FT_Face> fonts;
     size_t previousRemaining = 0;
@@ -328,43 +323,49 @@ epilogue:
 
     for (auto const & kv : m_charMap)
     {
+      FontID fontID;
+      uint32_t size;
+      CodePoint cp;
+      UnpackGlyphID(kv.first, fontID, cp, size);
+
       if (binPacker.RegisterItem(kv.first, kv.second.width, kv.second.height) != Dg::ErrorCode::None)
-      {
-        LOG_WARN("Failed to register glyph: {}", kv.first);
-        fails++;
-      }
+        LOG_INFO("Glyph not renderable. Font: {}, size: {}, code point: {}", fontID, size, cp);
     }
 
     while ((remaining > 0) && (previousRemaining != remaining))
     {
-      Dg::DynamicArray<Dg::BinPacker<uint32_t, GlyphID>::Item> bin;
-
-      previousRemaining = remaining;
-      remaining = binPacker.Fill(bin, FONTATLAS_TEXTURE_DIMENSION, FONTATLAS_TEXTURE_DIMENSION);
-
       uint8_t * pBuffer = new uint8_t[FONTATLAS_TEXTURE_DIMENSION * FONTATLAS_TEXTURE_DIMENSION]{};
-
       g_pPixels_DEBUG = pBuffer; // TODO DEBUG!!!
 
-      for (auto item : bin)
+      std::function<void(Dg::BinPacker<uint32_t, GlyphID>::Item const &)> callback = 
+        [ &m_charMap = this->m_charMap,
+          &m_textures = this->m_textures,
+          &fonts,
+          &pBuffer ]
+      (Dg::BinPacker<uint32_t, GlyphID>::Item const & item)
       {
         auto it = m_charMap.find(item.id);
-        DG_ERROR_IF(it == m_charMap.end(), Dg::ErrorCode::Failure);
-        it->second.posX = item.xy[0];
-        it->second.posY = item.xy[1];
-        it->second.textureID = uint16_t(m_textures.size());
-
+        
         FontID fontID;
         uint32_t size;
         CodePoint cp;
-        UnpackGlyphID(it->first, fontID, cp, size);
+        UnpackGlyphID(item.id, fontID, cp, size);
+
+        if (it == m_charMap.end())
+        {
+          LOG_WARN("Character missing from character map. Font: {}, size: {}, code point: {}", fontID, size, cp);
+          return;
+        }
+
+        it->second.posX = (uint16_t)item.xy[0];
+        it->second.posY = (uint16_t)item.xy[1];
+        it->second.textureID = uint16_t(m_textures.size());
 
         FT_Set_Pixel_Sizes(fonts[fontID], 0, size);
         if (FT_Load_Char(fonts[fontID], cp, FT_LOAD_RENDER) != 0)
         {
-          LOG_WARN("Failed to load character: {}", cp);
-          fails++;
-          continue;
+          LOG_WARN("Failed to load character. Font: {}, size: {}, code point: {}", fontID, size, cp);
+          return;
         }
 
         for (int xLocal = 0; xLocal < it->second.width; xLocal++)
@@ -377,7 +378,10 @@ epilogue:
             pBuffer[y * FONTATLAS_TEXTURE_DIMENSION + x] = pixel;
           }
         }
-      }
+      };
+
+      previousRemaining = remaining;
+      remaining = binPacker.Fill(callback, FONTATLAS_TEXTURE_DIMENSION, FONTATLAS_TEXTURE_DIMENSION);
 
       Ref<Texture2D> texture = Texture2D::Create();
       TextureAttributes attrs;
@@ -395,9 +399,7 @@ epilogue:
     for (FT_Face face : fonts)
       FT_Done_Face(face);
 
-    fails += remaining;
-
-    LOG_INFO("FONT LOAD FAILS: {}", fails);
+    LOG_WARN("Glyphs not loaded: {}", remaining);
     LOG_INFO("TEXTURE COUNT: {}", m_textures.size());
 
     result = Dg::ErrorCode::None;

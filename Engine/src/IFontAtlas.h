@@ -17,10 +17,11 @@ extern uint8_t * g_pPixels_DEBUG;
 namespace Engine
 {
   typedef uint32_t FontID;
+  uint16_t const GLYPH_NOT_RENDERABLE = 0xFFFF;
 
   struct GlyphData
   {
-    int32_t Advance;
+    int16_t advance;
     uint16_t textureID;
     uint16_t posX;
     uint16_t posY;
