@@ -337,18 +337,16 @@ epilogue:
 
     while ((remaining > 0) && (previousRemaining != remaining))
     {
-      BinPacker::Bin bin;
-      bin.maxDimensions[0] = FONTATLAS_TEXTURE_DIMENSION;
-      bin.maxDimensions[1] = FONTATLAS_TEXTURE_DIMENSION;
+      Dg::DynamicArray<Dg::BinPacker<uint32_t, GlyphID>::Item> bin;
 
       previousRemaining = remaining;
-      remaining = binPacker.Fill(bin);
+      remaining = binPacker.Fill(bin, FONTATLAS_TEXTURE_DIMENSION, FONTATLAS_TEXTURE_DIMENSION);
 
       uint8_t * pBuffer = new uint8_t[FONTATLAS_TEXTURE_DIMENSION * FONTATLAS_TEXTURE_DIMENSION]{};
 
       g_pPixels_DEBUG = pBuffer; // TODO DEBUG!!!
 
-      for (auto item : bin.items)
+      for (auto item : bin)
       {
         auto it = m_charMap.find(item.id);
         DG_ERROR_IF(it == m_charMap.end(), Dg::ErrorCode::Failure);
