@@ -19,121 +19,21 @@
 #include "EngineMessages.h"
 #include "DgBinPacker.h"
 #include "DgRNG_Local.h"
+#include "IFontAtlas.h"
 
-#define TEXTURE_XY 512
-
-Engine::Colour * GenerateBinTexture()
+Engine::Colour * GenerateTexture()
 {
-  int itemMin = 8;
-  int itemMax = 64;
-
-  int nItems = 220;
-
-  Dg::RNG_Local rng;
-  rng.SetSeed(14);
-
-  struct MyItem
+  Engine::Colour *pPixels = new Engine::Colour[FONTATLAS_TEXTURE_DIMENSION * FONTATLAS_TEXTURE_DIMENSION]{};
+  for (size_t i = 0; i < FONTATLAS_TEXTURE_DIMENSION * FONTATLAS_TEXTURE_DIMENSION; i++)
   {
-    int dim[2];
-    int pos[2];
-  };
-
-  Dg::BinPacker<int, int> rp;
-  std::map<int, MyItem> itemMap;
-
-  for (int i = 0; i < nItems; i++)
-  {
-    MyItem item;
-    item.dim[Dg::Element::width] = rng.GetUintRange(itemMin, itemMax);
-    item.dim[Dg::Element::height] = rng.GetUintRange(itemMin, itemMax);
-
-    rp.RegisterItem(i, item.dim[Dg::Element::width], item.dim[Dg::Element::height]);
-    itemMap.insert(std::pair<int, MyItem>(i, item));
-  }
-
-  Dg::BinPacker<int, int>::Bin bin;
-  bin.dimensions[0] = itemMax;
-  bin.dimensions[1] = itemMax;
-  bin.maxDimensions[0] = TEXTURE_XY;
-  bin.maxDimensions[1] = TEXTURE_XY;
-
-  size_t leftovers = rp.Fill(bin);
-  //bin.items.clear();
-  //leftovers = rp.Fill(bin);
-
-  LOG_INFO("Leftovers: {}", leftovers);
-
-  Dg::DynamicArray<MyItem> items;
-
-  for (auto const & item : bin.items)
-  {
-    int id = item.id;
-    itemMap.at(id).pos[Dg::Element::x] = item.xy[Dg::Element::x];
-    itemMap.at(id).pos[Dg::Element::y] = item.xy[Dg::Element::y];
-    items.push_back(itemMap.at(id));
-  }
-
-  LOG_INFO("Item count: {}", items.size());
-
-  Engine::Colour * pPixels = new Engine::Colour[TEXTURE_XY * TEXTURE_XY];
-
-  for (int i = 0; i < TEXTURE_XY * TEXTURE_XY; i++)
-  {
-    pPixels[i].a(255);
-    pPixels[i].r(0);
-    pPixels[i].g(0);
-    pPixels[i].b(0);
-  }
-
-  for (auto const & item : items)
-  {
-    int overlap = 0;
-    for (auto item2 : items)
-    {
-      if (item.pos[0] == item2.pos[0] && item.pos[1] == item2.pos[1])
-        overlap++;
-    }
-
-    if (overlap > 1)
-    {
-      LOG_INFO("FOUND: [{}, {}], {}", item.pos[0], item.pos[1], overlap);
-    }
-    rng.SetSeed(234);
-    uint32_t r = rng.GetUintRange(128, 255);
-    uint32_t g = rng.GetUintRange(128, 255);
-    uint32_t b = rng.GetUintRange(128, 255);
-
-    for (int x = item.pos[Dg::Element::x]; x < item.pos[Dg::Element::x] + item.dim[Dg::Element::width]; x++)
-    {
-      for (int y = item.pos[Dg::Element::y]; y < item.pos[Dg::Element::y] + item.dim[Dg::Element::height]; y++)
-      {
-        pPixels[x + y * TEXTURE_XY].a(255);
-        pPixels[x + y * TEXTURE_XY].r(r);
-        pPixels[x + y * TEXTURE_XY].g(g);
-        pPixels[x + y * TEXTURE_XY].b(b);
-      }
-    }
+    Engine::Colour c;
+    c.r(255);
+    c.g(255);
+    c.b(255);
+    c.a(g_pPixels_DEBUG[i]);
+    pPixels[i] = c;
   }
   return pPixels;
-}
-
-Engine::Colour * GenerateTexture(uint32_t a_width, uint32_t a_height)
-{
-  Engine::Colour * pixels = new Engine::Colour[a_width * a_height];
-
-  for (uint32_t y = 0; y < a_height; y++)
-  {
-    for (uint32_t x = 0; x < a_width; x++)
-    {
-      uint32_t ind = y * a_width + x;
-      pixels[ind].a(255);
-      pixels[ind].r(y < a_height / 2 ? 255 : 0);
-      pixels[ind].g(x < a_width / 2 ? 255 : 0);
-      pixels[ind].b(0);
-    }
-  }
-
-  return pixels;
 }
 
 class GameSystem : public Engine::System
@@ -190,7 +90,7 @@ public:
     attrs.SetWrap(Engine::TextureWrap::Clamp);
     attrs.SetPixelType(Engine::TexturePixelType::RGBA8);
     m_texture = Engine::Texture2D::Create();
-    m_texture->Set(TEXTURE_XY, TEXTURE_XY, GenerateBinTexture(), attrs);
+    m_texture->Set(FONTATLAS_TEXTURE_DIMENSION, FONTATLAS_TEXTURE_DIMENSION, GenerateTexture(), attrs);
     m_texture->Upload();
 
     m_material = Engine::Material::Create(refProg);

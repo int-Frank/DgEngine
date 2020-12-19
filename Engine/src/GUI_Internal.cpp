@@ -12,7 +12,7 @@
 #include <algorithm>
 
 #define DEFAULT_FONT_PATH "../Engine/assets/fonts/NotoSans-Regular.ttf"
-#define DEFAULT_FONT_SIZE 18
+#define DEFAULT_FONT_SIZE 58
 
 namespace Engine
 {

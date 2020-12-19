@@ -10,6 +10,10 @@
 #include "Texture.h"
 #include "Memory.h"
 
+
+extern uint8_t * g_pPixels_DEBUG;
+
+
 namespace Engine
 {
   typedef uint32_t FontID;

@@ -14,6 +14,8 @@
 #include <ft2build.h>
 #include FT_FREETYPE_H
 
+uint8_t * g_pPixels_DEBUG = nullptr; // TODO DEBUG!!!
+
 namespace Engine
 {
   typedef uint64_t GlyphID;
@@ -263,7 +265,10 @@ epilogue:
         do
         {
           if (FT_Load_Char(face, it->cp, FT_LOAD_RENDER) != 0)
+          {
+            LOG_WARN("Failed to read character: {}", it->cp);
             break;
+          }
 
           GlyphID glyphID = PackGlyphID(FontID(i), it->cp, it->size);
 
@@ -306,6 +311,8 @@ epilogue:
     size_t fails = 0;
     BinPacker binPacker;
     std::vector<FT_Face> fonts;
+    size_t previousRemaining = 0;
+    size_t remaining = m_charMap.size();
 
     DG_ERROR_NULL(m_pTempData, Dg::ErrorCode::NullObject);
 
@@ -322,19 +329,24 @@ epilogue:
     for (auto const & kv : m_charMap)
     {
       if (binPacker.RegisterItem(kv.first, kv.second.width, kv.second.height) != Dg::ErrorCode::None)
+      {
+        LOG_WARN("Failed to register glyph: {}", kv.first);
         fails++;
+      }
     }
 
-    while (true)
+    while ((remaining > 0) && (previousRemaining != remaining))
     {
       BinPacker::Bin bin;
-      bin.dimensions[0] = FONTATLAS_TEXTURE_DIMENSION;
-      bin.dimensions[1] = FONTATLAS_TEXTURE_DIMENSION;
       bin.maxDimensions[0] = FONTATLAS_TEXTURE_DIMENSION;
       bin.maxDimensions[1] = FONTATLAS_TEXTURE_DIMENSION;
 
-      size_t remaining = binPacker.Fill(bin);
+      previousRemaining = remaining;
+      remaining = binPacker.Fill(bin);
+
       uint8_t * pBuffer = new uint8_t[FONTATLAS_TEXTURE_DIMENSION * FONTATLAS_TEXTURE_DIMENSION]{};
+
+      g_pPixels_DEBUG = pBuffer; // TODO DEBUG!!!
 
       for (auto item : bin.items)
       {
@@ -352,6 +364,7 @@ epilogue:
         FT_Set_Pixel_Sizes(fonts[fontID], 0, size);
         if (FT_Load_Char(fonts[fontID], cp, FT_LOAD_RENDER) != 0)
         {
+          LOG_WARN("Failed to load character: {}", cp);
           fails++;
           continue;
         }
@@ -376,18 +389,18 @@ epilogue:
       attrs.SetPixelType(TexturePixelType::R8);
 
       texture->Set(FONTATLAS_TEXTURE_DIMENSION, FONTATLAS_TEXTURE_DIMENSION, pBuffer, attrs);
-      texture->Upload(true);
+      texture->Upload(false); //TODO Should be true!
 
       m_textures.push_back(texture);
-
-      if (remaining == 0)
-        break;
     }
 
     for (FT_Face face : fonts)
       FT_Done_Face(face);
 
+    fails += remaining;
+
     LOG_INFO("FONT LOAD FAILS: {}", fails);
+    LOG_INFO("TEXTURE COUNT: {}", m_textures.size());
 
     result = Dg::ErrorCode::None;
   epilogue:
