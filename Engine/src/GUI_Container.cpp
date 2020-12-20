@@ -2,7 +2,7 @@
 
 #include "DgDoublyLinkedList.h"
 #include "GUI_Internal.h"
-#include "GUI_Window.h"
+#include "GUI_Container.h"
 #include "GUI_Button.h"
 #include "Renderer.h"
 
@@ -13,7 +13,7 @@ namespace Engine
     //------------------------------------------------------------------------------------
     // State class declarations
     //------------------------------------------------------------------------------------
-    class Window::WindowState
+    class Container::ContainerState
     {
     public:
 
@@ -21,7 +21,7 @@ namespace Engine
       {
         Colour clrBackground;
 
-        Window * pWindow;
+        Container * pContainer;
         Widget * pParent;
         UIAABB aabb;
         Button * pGrab;
@@ -30,8 +30,8 @@ namespace Engine
         uint32_t flags;
       };
 
-      WindowState(Data * a_pData);
-      virtual ~WindowState();
+      ContainerState(Data * a_pData);
+      virtual ~ContainerState();
 
       void Destroy();
 
@@ -52,16 +52,16 @@ namespace Engine
       vec2 GetLocalPosition() const;
       vec2 GetSize() const;
 
-      virtual WindowState * HandleMessage(Message *) = 0;
+      virtual ContainerState * HandleMessage(Message *) = 0;
 
     protected:
 
-      bool HasFlag(Window::Flag) const;
+      bool HasFlag(Container::Flag) const;
 
       Data * m_pData;
     };
 
-    class StaticState : public Window::WindowState
+    class StaticState : public Container::ContainerState
     {
     public:
 
@@ -70,10 +70,10 @@ namespace Engine
 
       WidgetState QueryState() const override;
 
-      WindowState * HandleMessage(Message * a_pMsg) override;
-      WindowState * HandleMessage(Message_GUI_PointerDown * a_pMsg);
-      WindowState * HandleMessage(Message_GUI_PointerUp * a_pMsg);
-      WindowState * HandleMessage(Message_GUI_PointerMove * a_pMsg);
+      ContainerState * HandleMessage(Message * a_pMsg) override;
+      ContainerState * HandleMessage(Message_GUI_PointerDown * a_pMsg);
+      ContainerState * HandleMessage(Message_GUI_PointerUp * a_pMsg);
+      ContainerState * HandleMessage(Message_GUI_PointerMove * a_pMsg);
 
     private:
 
@@ -81,7 +81,7 @@ namespace Engine
       WidgetState m_state;
     };
 
-    class MoveState : public Window::WindowState
+    class MoveState : public Container::ContainerState
     {
     public:
 
@@ -90,8 +90,8 @@ namespace Engine
 
       WidgetState QueryState() const override;
 
-      WindowState * HandleMessage(Message * a_pMsg) override;
-      WindowState * HandleMessage(Message_GUI_PointerMove * a_pMsg);
+      ContainerState * HandleMessage(Message * a_pMsg) override;
+      ContainerState * HandleMessage(Message_GUI_PointerMove * a_pMsg);
 
     private:
 
@@ -99,7 +99,7 @@ namespace Engine
       vec2 m_positionAnchor;
     };
 
-    class ResizeState : public Window::WindowState
+    class ResizeState : public Container::ContainerState
     {
     public:
 
@@ -108,8 +108,8 @@ namespace Engine
 
       WidgetState QueryState() const override;
 
-      WindowState * HandleMessage(Message *) override;
-      WindowState * HandleMessage(Message_GUI_PointerMove *);
+      ContainerState * HandleMessage(Message *) override;
+      ContainerState * HandleMessage(Message_GUI_PointerMove *);
 
     private:
 
@@ -118,21 +118,21 @@ namespace Engine
     };
 
     //------------------------------------------------------------------------------------
-    // WindowState
+    // ContainerState
     //------------------------------------------------------------------------------------
 
-    Window::WindowState::WindowState(Data * a_pData)
+    Container::ContainerState::ContainerState(Data * a_pData)
       : m_pData(a_pData)
     {
 
     }
 
-    Window::WindowState::~WindowState()
+    Container::ContainerState::~ContainerState()
     {
 
     }
 
-    void Window::WindowState::Destroy()
+    void Container::ContainerState::Destroy()
     {
       Clear();
 
@@ -141,37 +141,37 @@ namespace Engine
       m_pData = nullptr;
     }
 
-    Widget * Window::WindowState::GetParent() const
+    Widget * Container::ContainerState::GetParent() const
     {
       return m_pData->pParent;
     }
 
-    void Window::WindowState::SetParent(Widget * a_pParent)
+    void Container::ContainerState::SetParent(Widget * a_pParent)
     {
       m_pData->pParent = a_pParent;
     }
 
-    vec2 Window::WindowState::GetSize() const
+    vec2 Container::ContainerState::GetSize() const
     {
       return m_pData->aabb.size;
     }
 
-    void Window::WindowState::Clear()
+    void Container::ContainerState::Clear()
     {
       for (auto pWgt : m_pData->children)
         delete pWgt;
       m_pData->children.clear();
     }
 
-    void Window::WindowState::Add(Widget * a_pWgt)
+    void Container::ContainerState::Add(Widget * a_pWgt)
     {
-      if (a_pWgt->IsWindow())
+      if (a_pWgt->IsContainer())
         m_pData->children.push_front(a_pWgt);
       else
         m_pData->children.push_back(a_pWgt);
     }
 
-    void Window::WindowState::Remove(Widget * a_pWgt)
+    void Container::ContainerState::Remove(Widget * a_pWgt)
     {
       for (auto it = m_pData->children.begin(); it != m_pData->children.end(); it++)
       {
@@ -184,26 +184,26 @@ namespace Engine
       }
     }
 
-    void Window::WindowState::Draw()
+    void Container::ContainerState::Draw()
     {
-      if (!HasFlag(Window::Flag::NoBackground))
+      if (!HasFlag(Container::Flag::NoBackground))
       {
         UIAABB aabb;
-        AABBType t = m_pData->pWindow->GetGlobalAABB(aabb);
+        AABBType t = m_pData->pContainer->GetGlobalAABB(aabb);
         if (t == AABBType::None)
           return;
 
-        if (t == AABBType::Window)
-        {
+        //if (t == AABBType::Window)
+        //{
           ::Engine::Renderer::Enable(RenderFeature::Sissor);
           ::Engine::Renderer::SetSissorBox((int)aabb.position.x(), (int)aabb.position.y(), (int)aabb.size.x(), (int)aabb.size.y());
-          Renderer::Instance()->DrawBox({m_pData->pWindow->GetGlobalPosition(), m_pData->pWindow->GetSize()}, m_pData->clrBackground);
+          Renderer::Instance()->DrawBox({m_pData->pContainer->GetGlobalPosition(), m_pData->pContainer->GetSize()}, m_pData->clrBackground);
           ::Engine::Renderer::Disable(RenderFeature::Sissor);
-        }
-        else
-        {
-          Renderer::Instance()->DrawBox(m_pData->aabb, m_pData->clrBackground);
-        }
+        //}
+        //else
+        //{
+        //  Renderer::Instance()->DrawBox(m_pData->aabb, m_pData->clrBackground);
+        //}
       }
 
       for (auto it = m_pData->children.end();;)
@@ -218,27 +218,27 @@ namespace Engine
         m_pData->pGrab->Draw();
     }
 
-    bool Window::WindowState::HasFlag(Window::Flag a_flag) const
+    bool Container::ContainerState::HasFlag(Container::Flag a_flag) const
     {
       return (m_pData->flags & a_flag) != 0;
     }
 
-    vec2 Window::WindowState::GetLocalPosition() const
+    vec2 Container::ContainerState::GetLocalPosition() const
     {
       return m_pData->aabb.position;
     }
 
-    void Window::WindowState::SetPosition(vec2 const & a_position)
+    void Container::ContainerState::SetPosition(vec2 const & a_position)
     {
       m_pData->aabb.position = a_position;
     }
 
-    void Window::WindowState::SetSize(vec2 const & a_size)
+    void Container::ContainerState::SetSize(vec2 const & a_size)
     {
       m_pData->aabb.size = a_size;
     }
 
-    void Window::WindowState::SetBackgroundColour(Colour a_clr)
+    void Container::ContainerState::SetBackgroundColour(Colour a_clr)
     {
       m_pData->clrBackground = a_clr;
     }
@@ -248,7 +248,7 @@ namespace Engine
     //------------------------------------------------------------------------------------
 
     StaticState::StaticState(Data * a_pData)
-      : WindowState(a_pData)
+      : ContainerState(a_pData)
       , m_pFocus(nullptr)
       , m_state(WidgetState::None)
     {
@@ -265,12 +265,12 @@ namespace Engine
       return m_state;
     }
 
-    Window::WindowState * StaticState::HandleMessage(Message * a_pMsg)
+    Container::ContainerState * StaticState::HandleMessage(Message * a_pMsg)
     {
       if (a_pMsg->GetCategory() != MC_GUI)
         return nullptr;
 
-      WindowState * pResult = nullptr;
+      ContainerState * pResult = nullptr;
 
       if (m_pFocus != nullptr)
       {
@@ -298,10 +298,10 @@ namespace Engine
       return pResult;
     }
 
-    Window::WindowState * StaticState::HandleMessage(Message_GUI_PointerDown * a_pMsg)
+    Container::ContainerState * StaticState::HandleMessage(Message_GUI_PointerDown * a_pMsg)
     {
       UIAABB aabb;
-      if (m_pData->pWindow->GetGlobalAABB(aabb) == AABBType::None)
+      if (m_pData->pContainer->GetGlobalAABB(aabb) == AABBType::None)
         return nullptr;
 
       vec2 point((float)a_pMsg->x, (float)a_pMsg->y);
@@ -330,7 +330,7 @@ namespace Engine
             m_pFocus = (*it);
             m_state = WidgetState::HasFocus;
           }
-          if ((*it)->IsWindow())
+          if ((*it)->IsContainer())
           {
             Widget * pWgt = (*it);
             m_pData->children.erase(it);
@@ -340,7 +340,7 @@ namespace Engine
         }
       }
 
-      if (HasFlag(Window::Movable) && PointInBox(point, aabb))
+      if (HasFlag(Container::Movable) && PointInBox(point, aabb))
       {
         a_pMsg->SetFlag(Message::Flag::Handled, true);
         return new MoveState(m_pData, point);
@@ -349,7 +349,7 @@ namespace Engine
       return nullptr;
     }
 
-    Window::WindowState * StaticState::HandleMessage(Message_GUI_PointerUp * a_pMsg)
+    Container::ContainerState * StaticState::HandleMessage(Message_GUI_PointerUp * a_pMsg)
     {
       for (Widget * pWidget : m_pData->children)
       {
@@ -367,7 +367,7 @@ namespace Engine
       return nullptr;
     }
 
-    Window::WindowState * StaticState::HandleMessage(Message_GUI_PointerMove * a_pMsg)
+    Container::ContainerState * StaticState::HandleMessage(Message_GUI_PointerMove * a_pMsg)
     {
       vec2 point((float)a_pMsg->x, (float)a_pMsg->y);
 
@@ -389,7 +389,7 @@ namespace Engine
       }
 
       UIAABB aabb;
-      if (m_pData->pWindow->GetGlobalAABB(aabb) != AABBType::None)
+      if (m_pData->pContainer->GetGlobalAABB(aabb) != AABBType::None)
       {
         vec2 point((float)a_pMsg->x, (float)a_pMsg->y);
 
@@ -404,7 +404,7 @@ namespace Engine
     //------------------------------------------------------------------------------------
 
     MoveState::MoveState(Data * a_pData, vec2 const & a_controlAnchor)
-      : WindowState(a_pData)
+      : ContainerState(a_pData)
       , m_controlAnchor(a_controlAnchor)
       , m_positionAnchor(a_pData->aabb.position)
     {
@@ -421,7 +421,7 @@ namespace Engine
       return WidgetState::HasFocus;
     }
 
-    Window::WindowState * MoveState::HandleMessage(Message * a_pMsg)
+    Container::ContainerState * MoveState::HandleMessage(Message * a_pMsg)
     {
       if (a_pMsg->GetCategory() != MC_GUI)
         return nullptr;
@@ -438,7 +438,7 @@ namespace Engine
       return nullptr;
     }
 
-    Window::WindowState * MoveState::HandleMessage(Message_GUI_PointerMove * a_pMsg)
+    Container::ContainerState * MoveState::HandleMessage(Message_GUI_PointerMove * a_pMsg)
     {
       vec2 point((float)a_pMsg->x, (float)a_pMsg->y);
 
@@ -462,7 +462,7 @@ namespace Engine
     //------------------------------------------------------------------------------------
 
     ResizeState::ResizeState(Data * a_pData, vec2 const & a_controlAnchor)
-      : WindowState(a_pData)
+      : ContainerState(a_pData)
       , m_controlAnchor(a_controlAnchor)
       , m_sizeAnchor(a_pData->aabb.size)
     {
@@ -479,7 +479,7 @@ namespace Engine
       return WidgetState::HasFocus;
     }
 
-    Window::WindowState * ResizeState::HandleMessage(Message * a_pMsg)
+    Container::ContainerState * ResizeState::HandleMessage(Message * a_pMsg)
     {
       if (a_pMsg->GetCategory() != MC_GUI)
         return nullptr;
@@ -496,16 +496,16 @@ namespace Engine
       return nullptr;
     }
 
-    Window::WindowState * ResizeState::HandleMessage(Message_GUI_PointerMove * a_pMsg)
+    Container::ContainerState * ResizeState::HandleMessage(Message_GUI_PointerMove * a_pMsg)
     {
       vec2 point((float)a_pMsg->x, (float)a_pMsg->y);
       vec2 newSize = m_sizeAnchor + (point - m_controlAnchor);
 
-      if (newSize.x() < Window::s_minSize.x())
-        newSize.x() = Window::s_minSize.x();
+      if (newSize.x() < Container::s_minSize.x())
+        newSize.x() = Container::s_minSize.x();
 
-      if (newSize.y() < Window::s_minSize.y())
-        newSize.y() = Window::s_minSize.y();
+      if (newSize.y() < Container::s_minSize.y())
+        newSize.y() = Container::s_minSize.y();
 
       m_pData->aabb.size = newSize;
       a_pMsg->SetFlag(Message::Flag::Handled, true);
@@ -517,18 +517,18 @@ namespace Engine
     }
 
     //------------------------------------------------------------------------------------
-    // Window
+    // Container
     //------------------------------------------------------------------------------------
 
-    vec2 const Window::s_minSize = vec2(50.f, 20.f);
+    vec2 const Container::s_minSize = vec2(50.f, 20.f);
 
-    Window::Window(Widget * a_pParent, vec2 const a_position, vec2 const & a_size, uint32_t a_flags)
+    Container::Container(Widget * a_pParent, vec2 const a_position, vec2 const & a_size, uint32_t a_flags)
       : m_pState(nullptr)
     {
-      WindowState::Data * pData = new WindowState::Data();
+      ContainerState::Data * pData = new ContainerState::Data();
       pData->clrBackground = 0xBB000000;
       pData->pParent = a_pParent;
-      pData->pWindow = this;
+      pData->pContainer = this;
       pData->aabb ={a_position, a_size};
       pData->flags = a_flags;
 
@@ -547,59 +547,59 @@ namespace Engine
       m_pState = new StaticState(pData);
     }
 
-    Window::~Window()
+    Container::~Container()
     {
       m_pState->Destroy();
       delete m_pState;
     }
 
-    Window * Window::Create(Widget * a_pParent, vec2 const a_position, vec2 const & a_size, uint32_t a_flags)
+    Container * Container::Create(Widget * a_pParent, vec2 const a_position, vec2 const & a_size, uint32_t a_flags)
     {
-      return new Window(a_pParent, a_position, a_size, a_flags);
+      return new Container(a_pParent, a_position, a_size, a_flags);
     }
 
-    void Window::HandleMessage(Message * a_pMsg)
+    void Container::HandleMessage(Message * a_pMsg)
     {
       UpdateState(m_pState->HandleMessage(a_pMsg));
     }
 
-    void Window::Clear()
+    void Container::Clear()
     {
       m_pState->Clear();
     }
 
-    void Window::Add(Widget * a_pMsg)
+    void Container::Add(Widget * a_pMsg)
     {
       a_pMsg->SetParent(this);
       m_pState->Add(a_pMsg);
     }
 
-    void Window::Remove(Widget * a_pMsg)
+    void Container::Remove(Widget * a_pMsg)
     {
       m_pState->Remove(a_pMsg);
     }
 
-    void Window::Draw()
+    void Container::Draw()
     {
       m_pState->Draw();
     }
 
-    WidgetState Window::QueryState() const
+    WidgetState Container::QueryState() const
     {
       return m_pState->QueryState();
     }
 
-    Widget * Window::GetParent() const
+    Widget * Container::GetParent() const
     {
       return m_pState->GetParent();
     }
 
-    void Window::SetParent(Widget * a_pParent)
+    void Container::SetParent(Widget * a_pParent)
     {
       m_pState->SetParent(a_pParent);
     }
 
-    void Window::UpdateState(WindowState * a_pState)
+    void Container::UpdateState(ContainerState * a_pState)
     {
       if (a_pState != nullptr)
       {
@@ -608,32 +608,32 @@ namespace Engine
       }
     }
 
-    vec2 Window::GetLocalPosition() const
+    vec2 Container::GetLocalPosition() const
     {
       return m_pState->GetLocalPosition();
     }
 
-    vec2 Window::GetSize() const
+    vec2 Container::GetSize() const
     {
       return m_pState->GetSize();
     }
 
-    void Window::SetPosition(vec2 const & a_position)
+    void Container::SetPosition(vec2 const & a_position)
     {
       m_pState->SetPosition(a_position);
     }
 
-    void Window::SetSize(vec2 const & a_size)
+    void Container::SetSize(vec2 const & a_size)
     {
       m_pState->SetSize(a_size);
     }
 
-    void Window::SetBackgroundColour(Colour a_clr)
+    void Container::SetBackgroundColour(Colour a_clr)
     {
       m_pState->SetBackgroundColour(a_clr);
     }
 
-    bool Window::IsWindow() const
+    bool Container::IsContainer() const
     {
       return true;
     }

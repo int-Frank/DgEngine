@@ -15,7 +15,7 @@
 #include "InputCodes.h"
 
 #include "GUI_Button.h"
-#include "GUI_Window.h"
+#include "GUI_Container.h"
 #include "EngineMessages.h"
 #include "DgBinPacker.h"
 #include "DgRNG_Local.h"
@@ -156,7 +156,7 @@ public:
     }
     else
     {
-      Engine::GUI::Window * pWindow1a = Engine::GUI::Window::Create(nullptr, {20.f, 20.f}, {200.f, 100.f});
+      Engine::GUI::Container * pWindow1a = Engine::GUI::Container::Create(nullptr, {20.f, 20.f}, {200.f, 100.f});
       pWindow1a->SetBackgroundColour(Engine::Colour(0, 255, 0, 255));
       Engine::GUI::Button * pBtn1a = Engine::GUI::Button::Create(nullptr, "Hello", 0, {10.f, 20.f}, {50.f, 20.f});
       pBtn1a->SetBackgroundColour(Engine::Colour(64, 0, 128, 255));
@@ -165,7 +165,7 @@ public:
       pBtn1a->BindHoverOn([](){LOG_DEBUG("HOVER ON 1a");});
       pBtn1a->BindHoverOff([](){LOG_DEBUG("HOVER OFF 1a");});
 
-      Engine::GUI::Window * pWindow1b = Engine::GUI::Window::Create(nullptr, {400.f, 20.f}, {200.f, 100.f});
+      Engine::GUI::Container * pWindow1b = Engine::GUI::Container::Create(nullptr, {400.f, 20.f}, {200.f, 100.f});
       pWindow1b->SetBackgroundColour(Engine::Colour(0, 255, 255, 255));
       Engine::GUI::Button * pBtn1b = Engine::GUI::Button::Create(nullptr, "Hello", 0, {10.f, 20.f}, {50.f, 20.f});
       pBtn1b->SetBackgroundColour(Engine::Colour(64, 64, 128, 255));
@@ -174,7 +174,7 @@ public:
       pBtn1b->BindHoverOn([](){LOG_DEBUG("HOVER ON 1b");});
       pBtn1b->BindHoverOff([](){LOG_DEBUG("HOVER OFF 1b");});
 
-      Engine::GUI::Window * pWindow1 = Engine::GUI::Window::Create(nullptr, {20.f, 20.f}, {800.f, 400.f});
+      Engine::GUI::Container * pWindow1 = Engine::GUI::Container::Create(nullptr, {20.f, 20.f}, {800.f, 400.f});
       pWindow1->SetBackgroundColour(Engine::Colour(255, 255, 255, 255));
       Engine::GUI::Button * pBtn1 = Engine::GUI::Button::Create(nullptr, "Hello", 0, {10.f, 20.f}, {50.f, 20.f});
       pBtn1->SetBackgroundColour(Engine::Colour(64, 128, 0, 255));

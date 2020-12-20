@@ -5,7 +5,7 @@
 
 #include "EngineMessages.h"
 #include "System.h"
-#include "GUI_Window.h"
+#include "GUI_Container.h"
 
 namespace Engine
 {
@@ -32,7 +32,7 @@ namespace Engine
 
   private:
 
-    GUI::Window * m_pScreen;
+    GUI::Container * m_pScreen;
     float m_dt;
   };
 }

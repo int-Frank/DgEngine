@@ -12,7 +12,7 @@ namespace Engine
     : m_dt(1.0f / 60.0f)
     , m_pScreen(nullptr)
   {
-    m_pScreen = GUI::Window::Create(nullptr, {0.f, 0.f}, {(float)a_windowW, (float)a_windowH}, GUI::Window::NoBackground);
+    m_pScreen = GUI::Container::Create(nullptr, {0.f, 0.f}, {(float)a_windowW, (float)a_windowH}, GUI::Container::NoBackground);
   }
 
   System_GUI::~System_GUI()

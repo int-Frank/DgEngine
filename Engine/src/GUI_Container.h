@@ -1,7 +1,7 @@
 //@group UI
 
-#ifndef UIWINDOW_H
-#define UIWINDOW_H
+#ifndef GUI_WINDOW_H
+#define GUI_WINDOW_H
 
 #include "Utils.h"
 #include "GUI_Widget.h"
@@ -10,9 +10,9 @@ namespace Engine
 {
   namespace GUI
   {
-    class Window : public Widget
+    class Container : public Widget
     {
-      Window(Widget * pParent, vec2 const position, vec2 const & size, uint32_t flags);
+      Container(Widget * pParent, vec2 const position, vec2 const & size, uint32_t flags);
     public:
 
       static vec2 const s_minSize;
@@ -26,8 +26,8 @@ namespace Engine
         COUNT
       };
 
-      static Window * Create(Widget * pParent, vec2 const position, vec2 const & size, uint32_t flags = Resizable | Movable);
-      ~Window();
+      static Container * Create(Widget * pParent, vec2 const position, vec2 const & size, uint32_t flags = Resizable | Movable);
+      ~Container();
 
       void SetPosition(vec2 const &) override;
       void SetSize(vec2 const &) override;
@@ -49,14 +49,14 @@ namespace Engine
       vec2 GetLocalPosition() const override;
       vec2 GetSize() const override;
 
-      bool IsWindow() const override;
+      bool IsContainer() const override;
 
-      class WindowState;
+      class ContainerState;
 
     private:
 
-      void UpdateState(WindowState *);
-      WindowState * m_pState;
+      void UpdateState(ContainerState *);
+      ContainerState * m_pState;
     };
   }
 }

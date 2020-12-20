@@ -58,12 +58,13 @@ namespace Engine
       virtual WidgetState QueryState() const = 0;
       virtual Widget * GetParent() const = 0;
       virtual void SetParent(Widget *) = 0;
+      virtual bool GetContentBorder(float & left, float & top, float & right, float & bottom);
 
       AABBType GetGlobalAABB(UIAABB &) const;
       vec2 GetGlobalPosition() const;
       virtual vec2 GetLocalPosition() const = 0;
       virtual vec2 GetSize() const = 0;
-      virtual bool IsWindow() const;
+      virtual bool IsContainer() const;
     };
   }
 }

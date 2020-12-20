@@ -40,7 +40,12 @@ namespace Engine
       return AABBType::Window;
     }
 
-    bool Widget::IsWindow() const
+    bool Widget::IsContainer() const
+    {
+      return false;
+    }
+    
+    bool Widget::GetContentBorder(float & left, float & top, float & right, float & bottom)
     {
       return false;
     }
