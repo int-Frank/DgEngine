@@ -1,7 +1,7 @@
-//@group UI
+//@group GUI
 
-#ifndef UIWIDGET_H
-#define UIWIDGET_H
+#ifndef GUI_WIDGET_H
+#define GUI_WIDGET_H
 
 #include <string>
 #include <functional>
@@ -25,6 +25,9 @@
   - Interactive area, overlays on top of say an Image Display, and captues events
 */
 
+// ContentDiv: Some widgets allow content to be drawn on itself
+// Content can be text or images, and is not interactive.
+
 namespace Engine
 {
   namespace GUI
@@ -36,14 +39,22 @@ namespace Engine
       HasFocus // Eg text inputs in focus and waiting for input
     };
 
+    enum class WidgetFlag
+    {
+      StretchWidth,
+      StretchHeight,
+
+      // Container
+      Resizable,
+      Movable,
+      NoBackground,
+    };
+
     class Widget
     {
     public:
 
-      virtual void SetPosition(vec2 const &) = 0;
-      virtual void SetSize(vec2 const &) = 0;
-
-      // Internal use...
+      Widget(std::initializer_list<WidgetFlag> flags = {});
       virtual ~Widget();
 
       virtual void HandleMessage(Message *) { };
@@ -51,14 +62,36 @@ namespace Engine
       virtual WidgetState QueryState() const = 0;
       virtual Widget * GetParent() const = 0;
       virtual void SetParent(Widget *) = 0;
-      virtual bool GetContentBorder(float & left, float & top, float & right, float & bottom);
 
-      // false implies none of the widget can be seen (probably completely clipped by another widget)
-      bool GetGlobalAABB(UIAABB &) const;
-      vec2 GetGlobalPosition() const;
-      virtual vec2 GetLocalPosition() const = 0;
-      virtual vec2 GetSize() const = 0;
+      void SetPosition(vec2 const &);
+      void SetSize(vec2 const &);
+
+      // Finds the viewable/interactable portion of the widget.
+      // Return of 'false' implies none of the widget can be seen (probably completely clipped by parent widget)
+      bool GetGlobalContentDivAABB(UIAABB &);
+      bool GetGlobalAABB(UIAABB &);
+
+      virtual vec2 GetContentDivPosition();
+      virtual vec2 GetContentDivSize();
+
+      vec2 GetGlobalPosition();
+      vec2 GetLocalPosition();
+      vec2 GetSize();
       virtual bool IsContainer() const;
+
+      bool HasFlag(WidgetFlag) const;
+
+    protected:
+
+      // All these will do is get/set the raw vec2.
+      virtual void _SetLocalPosition(vec2 const &) = 0;
+      virtual void _SetSize(vec2 const &) = 0;
+      virtual vec2 _GetLocalPosition() = 0;
+      virtual vec2 _GetSize() = 0;
+
+    private:
+
+      uint32_t m_flags;
     };
   }
 }

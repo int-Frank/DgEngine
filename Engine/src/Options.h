@@ -19,7 +19,7 @@
 #define TEMP_BUFFER_SIZE (16 * 1024 * 1024)
 #define RENDER_COMMAND_BUFFER_SIZE (1 * 1024 * 1024)
 #define RENDER_COMMAND_BUFFER_MEM_POOL (64 * 1024 * 1024)
-#define FONTATLAS_TEXTURE_DIMENSION 2048
+#define FONTATLAS_DEFAULT_TEXTURE_DIMENSION 2048
 
 //----------------------------------------------------------------------------
 // Logging

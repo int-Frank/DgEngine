@@ -62,6 +62,7 @@ namespace Engine
     Dg::ErrorCode Init();
 
     Dg::ErrorCode RegisterFont(std::string const & fontPath, FontID & out);
+    void SetTextureDimension(uint32_t) override;
 
     void BeginLoad() override;
     Dg::ErrorCode RegisterGlyph(FontID, uint32_t size, CodePoint c) override;
@@ -74,6 +75,7 @@ namespace Engine
     Dg::ErrorCode GenerateCharMap();
     Dg::ErrorCode GenerateTextures();
 
+    uint32_t m_textureDimension;
     FT_Library m_pContext;
     TempData *m_pTempData;
     Dg::Map_AVL<GlyphID, GlyphData> m_charMap;
@@ -102,7 +104,8 @@ namespace Engine
   }
 
   FreeTypeFontAtlas::FreeTypeFontAtlas()
-    : m_pContext(nullptr)
+    : m_textureDimension(FONTATLAS_DEFAULT_TEXTURE_DIMENSION)
+    , m_pContext(nullptr)
     , m_pTempData(nullptr)
   {
 
@@ -124,6 +127,11 @@ namespace Engine
     delete m_pTempData;
     m_pTempData = nullptr;
     m_textures.clear();
+  }
+
+  void FreeTypeFontAtlas::SetTextureDimension(uint32_t a_uv)
+  {
+    m_textureDimension = a_uv;
   }
 
   Dg::ErrorCode FreeTypeFontAtlas::RegisterFont(std::string const & fontPath, FontID & out)
@@ -334,24 +342,25 @@ epilogue:
 
     while ((remaining > 0) && (previousRemaining != remaining))
     {
-      uint8_t * pBuffer = new uint8_t[FONTATLAS_TEXTURE_DIMENSION * FONTATLAS_TEXTURE_DIMENSION]{};
+      uint8_t * pBuffer = new uint8_t[m_textureDimension * m_textureDimension]{};
       g_pPixels_DEBUG = pBuffer; // TODO DEBUG!!!
 
       std::function<void(Dg::BinPacker<uint32_t, GlyphID>::Item const &)> callback = 
-        [ &m_charMap = this->m_charMap,
-          &m_textures = this->m_textures,
+        [ &charMap = this->m_charMap,
+          &textures = this->m_textures,
+          &textureDimension = this->m_textureDimension,
           &fonts,
           &pBuffer ]
       (Dg::BinPacker<uint32_t, GlyphID>::Item const & item)
       {
-        auto it = m_charMap.find(item.id);
+        auto it = charMap.find(item.id);
         
         FontID fontID;
         uint32_t size;
         CodePoint cp;
         UnpackGlyphID(item.id, fontID, cp, size);
 
-        if (it == m_charMap.end())
+        if (it == charMap.end())
         {
           LOG_WARN("Character missing from character map. Font: {}, size: {}, code point: {}", fontID, size, cp);
           return;
@@ -359,7 +368,7 @@ epilogue:
 
         it->second.posX = (uint16_t)item.xy[0];
         it->second.posY = (uint16_t)item.xy[1];
-        it->second.textureID = uint16_t(m_textures.size());
+        it->second.textureID = uint16_t(textures.size());
 
         FT_Set_Pixel_Sizes(fonts[fontID], 0, size);
         if (FT_Load_Char(fonts[fontID], cp, FT_LOAD_RENDER) != 0)
@@ -375,13 +384,13 @@ epilogue:
           {
             int y = item.xy[1] + yLocal;
             uint8_t pixel = fonts[fontID]->glyph->bitmap.buffer[yLocal * fonts[fontID]->glyph->bitmap.width + xLocal];
-            pBuffer[y * FONTATLAS_TEXTURE_DIMENSION + x] = pixel;
+            pBuffer[y * textureDimension + x] = pixel;
           }
         }
       };
 
       previousRemaining = remaining;
-      remaining = binPacker.Fill(callback, FONTATLAS_TEXTURE_DIMENSION, FONTATLAS_TEXTURE_DIMENSION);
+      remaining = binPacker.Fill(callback, m_textureDimension, m_textureDimension);
 
       Ref<Texture2D> texture = Texture2D::Create();
       TextureAttributes attrs;
@@ -390,7 +399,7 @@ epilogue:
       attrs.SetWrap(TextureWrap::None);
       attrs.SetPixelType(TexturePixelType::R8);
 
-      texture->Set(FONTATLAS_TEXTURE_DIMENSION, FONTATLAS_TEXTURE_DIMENSION, pBuffer, attrs);
+      texture->Set(m_textureDimension, m_textureDimension, pBuffer, attrs);
       texture->Upload(false); //TODO Should be true!
 
       m_textures.push_back(texture);

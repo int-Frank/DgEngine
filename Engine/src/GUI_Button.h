@@ -1,7 +1,7 @@
-//@group UI
+//@group GUI
 
-#ifndef UIBUTTON_H
-#define UIBUTTON_H
+#ifndef GUI_BUTTON_H
+#define GUI_BUTTON_H
 
 #include "Utils.h"
 #include "GUI_Widget.h"
@@ -12,15 +12,13 @@ namespace Engine
   {
     class Button : public Widget
     {
-      Button(Widget * pParent, std::string const & text, uint32_t fontID, vec2 const & position, vec2 const & size);
+      Button(Widget * pParent, std::string const & text, vec2 const & position, vec2 const & size, std::initializer_list<WidgetFlag> flags);
     public:
 
-      static Button * Create(Widget * pParent, std::string const & text, uint32_t fontID, vec2 const & position, vec2 const & size);
+      static Button * Create(Widget * pParent, std::string const & text, vec2 const & position, vec2 const & size, std::initializer_list<WidgetFlag> flags = {});
 
       ~Button();
 
-      void SetPosition(vec2 const &) override;
-      void SetSize(vec2 const &) override;
       void SetBackgroundColour(Colour);
       void SetHoverOnBackgroundColour(Colour);
 
@@ -38,26 +36,31 @@ namespace Engine
       void HandleMessage(Message *) override;
 
       void Draw() override;
-      vec2 GetLocalPosition() const override;
-      vec2 GetSize() const override;
-
       WidgetState QueryState() const override;
       Widget * GetParent() const override;
       void SetParent(Widget *) override;
+
+      vec2 GetContentDivPosition() override;
+      vec2 GetContentDivSize() override;
 
     private:
 
       void HandleMessage(Message_GUI_PointerDown *);
       void HandleMessage(Message_GUI_PointerMove *);
 
+      void _SetLocalPosition(vec2 const &) override;
+      void _SetSize(vec2 const &) override;
+      vec2 _GetLocalPosition() override;
+      vec2 _GetSize() override;
+
     private:
 
       std::string m_text;
-      uint32_t m_fontID;
       Colour m_clrDefault;
       Colour m_clrHover;
       UIAABB m_aabb;
       WidgetState m_state;
+      float m_contentBoarder;
       Widget * m_pParent;
 
       std::function<void()> m_clbk_HoverOn;

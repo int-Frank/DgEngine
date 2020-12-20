@@ -1,7 +1,7 @@
-//@group UI
+//@group GUI
 
-#ifndef UI_INTERNAL_H
-#define UI_INTERNAL_H
+#ifndef GUI_INTERNAL_H
+#define GUI_INTERNAL_H
 
 #include "Utils.h"
 #include "IFontAtlas.h"

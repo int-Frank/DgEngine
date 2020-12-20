@@ -1,4 +1,4 @@
-//@group UI
+//@group GUI
 
 #include "DgDoublyLinkedList.h"
 #include "GUI_Internal.h"
@@ -24,10 +24,10 @@ namespace Engine
         Container * pContainer;
         Widget * pParent;
         UIAABB aabb;
+        float contentBorder[4]; // left, top, right, botom
         Button * pGrab;
         bool grabPressed;
         Dg::DoublyLinkedList<Widget *> children;
-        uint32_t flags;
       };
 
       ContainerState(Data * a_pData);
@@ -42,21 +42,22 @@ namespace Engine
       void Clear();
 
       void SetBackgroundColour(Colour);
-      void SetPosition(vec2 const &);
-      void SetSize(vec2 const &);
 
       void Add(Widget * a_pWgt);
       void Remove(Widget * a_pWgt);
 
       void Draw();
-      vec2 GetLocalPosition() const;
-      vec2 GetSize() const;
+      vec2 GetContentDivPosition();
+      vec2 GetContentDivSize();
 
       virtual ContainerState * HandleMessage(Message *) = 0;
 
-    protected:
+      void _SetLocalPosition(vec2 const &);
+      void _SetSize(vec2 const &);
+      vec2 _GetLocalPosition();
+      vec2 _GetSize();
 
-      bool HasFlag(Container::Flag) const;
+    protected:
 
       Data * m_pData;
     };
@@ -151,7 +152,7 @@ namespace Engine
       m_pData->pParent = a_pParent;
     }
 
-    vec2 Container::ContainerState::GetSize() const
+    vec2 Container::ContainerState::_GetSize()
     {
       return m_pData->aabb.size;
     }
@@ -186,7 +187,7 @@ namespace Engine
 
     void Container::ContainerState::Draw()
     {
-      if (!HasFlag(Container::Flag::NoBackground))
+      if (!m_pData->pContainer->HasFlag(WidgetFlag::NoBackground))
       {
         UIAABB viewableWindow;
         if (!m_pData->pContainer->GetGlobalAABB(viewableWindow))
@@ -210,22 +211,17 @@ namespace Engine
         m_pData->pGrab->Draw();
     }
 
-    bool Container::ContainerState::HasFlag(Container::Flag a_flag) const
-    {
-      return (m_pData->flags & a_flag) != 0;
-    }
-
-    vec2 Container::ContainerState::GetLocalPosition() const
+    vec2 Container::ContainerState::_GetLocalPosition()
     {
       return m_pData->aabb.position;
     }
 
-    void Container::ContainerState::SetPosition(vec2 const & a_position)
+    void Container::ContainerState::_SetLocalPosition(vec2 const & a_position)
     {
       m_pData->aabb.position = a_position;
     }
 
-    void Container::ContainerState::SetSize(vec2 const & a_size)
+    void Container::ContainerState::_SetSize(vec2 const & a_size)
     {
       m_pData->aabb.size = a_size;
     }
@@ -233,6 +229,22 @@ namespace Engine
     void Container::ContainerState::SetBackgroundColour(Colour a_clr)
     {
       m_pData->clrBackground = a_clr;
+    }
+
+    vec2 Container::ContainerState::GetContentDivPosition()
+    {
+      return vec2(m_pData->contentBorder[0], m_pData->contentBorder[1]);
+    }
+
+    vec2 Container::ContainerState::GetContentDivSize()
+    {
+      vec2 size = m_pData->pContainer->GetSize() - vec2(m_pData->contentBorder[0] + m_pData->contentBorder[2],
+                                                     m_pData->contentBorder[1] + m_pData->contentBorder[3]);
+
+      if ((size[0] <= 0.0f) || (size[1] <= 0.0f))
+        size.Zero();
+
+      return size;
     }
 
     //------------------------------------------------------------------------------------
@@ -332,7 +344,7 @@ namespace Engine
         }
       }
 
-      if (HasFlag(Container::Movable) && PointInBox(point, aabb))
+      if (m_pData->pContainer->HasFlag(WidgetFlag::Movable) && PointInBox(point, aabb))
       {
         a_pMsg->SetFlag(Message::Flag::Handled, true);
         return new MoveState(m_pData, point);
@@ -436,7 +448,10 @@ namespace Engine
 
       if (m_pData->pParent)
       {
-        UIAABB aabb = {m_pData->pParent->GetGlobalPosition(), m_pData->pParent->GetSize()};
+        UIAABB aabb;
+        if (!m_pData->pParent->GetGlobalAABB(aabb))
+          return nullptr;
+
         if (PointInBox(point, aabb))
           m_pData->aabb.position = m_positionAnchor + (point - m_controlAnchor);
       }
@@ -514,29 +529,33 @@ namespace Engine
 
     vec2 const Container::s_minSize = vec2(50.f, 20.f);
 
-    Container::Container(Widget * a_pParent, vec2 const a_position, vec2 const & a_size, uint32_t a_flags)
-      : m_pState(nullptr)
+    Container::Container(Widget * a_pParent, vec2 const a_position, vec2 const & a_size, std::initializer_list<WidgetFlag> a_flags)
+      : Widget(a_flags)
+      , m_pState(nullptr)
     {
       ContainerState::Data * pData = new ContainerState::Data();
       pData->clrBackground = 0xBB000000;
       pData->pParent = a_pParent;
       pData->pContainer = this;
       pData->aabb ={a_position, a_size};
-      pData->flags = a_flags;
+
+      for (int i = 0; i < 4; i++)
+        pData->contentBorder[i] = 4.0f;
 
       vec2 grabSize(16.f, 16.f);
       pData->grabPressed = false;
       pData->pGrab = nullptr;
 
-      if (a_flags & Flag::Resizable)
+      if (HasFlag(WidgetFlag::Resizable))
       {
-        pData->pGrab = Button::Create(this, "", 0, a_size - grabSize, grabSize);
+        pData->pGrab = Button::Create(this, "", a_size - grabSize, grabSize);
         pData->pGrab->BindSelect([pBool = &pData->grabPressed](){*pBool = true; });
         pData->pGrab->SetBackgroundColour(Colour(43, 145, 175, 255));
         pData->pGrab->SetHoverOnBackgroundColour(Colour(63, 195, 225, 255));
       }
 
       m_pState = new StaticState(pData);
+      char t = 0;
     }
 
     Container::~Container()
@@ -545,7 +564,7 @@ namespace Engine
       delete m_pState;
     }
 
-    Container * Container::Create(Widget * a_pParent, vec2 const a_position, vec2 const & a_size, uint32_t a_flags)
+    Container * Container::Create(Widget * a_pParent, vec2 const a_position, vec2 const & a_size, std::initializer_list<WidgetFlag> a_flags)
     {
       return new Container(a_pParent, a_position, a_size, a_flags);
     }
@@ -600,24 +619,24 @@ namespace Engine
       }
     }
 
-    vec2 Container::GetLocalPosition() const
+    void Container::_SetLocalPosition(vec2 const & a_pos)
     {
-      return m_pState->GetLocalPosition();
+      m_pState->_SetLocalPosition(a_pos);
     }
 
-    vec2 Container::GetSize() const
+    void Container::_SetSize(vec2 const & a_size)
     {
-      return m_pState->GetSize();
+      m_pState->_SetSize(a_size);
     }
 
-    void Container::SetPosition(vec2 const & a_position)
+    vec2 Container::_GetLocalPosition()
     {
-      m_pState->SetPosition(a_position);
+      return m_pState->_GetLocalPosition();
     }
 
-    void Container::SetSize(vec2 const & a_size)
+    vec2 Container::_GetSize()
     {
-      m_pState->SetSize(a_size);
+      return m_pState->_GetSize();
     }
 
     void Container::SetBackgroundColour(Colour a_clr)
@@ -628,6 +647,16 @@ namespace Engine
     bool Container::IsContainer() const
     {
       return true;
+    }
+
+    vec2 Container::GetContentDivPosition()
+    {
+      return m_pState->GetContentDivPosition();
+    }
+
+    vec2 Container::GetContentDivSize()
+    {
+      return m_pState->GetContentDivSize();
     }
   }
 }

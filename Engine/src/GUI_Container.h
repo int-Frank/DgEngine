@@ -1,4 +1,4 @@
-//@group UI
+//@group GUI
 
 #ifndef GUI_WINDOW_H
 #define GUI_WINDOW_H
@@ -12,25 +12,13 @@ namespace Engine
   {
     class Container : public Widget
     {
-      Container(Widget * pParent, vec2 const position, vec2 const & size, uint32_t flags);
+      Container(Widget * pParent, vec2 const position, vec2 const & size, std::initializer_list<WidgetFlag> flags);
     public:
 
       static vec2 const s_minSize;
 
-      enum Flag : uint32_t
-      {
-        Resizable     = (1u << 0),
-        Movable       = (1u << 1),
-        NoBackground  = (1u << 2),
-
-        COUNT
-      };
-
-      static Container * Create(Widget * pParent, vec2 const position, vec2 const & size, uint32_t flags = Resizable | Movable);
+      static Container * Create(Widget * pParent, vec2 const position, vec2 const & size, std::initializer_list<WidgetFlag> flags = {WidgetFlag::Movable, WidgetFlag::Resizable});
       ~Container();
-
-      void SetPosition(vec2 const &) override;
-      void SetSize(vec2 const &) override;
 
       void SetBackgroundColour(Colour);
       //void SetHoverOnBackgroundColour(Colour);
@@ -46,8 +34,8 @@ namespace Engine
       WidgetState QueryState() const override;
       Widget * GetParent() const override;
       void SetParent(Widget *) override;
-      vec2 GetLocalPosition() const override;
-      vec2 GetSize() const override;
+      vec2 GetContentDivPosition() override;
+      vec2 GetContentDivSize() override;
 
       bool IsContainer() const override;
 
@@ -56,6 +44,14 @@ namespace Engine
     private:
 
       void UpdateState(ContainerState *);
+
+      void _SetLocalPosition(vec2 const &) override;
+      void _SetSize(vec2 const &) override;
+      vec2 _GetLocalPosition() override;
+      vec2 _GetSize() override;
+
+    private:
+
       ContainerState * m_pState;
     };
   }

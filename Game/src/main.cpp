@@ -23,8 +23,8 @@
 
 Engine::Colour * GenerateTexture()
 {
-  Engine::Colour *pPixels = new Engine::Colour[FONTATLAS_TEXTURE_DIMENSION * FONTATLAS_TEXTURE_DIMENSION]{};
-  for (size_t i = 0; i < FONTATLAS_TEXTURE_DIMENSION * FONTATLAS_TEXTURE_DIMENSION; i++)
+  Engine::Colour *pPixels = new Engine::Colour[FONTATLAS_DEFAULT_TEXTURE_DIMENSION * FONTATLAS_DEFAULT_TEXTURE_DIMENSION]{};
+  for (size_t i = 0; i < FONTATLAS_DEFAULT_TEXTURE_DIMENSION * FONTATLAS_DEFAULT_TEXTURE_DIMENSION; i++)
   {
     Engine::Colour c;
     c.r(255);
@@ -90,7 +90,7 @@ public:
     attrs.SetWrap(Engine::TextureWrap::Clamp);
     attrs.SetPixelType(Engine::TexturePixelType::RGBA8);
     m_texture = Engine::Texture2D::Create();
-    m_texture->Set(FONTATLAS_TEXTURE_DIMENSION, FONTATLAS_TEXTURE_DIMENSION, GenerateTexture(), attrs);
+    m_texture->Set(FONTATLAS_DEFAULT_TEXTURE_DIMENSION, FONTATLAS_DEFAULT_TEXTURE_DIMENSION, GenerateTexture(), attrs);
     m_texture->Upload();
 
     m_material = Engine::Material::Create(refProg);
@@ -158,7 +158,7 @@ public:
     {
       Engine::GUI::Container * pWindow1a = Engine::GUI::Container::Create(nullptr, {20.f, 20.f}, {200.f, 100.f});
       pWindow1a->SetBackgroundColour(Engine::Colour(0, 255, 0, 255));
-      Engine::GUI::Button * pBtn1a = Engine::GUI::Button::Create(nullptr, "Hello", 0, {10.f, 20.f}, {50.f, 20.f});
+      Engine::GUI::Button * pBtn1a = Engine::GUI::Button::Create(nullptr, "Hello", {10.f, 20.f}, {50.f, 20.f});
       pBtn1a->SetBackgroundColour(Engine::Colour(64, 0, 128, 255));
       pBtn1a->SetHoverOnBackgroundColour(Engine::Colour(128, 0, 255, 255));
       pBtn1a->BindSelect([](){LOG_WARN("PRESSED 1a");});
@@ -167,7 +167,7 @@ public:
 
       Engine::GUI::Container * pWindow1b = Engine::GUI::Container::Create(nullptr, {400.f, 20.f}, {200.f, 100.f});
       pWindow1b->SetBackgroundColour(Engine::Colour(0, 255, 255, 255));
-      Engine::GUI::Button * pBtn1b = Engine::GUI::Button::Create(nullptr, "Hello", 0, {10.f, 20.f}, {50.f, 20.f});
+      Engine::GUI::Button * pBtn1b = Engine::GUI::Button::Create(nullptr, "Hello", {10.f, 20.f}, {50.f, 20.f}, {Engine::GUI::WidgetFlag::StretchHeight, Engine::GUI::WidgetFlag::StretchWidth});
       pBtn1b->SetBackgroundColour(Engine::Colour(64, 64, 128, 255));
       pBtn1b->SetHoverOnBackgroundColour(Engine::Colour(128, 128, 255, 255));
       pBtn1b->BindSelect([](){LOG_WARN("PRESSED 1b");});
@@ -176,7 +176,7 @@ public:
 
       Engine::GUI::Container * pWindow1 = Engine::GUI::Container::Create(nullptr, {20.f, 20.f}, {800.f, 400.f});
       pWindow1->SetBackgroundColour(Engine::Colour(255, 255, 255, 255));
-      Engine::GUI::Button * pBtn1 = Engine::GUI::Button::Create(nullptr, "Hello", 0, {10.f, 20.f}, {50.f, 20.f});
+      Engine::GUI::Button * pBtn1 = Engine::GUI::Button::Create(nullptr, "Hello", {10.f, 20.f}, {50.f, 20.f});
       pBtn1->SetBackgroundColour(Engine::Colour(64, 128, 0, 255));
       pBtn1->SetHoverOnBackgroundColour(Engine::Colour(128, 255, 0, 255));
       pBtn1->BindSelect([](){LOG_WARN("PRESSED 1");});
