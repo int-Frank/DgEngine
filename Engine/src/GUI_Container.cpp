@@ -188,22 +188,14 @@ namespace Engine
     {
       if (!HasFlag(Container::Flag::NoBackground))
       {
-        UIAABB aabb;
-        AABBType t = m_pData->pContainer->GetGlobalAABB(aabb);
-        if (t == AABBType::None)
+        UIAABB viewableWindow;
+        if (!m_pData->pContainer->GetGlobalAABB(viewableWindow))
           return;
 
-        //if (t == AABBType::Window)
-        //{
-          ::Engine::Renderer::Enable(RenderFeature::Sissor);
-          ::Engine::Renderer::SetSissorBox((int)aabb.position.x(), (int)aabb.position.y(), (int)aabb.size.x(), (int)aabb.size.y());
-          Renderer::Instance()->DrawBox({m_pData->pContainer->GetGlobalPosition(), m_pData->pContainer->GetSize()}, m_pData->clrBackground);
-          ::Engine::Renderer::Disable(RenderFeature::Sissor);
-        //}
-        //else
-        //{
-        //  Renderer::Instance()->DrawBox(m_pData->aabb, m_pData->clrBackground);
-        //}
+        ::Engine::Renderer::Enable(RenderFeature::Sissor);
+        ::Engine::Renderer::SetSissorBox((int)viewableWindow.position.x(), (int)viewableWindow.position.y(), (int)viewableWindow.size.x(), (int)viewableWindow.size.y());
+        Renderer::Instance()->DrawBox({m_pData->pContainer->GetGlobalPosition(), m_pData->pContainer->GetSize()}, m_pData->clrBackground);
+        ::Engine::Renderer::Disable(RenderFeature::Sissor);
       }
 
       for (auto it = m_pData->children.end();;)
@@ -301,7 +293,7 @@ namespace Engine
     Container::ContainerState * StaticState::HandleMessage(Message_GUI_PointerDown * a_pMsg)
     {
       UIAABB aabb;
-      if (m_pData->pContainer->GetGlobalAABB(aabb) == AABBType::None)
+      if (!m_pData->pContainer->GetGlobalAABB(aabb))
         return nullptr;
 
       vec2 point((float)a_pMsg->x, (float)a_pMsg->y);
@@ -389,7 +381,7 @@ namespace Engine
       }
 
       UIAABB aabb;
-      if (m_pData->pContainer->GetGlobalAABB(aabb) != AABBType::None)
+      if (!m_pData->pContainer->GetGlobalAABB(aabb))
       {
         vec2 point((float)a_pMsg->x, (float)a_pMsg->y);
 

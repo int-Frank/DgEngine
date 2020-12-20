@@ -36,13 +36,6 @@ namespace Engine
       HasFocus // Eg text inputs in focus and waiting for input
     };
 
-    enum class AABBType
-    {
-      FullScreen,
-      Window,
-      None
-    };
-
     class Widget
     {
     public:
@@ -60,7 +53,8 @@ namespace Engine
       virtual void SetParent(Widget *) = 0;
       virtual bool GetContentBorder(float & left, float & top, float & right, float & bottom);
 
-      AABBType GetGlobalAABB(UIAABB &) const;
+      // false implies none of the widget can be seen (probably completely clipped by another widget)
+      bool GetGlobalAABB(UIAABB &) const;
       vec2 GetGlobalPosition() const;
       virtual vec2 GetLocalPosition() const = 0;
       virtual vec2 GetSize() const = 0;

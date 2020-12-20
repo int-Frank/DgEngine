@@ -21,23 +21,23 @@ namespace Engine
       return pParent->GetGlobalPosition() + GetLocalPosition();
     }
 
-    AABBType Widget::GetGlobalAABB(UIAABB & a_out) const
+    bool Widget::GetGlobalAABB(UIAABB & a_out) const
     {
       Widget * pParent = GetParent();
       if (pParent == nullptr)
       {
         a_out.position = GetLocalPosition();
         a_out.size = GetSize();
-        return AABBType::FullScreen;
+        return true;
       }
 
       UIAABB aabb ={};
-      if (pParent->GetGlobalAABB(aabb) == AABBType::None)
-        return AABBType::None;
+      if (pParent->GetGlobalAABB(aabb) == false)
+        return false;
 
       if (!Intersection(aabb, {pParent->GetGlobalPosition() + GetLocalPosition(), GetSize()}, a_out))
-        return AABBType::None;
-      return AABBType::Window;
+        return false;
+      return true;
     }
 
     bool Widget::IsContainer() const

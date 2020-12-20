@@ -62,7 +62,7 @@ namespace Engine
     void Button::HandleMessage(Message_GUI_PointerDown * a_pMsg)
     {
       UIAABB aabb;
-      if (GetGlobalAABB(aabb) == AABBType::None)
+      if (!GetGlobalAABB(aabb))
         return;
 
       if (PointInBox(vec2((float)a_pMsg->x, (float)a_pMsg->y), aabb) && m_clbk_Select != nullptr)
@@ -75,7 +75,7 @@ namespace Engine
     void Button::HandleMessage(Message_GUI_PointerMove * a_pMsg)
     {
       UIAABB aabb;
-      if (GetGlobalAABB(aabb) == AABBType::None)
+      if (!GetGlobalAABB(aabb))
         return;
 
       bool isInside = PointInBox(vec2((float)a_pMsg->x, (float)a_pMsg->y), aabb);
@@ -105,22 +105,14 @@ namespace Engine
 
     void Button::Draw()
     {
-      UIAABB sissor;
-      AABBType t = GetGlobalAABB(sissor);
-      if (t == AABBType::None)
+      UIAABB viewableWindow;
+      if (!GetGlobalAABB(viewableWindow))
         return;
 
-      if (t == AABBType::Window)
-      {
-        ::Engine::Renderer::Enable(RenderFeature::Sissor);
-        ::Engine::Renderer::SetSissorBox((int)sissor.position.x(), (int)sissor.position.y(), (int)sissor.size.x(), (int)sissor.size.y());
-        Renderer::Instance()->DrawBox({GetGlobalPosition(), GetSize()}, m_state == WidgetState::None ? m_clrDefault : m_clrHover);
-        ::Engine::Renderer::Disable(RenderFeature::Sissor);
-      }
-      else
-      {
-        Renderer::Instance()->DrawBox(m_aabb, m_state == WidgetState::None ? m_clrDefault : m_clrHover);
-      }
+      ::Engine::Renderer::Enable(RenderFeature::Sissor);
+      ::Engine::Renderer::SetSissorBox((int)viewableWindow.position.x(), (int)viewableWindow.position.y(), (int)viewableWindow.size.x(), (int)viewableWindow.size.y());
+      Renderer::Instance()->DrawBox({GetGlobalPosition(), GetSize()}, m_state == WidgetState::None ? m_clrDefault : m_clrHover);
+      ::Engine::Renderer::Disable(RenderFeature::Sissor);
     }
 
     WidgetState Button::QueryState() const
