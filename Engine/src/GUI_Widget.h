@@ -47,7 +47,7 @@ namespace Engine
       // Container
       Resizable,
       Movable,
-      NoBackground,
+      NoBackground
     };
 
     class Widget

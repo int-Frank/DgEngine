@@ -76,8 +76,8 @@ namespace Engine
       Dg::ErrorCode Init();
 
       void SetScreenSize(vec2 const &);
-      void DrawText(std::string const &, UIAABB const &, TextOptions const &);
-      void DrawText(std::string const &, UIAABB const &, TextOptions const &, Ref<IFontAtlas>, FontID);
+      //void DrawText(std::string const &, UIAABB const &, TextOptions const &);
+      //void DrawText(std::string const &, UIAABB const &, TextOptions const &, Ref<IFontAtlas>, FontID);
       void DrawBox(UIAABB const &, Colour colour);
 
     private:
@@ -169,7 +169,7 @@ namespace Engine
       ::Engine::Renderer::DrawIndexed(6, false);
     }
 
-    void Renderer::PIMPL::DrawText(std::string const & a_str, UIAABB const & a_aabb, TextOptions const & a_options)
+    /*void Renderer::PIMPL::DrawText(std::string const & a_str, UIAABB const & a_aabb, TextOptions const & a_options)
     {
 
     }
@@ -177,7 +177,7 @@ namespace Engine
     void Renderer::PIMPL::DrawText(std::string const & a_str, UIAABB const & a_aabb, TextOptions const & a_options, Ref<IFontAtlas> a_fontAtlas, FontID a_id)
     {
 
-    }
+    }*/
 
     //------------------------------------------------------------------------
     // Renderer
@@ -218,7 +218,7 @@ namespace Engine
       m_pimpl->SetScreenSize(a_size);
     }
 
-    void Renderer::DrawText(std::string const & a_str, UIAABB const & a_aabb, TextOptions const & a_options)
+    /*void Renderer::DrawText(std::string const & a_str, UIAABB const & a_aabb, TextOptions const & a_options)
     {
       m_pimpl->DrawText(a_str, a_aabb, a_options);
     }
@@ -226,7 +226,7 @@ namespace Engine
     void Renderer::DrawText(std::string const & a_str, UIAABB const & a_aabb, TextOptions const & a_options, Ref<IFontAtlas> a_fontAtlas, FontID a_id)
     {
       m_pimpl->DrawText(a_str, a_aabb, a_options, a_fontAtlas, a_id);
-    }
+    }*/
 
     void Renderer::DrawBox(UIAABB const & a_aabb, Colour a_colour)
     {
