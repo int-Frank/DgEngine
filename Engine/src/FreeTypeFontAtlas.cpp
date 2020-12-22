@@ -287,7 +287,7 @@ epilogue:
           gData.bearingX = face->glyph->bitmap_left;
           gData.bearingY = face->glyph->bitmap_top;
 
-          m_charMap.insert(glyphID, gData);
+          m_charMap.insert(Dg::Pair<GlyphID, GlyphData>(glyphID, gData));
 
           hasFailed = false;
         } while (false);
@@ -353,7 +353,7 @@ epilogue:
           &pBuffer ]
       (Dg::BinPacker<uint32_t, GlyphID>::Item const & item)
       {
-        auto it = charMap.find(item.id);
+        Dg::Map_AVL<GlyphID, GlyphData>::iterator it = charMap.find(item.id);
         
         FontID fontID;
         uint32_t size;
@@ -439,7 +439,7 @@ epilogue:
 
   GlyphData * FreeTypeFontAtlas::GetGlyphData(FontID fID, CodePoint cp, uint32_t size)
   {
-    auto it = m_charMap.find(PackGlyphID(fID, cp, size));
+    Dg::Map_AVL<GlyphID, GlyphData>::iterator it = m_charMap.find(PackGlyphID(fID, cp, size));
     if (it != m_charMap.end())
       return &(it->second);
     return nullptr;
