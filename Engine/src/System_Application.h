@@ -17,7 +17,7 @@ namespace Engine
 
     ASSIGN_ID(static_cast<ID>(DefaultSystem::Application))
 
-      System_Application();
+    System_Application();
     ~System_Application();
 
     void OnAttach();

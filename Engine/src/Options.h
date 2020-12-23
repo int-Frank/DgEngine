@@ -13,6 +13,9 @@
 //----------------------------------------------------------------------------
 // Constants
 //----------------------------------------------------------------------------
+// TODO Load all these from a settings file.
+//      Also all GUI defaults.
+
 #define LOG_OUTPUT_FILE "log-output.txt"
 #define CRASH_REPORT_FILE "crash-report.txt"
 
@@ -20,6 +23,7 @@
 #define RENDER_COMMAND_BUFFER_SIZE (1 * 1024 * 1024)
 #define RENDER_COMMAND_BUFFER_MEM_POOL (64 * 1024 * 1024)
 #define FONTATLAS_DEFAULT_TEXTURE_DIMENSION 2048
+#define DEFAULT_FONT_SIZE 18
 
 //----------------------------------------------------------------------------
 // Logging

@@ -12,7 +12,6 @@
 #include <algorithm>
 
 #define DEFAULT_FONT_PATH "../Engine/assets/fonts/NotoSans-Regular.ttf"
-#define DEFAULT_FONT_SIZE 64
 
 namespace Engine
 {
@@ -26,20 +25,20 @@ namespace Engine
       uiM_COUNT
     };
 
-    static char const * g_box_vs = R"(
+    static char const * g_flatShader_vs = R"(
       #version 430
       layout(location = 0) in vec2 inPos;
       uniform vec2 windowSize;
-      uniform vec2 buttonPos;
-      uniform vec2 buttonSize;
+      uniform vec2 offset;
+      uniform vec2 scale;
       void main()
       {
-        vec2 xy = ((inPos * buttonSize + buttonPos)  / windowSize  - vec2(0.5, 0.5)) * 2.0;
+        vec2 xy = ((inPos * scale + offset)  / windowSize  - vec2(0.5, 0.5)) * 2.0;
         xy.y = -xy.y;
         gl_Position = vec4(xy, 0.0, 1.0);
       })";
 
-    static char const * g_box_fs = R"(
+    static char const * g_flatShader_fs = R"(
       #version 430
       uniform vec4 colour;
       out vec4 FragColour;
@@ -47,6 +46,31 @@ namespace Engine
       {
         FragColour = colour;
       })";
+
+    static char const * g_textShader_vs = R"(
+      #version 430
+      layout (location = 0) in vec2 inPos;
+      layout (location = 1) in vec2 inTexCoord;
+      uniform vec2 windowSize;
+      uniform vec2 offset;
+      uniform vec2 scale;
+      out vec2 texCoord;
+      void main()
+      {
+        vec2 xy = ((inPos * scale + offset)  / windowSize  - vec2(0.5, 0.5)) * 2.0;
+        xy.y = -xy.y;
+        gl_Position = vec4(xy, 0.0, 1.0);
+        texCoord = inTexCoord;
+      })";
+
+    static char const * g_textShader_fs = R"(
+     in vec2 texCoord;
+     out vec4 FragColor;
+     uniform sampler2D textureAtlas;
+     void main()
+     {
+       FragColor = vec4(texture(textureAtlas, texCoord);
+     })";
 
     static float const g_boxVerts[] =
     {
@@ -89,6 +113,7 @@ namespace Engine
       FontID m_defaultFont;
       Ref<IFontAtlas> m_fontAtlas;
       Renderable m_renBox;
+      Renderable m_renText;
     };
 
     //------------------------------------------------------------------------
@@ -140,8 +165,8 @@ namespace Engine
       m_renBox.va->SetIndexBuffer(m_renBox.ib);
 
       Engine::ShaderData * pSD = new ShaderData({
-          { Engine::ShaderDomain::Vertex, Engine::StrType::Source, g_box_vs },
-          { Engine::ShaderDomain::Fragment, Engine::StrType::Source, g_box_fs }
+          { Engine::ShaderDomain::Vertex, Engine::StrType::Source, g_flatShader_vs },
+          { Engine::ShaderDomain::Fragment, Engine::StrType::Source, g_flatShader_fs }
         });
 
       ResourceManager::Instance()->RegisterResource(ir_GUIShaderData, pSD);
@@ -160,8 +185,8 @@ namespace Engine
       float clr[4] ={a_colour.fr(), a_colour.fg(), a_colour.fb(), a_colour.fa()};
 
       m_renBox.material->SetUniform("colour", clr, sizeof(clr));
-      m_renBox.material->SetUniform("buttonPos", a_aabb.position.GetData(), sizeof(a_aabb.position));
-      m_renBox.material->SetUniform("buttonSize", a_aabb.size.GetData(), sizeof(a_aabb.size));
+      m_renBox.material->SetUniform("offset", a_aabb.position.GetData(), sizeof(a_aabb.position));
+      m_renBox.material->SetUniform("scale", a_aabb.size.GetData(), sizeof(a_aabb.size));
 
       m_renBox.material->Bind();
       m_renBox.va->Bind();

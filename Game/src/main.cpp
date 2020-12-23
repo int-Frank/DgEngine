@@ -15,6 +15,7 @@
 #include "InputCodes.h"
 
 #include "GUI_Button.h"
+#include "GUI_Text.h"
 #include "GUI_Container.h"
 #include "EngineMessages.h"
 #include "DgBinPacker.h"
@@ -167,12 +168,7 @@ public:
 
       Engine::GUI::Container * pWindow1b = Engine::GUI::Container::Create(nullptr, {400.f, 20.f}, {200.f, 100.f});
       pWindow1b->SetBackgroundColour(Engine::Colour(0, 255, 255, 255));
-      Engine::GUI::Button * pBtn1b = Engine::GUI::Button::Create(nullptr, "Hello", {10.f, 20.f}, {50.f, 20.f}, {Engine::GUI::WidgetFlag::StretchHeight, Engine::GUI::WidgetFlag::StretchWidth});
-      pBtn1b->SetBackgroundColour(Engine::Colour(64, 64, 128, 255));
-      pBtn1b->SetHoverOnBackgroundColour(Engine::Colour(128, 128, 255, 255));
-      pBtn1b->BindSelect([](){LOG_WARN("PRESSED 1b");});
-      pBtn1b->BindHoverOn([](){LOG_DEBUG("HOVER ON 1b");});
-      pBtn1b->BindHoverOff([](){LOG_DEBUG("HOVER OFF 1b");});
+      Engine::GUI::Text * pText1b = Engine::GUI::Text::Create(nullptr, "Hello", {10.f, 20.f}, {50.f, 20.f}, nullptr, {Engine::GUI::WidgetFlag::StretchHeight, Engine::GUI::WidgetFlag::StretchWidth});
 
       Engine::GUI::Container * pWindow1 = Engine::GUI::Container::Create(nullptr, {20.f, 20.f}, {800.f, 400.f});
       pWindow1->SetBackgroundColour(Engine::Colour(255, 255, 255, 255));
@@ -184,7 +180,7 @@ public:
       pBtn1->BindHoverOff([](){LOG_DEBUG("HOVER OFF 1");});
 
       pWindow1a->Add(pBtn1a);
-      pWindow1b->Add(pBtn1b);
+      pWindow1b->Add(pText1b);
       pWindow1->Add(pBtn1);
       pWindow1->Add(pWindow1a);
       pWindow1->Add(pWindow1b);

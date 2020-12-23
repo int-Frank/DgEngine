@@ -16,12 +16,12 @@
   Copyright 2017-2019 Frank Hart <frankhart010@gmail.com>
 */
 
-#include <glad/glad.h>
 #include "RT_VertexArray.h"
 #include "Buffer.h"
 #include "RT_Buffer.h"
 #include "RenderThreadData.h"
 #include "ShaderUtils.h"
+#include <glad/glad.h>
 
 namespace Engine
 {

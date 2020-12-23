@@ -1,4 +1,4 @@
-//@group UI
+//@group GUI
 
 #include "GUI_Widget.h"
 #include "Message.h"

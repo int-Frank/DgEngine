@@ -2,7 +2,6 @@
 
 
 #include "SDL.h"
-#include "glad/glad.h"
 
 #include "Framework.h"
 #include "Options.h"
@@ -10,6 +9,7 @@
 #include "IWindow.h"
 #include "BSR_Assert.h"
 #include "OpenGLContext.h"
+#include "glad/glad.h"
 
 #define OPENGL_MAJOR 4
 #define OPENGL_MINOR 6

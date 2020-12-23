@@ -1,9 +1,9 @@
 //@group Renderer/RenderThread
 
-#include <glad/glad.h>
 #include "RT_Texture.h"
 #include "RT_RendererAPI.h"
 #include "BSR_Assert.h"
+#include <glad/glad.h>
 
 namespace Engine
 {
@@ -59,22 +59,22 @@ namespace Engine
     {
       case TexturePixelType::R8:
       {
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RED, a_data.width, a_data.height, 0, GL_RED, GL_UNSIGNED_BYTE, a_data.pPixels);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_R8, a_data.width, a_data.height, 0, GL_RED, GL_UNSIGNED_BYTE, a_data.pPixels);
         break;
       }
       case TexturePixelType::RG8:
       {
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RG, a_data.width, a_data.height, 0, GL_RG, GL_UNSIGNED_BYTE, a_data.pPixels);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RG8, a_data.width, a_data.height, 0, GL_RG, GL_UNSIGNED_BYTE, a_data.pPixels);
         break;
       }
       case TexturePixelType::RGB8:
       {
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, a_data.width, a_data.height, 0, GL_RGB, GL_UNSIGNED_BYTE, a_data.pPixels);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB8, a_data.width, a_data.height, 0, GL_RGB, GL_UNSIGNED_BYTE, a_data.pPixels);
         break;
       }
       case TexturePixelType::RGBA8:
       {
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, a_data.width, a_data.height, 0, GL_RGBA, GL_UNSIGNED_BYTE, a_data.pPixels);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, a_data.width, a_data.height, 0, GL_RGBA, GL_UNSIGNED_BYTE, a_data.pPixels);
         break;
       }
       default:

@@ -100,6 +100,7 @@ project "Engine"
   systemversion "latest"
   language "C++"
   cppdialect "C++17"
+  flags {"FatalWarnings"}
   
   files 
   {
@@ -109,11 +110,6 @@ project "Engine"
 
   links
   {
-    "DgLib",
-    "Glad",
-    "Vendor/SDL2/lib/x64/SDL2.lib",
-    "Vendor/SDL2/lib/x64/SDL2main.lib",
-    "Vendor/freetype2/lib/x64/freetype.lib"
   }
 
   includedirs
@@ -167,7 +163,11 @@ project "Engine"
     links
     {
       "Engine",
-      "DgLib"
+      "DgLib",
+      "Vendor/freetype2/lib/x64/freetype.lib",
+      "Glad",
+      "Vendor/SDL2/lib/x64/SDL2.lib",
+      "Vendor/SDL2/lib/x64/SDL2main.lib"
     }
     
     postbuildcommands {

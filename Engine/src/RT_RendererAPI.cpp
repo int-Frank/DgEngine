@@ -16,11 +16,11 @@
   Copyright 2017-2019 Frank Hart <frankhart010@gmail.com>
 */
 
-#include <glad/glad.h>
 #include "RT_RendererAPI.h"
 #include "Log.h"
 #include "BSR_Assert.h"
 #include "Framework.h"
+#include <glad/glad.h>
 
 namespace Engine
 {
