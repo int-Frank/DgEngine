@@ -19,11 +19,15 @@
 #define LOG_OUTPUT_FILE "log-output.txt"
 #define CRASH_REPORT_FILE "crash-report.txt"
 
+// Renderer...
 #define TEMP_BUFFER_SIZE (16 * 1024 * 1024)
 #define RENDER_COMMAND_BUFFER_SIZE (1 * 1024 * 1024)
 #define RENDER_COMMAND_BUFFER_MEM_POOL (64 * 1024 * 1024)
-#define FONTATLAS_DEFAULT_TEXTURE_DIMENSION 2048
-#define DEFAULT_FONT_SIZE 18
+
+// Fonts and text...
+#define FONTATLAS_DEFAULT_TEXTURE_DIMENSION 1024
+#define DEFAULT_FONT_SIZE 24
+#define MAX_TEXT_CHARACTERS 65536
 
 //----------------------------------------------------------------------------
 // Logging

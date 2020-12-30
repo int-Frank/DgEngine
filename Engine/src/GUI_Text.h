@@ -13,26 +13,18 @@ namespace Engine
     enum class TextAlignment
     {
       Min,    // left/top
-      Max,    // right/bottom
       Center,
-    };
-
-    enum class TextWrapType
-    {
-      None,
-      Letter,
-      Word,
-      Ellipse
+      Max     // right/bottom
     };
 
     struct TextAttributes
     {
       uint32_t size;
       Colour colourText;
-      Colour colourBackground;
       TextAlignment horizontalAlign;
       TextAlignment verticalAlign;
-      TextWrapType wrapType;
+      float lineSpacing;
+      bool wrapText;
     };
 
     class Text : public Widget
@@ -44,11 +36,11 @@ namespace Engine
 
       ~Text();
 
-      void SetBorder(float);
       void SetText(std::string const &);
 
       void HandleMessage(Message *) override;
 
+      //void SetFont(FontID fontID, uint32_t size);
       void Draw() override;
       WidgetState QueryState() const override;
       Widget * GetParent() const override;
@@ -68,7 +60,6 @@ namespace Engine
 
       Widget * m_pParent;
       std::string m_text;
-      float m_border;
       TextAttributes m_attributes;
       UIAABB m_aabb;
     };

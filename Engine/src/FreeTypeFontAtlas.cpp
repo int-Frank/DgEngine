@@ -21,7 +21,24 @@ namespace Engine
   typedef uint64_t GlyphID;
   typedef Dg::BinPacker<uint32_t, GlyphID> BinPacker;
 
-  static std::vector<std::string> s_FontPaths;
+  class FontData
+  {
+  public:
+
+    FontData(std::string const & a_path)
+      : path(a_path)
+      , greatestAscent(0)
+      , greatestDescent(0)
+    {
+    
+    }
+
+    std::string path;
+    int16_t greatestAscent;
+    int16_t greatestDescent;
+  };
+
+  static std::vector<FontData> s_Fonts;
 
   static GlyphID PackGlyphID(FontID fID, CodePoint cp, uint32_t size)
   {
@@ -64,6 +81,7 @@ namespace Engine
     Dg::ErrorCode Init();
 
     void SetTextureDimension(uint32_t) override;
+    Dg::ErrorCode GetTexture(uint16_t, Ref<Texture2D> & out) override;
 
     void BeginLoad() override;
     Dg::ErrorCode RegisterGlyph(FontID, uint32_t size, CodePoint c) override;
@@ -134,6 +152,20 @@ namespace Engine
     m_textureDimension = a_uv;
   }
 
+  Dg::ErrorCode IFontAtlas::GetCharacterSizeRange(FontID a_id, int16_t & a_ascent, int16_t & a_descent)
+  {
+    Dg::ErrorCode result;
+
+    DG_ERROR_IF((size_t)a_id >= s_Fonts.size(), Dg::ErrorCode::OutOfBounds);
+
+    a_ascent = s_Fonts[a_id].greatestAscent;
+    a_descent = s_Fonts[a_id].greatestDescent;
+
+    result = Dg::ErrorCode::None;
+  epilogue:
+    return result;
+  }
+
   Dg::ErrorCode IFontAtlas::RegisterFont(std::string const & fontPath, FontID & out)
   {
     Dg::ErrorCode result;
@@ -143,9 +175,9 @@ namespace Engine
 
     std::string path = Framework::Instance()->GetFileSystem()->GetAbsolutePath(fontPath);
 
-    for (size_t i = 0; i < s_FontPaths.size(); i++)
+    for (size_t i = 0; i < s_Fonts.size(); i++)
     {
-      if (path == s_FontPaths[i])
+      if (path == s_Fonts[i].path)
       {
         out = FontID(i);
         DG_ERROR_SET_AND_BREAK(Dg::ErrorCode::None);
@@ -158,8 +190,8 @@ namespace Engine
     DG_ERROR_IF(err != 0, Dg::ErrorCode::FailedToOpenFile);
     DG_ERROR_IF(err == FT_Err_Unknown_File_Format, Dg::ErrorCode::IncorrectFileType);
 
-    out = FontID(s_FontPaths.size());
-    s_FontPaths.push_back(path);
+    out = FontID(s_Fonts.size());
+    s_Fonts.push_back(FontData(path));
 
     result = Dg::ErrorCode::None;
 epilogue:
@@ -178,7 +210,7 @@ epilogue:
     m_pTempData = new TempData();
     m_textures.clear();
 
-    for (uint32_t i = 0; i < (uint32_t)s_FontPaths.size(); i++)
+    for (uint32_t i = 0; i < (uint32_t)s_Fonts.size(); i++)
     {
       LoadFont lf;
       m_pTempData->loadFonts.push_back(lf);
@@ -191,7 +223,7 @@ epilogue:
     LoadGlyph lg = {};
 
     DG_ERROR_NULL(m_pTempData, Dg::ErrorCode::NullObject);
-    DG_ERROR_IF((size_t)fID >= s_FontPaths.size(), Dg::ErrorCode::OutOfBounds);
+    DG_ERROR_IF((size_t)fID >= s_Fonts.size(), Dg::ErrorCode::OutOfBounds);
 
     lg.cp = cp;
     lg.size = size;
@@ -212,9 +244,9 @@ epilogue:
     FT_Error err;
 
     DG_ERROR_NULL(m_pTempData, Dg::ErrorCode::NullObject);
-    DG_ERROR_IF((size_t)fID >= s_FontPaths.size(), Dg::ErrorCode::OutOfBounds);
+    DG_ERROR_IF((size_t)fID >= s_Fonts.size(), Dg::ErrorCode::OutOfBounds);
 
-    err = FT_New_Face(m_pContext, s_FontPaths[fID].c_str(), 0, &face);
+    err = FT_New_Face(m_pContext, s_Fonts[fID].path.c_str(), 0, &face);
     DG_ERROR_IF(err == FT_Err_Unknown_File_Format, Dg::ErrorCode::IncorrectFileType);
     DG_ERROR_IF(err != 0, Dg::ErrorCode::FailedToOpenFile);
 
@@ -250,7 +282,7 @@ epilogue:
     for (size_t i = 0; i < m_pTempData->loadFonts.size(); i++)
     {
       FT_Face face = nullptr;
-      err = FT_New_Face(m_pContext, s_FontPaths[i].c_str(), 0, &face);
+      err = FT_New_Face(m_pContext, s_Fonts[i].path.c_str(), 0, &face);
       DG_ERROR_IF(err == FT_Err_Unknown_File_Format, Dg::ErrorCode::IncorrectFileType);
       DG_ERROR_IF(err != 0, Dg::ErrorCode::FailedToOpenFile);
 
@@ -271,7 +303,7 @@ epilogue:
           GlyphID glyphID = PackGlyphID(FontID(i), it->cp, it->size);
 
           GlyphData gData ={};
-          gData.textureID = GLYPH_NOT_RENDERABLE;
+          gData.textureID = INVALID_FONT_TEXTURE;
           gData.advance = (int16_t)(face->glyph->advance.x >> 6);
           gData.width = face->glyph->bitmap.width;
           gData.height = face->glyph->bitmap.rows;
@@ -279,6 +311,14 @@ epilogue:
           gData.bearingY = face->glyph->bitmap_top;
 
           m_charMap.insert(Dg::Pair<GlyphID, GlyphData>(glyphID, gData));
+
+          int16_t ascent = gData.bearingY;
+          int16_t descent = gData.bearingY - gData.height;
+
+          if (ascent > s_Fonts[i].greatestAscent)
+            s_Fonts[i].greatestAscent = ascent;
+          if (descent < s_Fonts[i].greatestDescent)
+            s_Fonts[i].greatestDescent = descent;
 
           hasFailed = false;
         } while (false);
@@ -310,10 +350,10 @@ epilogue:
 
     DG_ERROR_NULL(m_pTempData, Dg::ErrorCode::NullObject);
 
-    for (size_t i = 0; i < s_FontPaths.size(); i++)
+    for (size_t i = 0; i < s_Fonts.size(); i++)
     {
       FT_Face face = nullptr;
-      err = FT_New_Face(m_pContext, s_FontPaths[i].c_str(), 0, &face);
+      err = FT_New_Face(m_pContext, s_Fonts[i].path.c_str(), 0, &face);
       DG_ERROR_IF(err == FT_Err_Unknown_File_Format, Dg::ErrorCode::IncorrectFileType);
       DG_ERROR_IF(err != 0, Dg::ErrorCode::FailedToOpenFile);
       FT_Select_Charmap(face, FT_ENCODING_UNICODE);
@@ -436,5 +476,13 @@ epilogue:
     if (it != m_charMap.end())
       return &(it->second);
     return nullptr;
+  }
+
+  Dg::ErrorCode FreeTypeFontAtlas::GetTexture(uint16_t a_index, Ref<Texture2D> & a_out)
+  {
+    if (a_index >= m_textures.size())
+      return Dg::ErrorCode::OutOfBounds;
+    a_out = m_textures[a_index];
+    return Dg::ErrorCode::None;
   }
 }

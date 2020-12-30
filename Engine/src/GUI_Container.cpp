@@ -195,7 +195,7 @@ namespace Engine
 
         ::Engine::Renderer::Enable(RenderFeature::Sissor);
         ::Engine::Renderer::SetSissorBox((int)viewableWindow.position.x(), (int)viewableWindow.position.y(), (int)viewableWindow.size.x(), (int)viewableWindow.size.y());
-        Renderer::Instance()->DrawBox({m_pData->pContainer->GetGlobalPosition(), m_pData->pContainer->GetSize()}, m_pData->clrBackground);
+        Renderer::DrawBox({m_pData->pContainer->GetGlobalPosition(), m_pData->pContainer->GetSize()}, m_pData->clrBackground);
         ::Engine::Renderer::Disable(RenderFeature::Sissor);
       }
 

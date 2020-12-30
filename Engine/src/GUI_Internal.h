@@ -10,36 +10,21 @@ namespace Engine
 {
   namespace GUI
   {
-    // TODO More distinct name for this?
-    class Renderer
+    namespace Renderer
     {
-      static Renderer * s_pInstance;
+      Dg::ErrorCode Init();
+      void Destroy();
 
-      Renderer();
-      ~Renderer();
+      void GetCharacterSizeRange(int16_t & ascent, int16_t & descent);
 
-    public:
-
-      static Dg::ErrorCode Init();
-      static void Destroy();
-      static Renderer * Instance();
-
+      // Get the glyph data for the default font and size
+      GlyphData * GetGlyphData(CodePoint);
       void SetScreenSize(vec2 const &);
-      //void DrawText(std::string const &, UIAABB const &, TextOptions const &);
-      //void DrawText(std::string const &, UIAABB const &, TextOptions const &, Ref<IFontAtlas>, FontID);
       void DrawBox(UIAABB const &, Colour colour);
-      //void DrawRoundedBox(UIAABB const &, Colour colour, float radius);
+      void DrawText(uint16_t textureID, Colour colour, uint32_t count, void * pData);
+    }
 
-    private:
-
-      class PIMPL;
-      PIMPL * m_pimpl;
-    };
-
-    bool Intersection(UIAABB const & A,
-                      UIAABB const & B,
-                      UIAABB & out);
-
+    bool Intersection(UIAABB const & A, UIAABB const & B,  UIAABB & out);
     bool PointInBox(vec2 const & point, UIAABB const & box);
   }
 }

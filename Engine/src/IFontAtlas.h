@@ -9,15 +9,14 @@
 #include "unicode.h"
 #include "Texture.h"
 #include "Memory.h"
-
+#include "Texture.h"
 
 extern uint8_t * g_pPixels_DEBUG;
-
 
 namespace Engine
 {
   typedef uint32_t FontID;
-  uint16_t const GLYPH_NOT_RENDERABLE = 0xFFFF;
+  uint16_t const INVALID_FONT_TEXTURE = 0xFFFF;
 
   struct GlyphData
   {
@@ -37,7 +36,10 @@ namespace Engine
 
     virtual ~IFontAtlas(){}
 
-    static  Dg::ErrorCode RegisterFont(std::string const & fontPath, FontID & out);
+    static Dg::ErrorCode RegisterFont(std::string const & fontPath, FontID & out);
+    static Dg::ErrorCode GetCharacterSizeRange(FontID, int16_t & ascent, int16_t & descent);
+
+    virtual Dg::ErrorCode GetTexture(uint16_t, Ref<Texture2D> & out) = 0;
     virtual void SetTextureDimension(uint32_t) = 0;
 
     virtual void BeginLoad() = 0;

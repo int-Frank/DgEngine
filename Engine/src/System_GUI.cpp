@@ -35,7 +35,7 @@ namespace Engine
   void System_GUI::HandleMessage(Message_Window_Resized * a_pMsg)
   {
     vec2 size((float)a_pMsg->w, (float)a_pMsg->h);
-    GUI::Renderer::Instance()->SetScreenSize(size);
+    GUI::Renderer::SetScreenSize(size);
     m_pScreen->SetSize(size);
   }
 

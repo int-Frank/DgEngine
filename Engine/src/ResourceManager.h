@@ -16,7 +16,8 @@ namespace Engine
 
   enum InternalResourceID : ResourceID
   {
-    ir_GUIShaderData = (0x80000000 + 1)
+    ir_GUIBoxShader = 0x80000000,
+    ir_GUITextShader
   };
 
   class ResourceWrapperBase

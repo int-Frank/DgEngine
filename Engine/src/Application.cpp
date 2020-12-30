@@ -101,8 +101,10 @@ namespace Engine
     int windowWidth, windowHeight;
     m_pimpl->pWindow->GetDimensions(windowWidth, windowHeight);
 
-    GUI::Renderer::Init();
-    GUI::Renderer::Instance()->SetScreenSize(vec2((float)windowWidth, (float)windowHeight));
+    if (GUI::Renderer::Init() != Dg::ErrorCode::None)
+      throw std::runtime_error("Failed to initialise GUI Renderer!");
+
+    GUI::Renderer::SetScreenSize(vec2((float)windowWidth, (float)windowHeight));
 
     m_pimpl->systemStack.PushSystem(new System_Application(), System_Application::GetStaticID());
     m_pimpl->systemStack.PushSystem(new System_Input(), System_Input::GetStaticID());
@@ -115,6 +117,7 @@ namespace Engine
 
   Application::~Application()
   {
+    GUI::Renderer::Destroy();
     RenderThread::ShutDown();
     Renderer::ShutDown();
 

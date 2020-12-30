@@ -41,7 +41,7 @@ namespace Engine
 
   struct BufferElement
   {
-    //TODO Do we even need name? Perhaps just to see in the code what it is?
+    //TODO Remove name. It has no context here.
     std::string name;
     ShaderDataType type;
     uint32_t size;

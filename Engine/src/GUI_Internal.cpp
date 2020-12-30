@@ -17,15 +17,18 @@ namespace Engine
 {
   namespace GUI
   {
-    enum Mesh
+    namespace Renderer
     {
-      uiM_Box,
-      uiM_RoundedBox,
 
-      uiM_COUNT
-    };
+      enum Mesh
+      {
+        uiM_Box,
+        uiM_RoundedBox,
 
-    static char const * g_flatShader_vs = R"(
+        uiM_COUNT
+      };
+
+      static char const * g_flatShader_vs = R"(
       #version 430
       layout(location = 0) in vec2 inPos;
       uniform vec2 windowSize;
@@ -38,7 +41,7 @@ namespace Engine
         gl_Position = vec4(xy, 0.0, 1.0);
       })";
 
-    static char const * g_flatShader_fs = R"(
+      static char const * g_flatShader_fs = R"(
       #version 430
       uniform vec4 colour;
       out vec4 FragColour;
@@ -47,215 +50,182 @@ namespace Engine
         FragColour = colour;
       })";
 
-    static char const * g_textShader_vs = R"(
+      static char const * g_textShader_vs = R"(
       #version 430
       layout (location = 0) in vec2 inPos;
-      layout (location = 1) in vec2 inTexCoord;
+      layout (location = 1) in vec2 inPosOffset_instance;
+      layout (location = 1) in vec2 inTexOffset_instance;
+      layout (location = 2) in vec2 inDim_instance;
       uniform vec2 windowSize;
-      uniform vec2 offset;
-      uniform vec2 scale;
       out vec2 texCoord;
       void main()
       {
-        vec2 xy = ((inPos * scale + offset)  / windowSize  - vec2(0.5, 0.5)) * 2.0;
-        xy.y = -xy.y;
-        gl_Position = vec4(xy, 0.0, 1.0);
-        texCoord = inTexCoord;
+        vec2 posXY = inPos * pixelSizes[gl_InstanceID] + posOffsets[gl_InstanceID];
+        posXY = (posXY  / windowSize  - vec2(0.5, 0.5)) * 2.0;
+        posXY.y = -posXY.y;
+        texCoord = inPos * texOffsets[gl_InstanceID] + texOffsets[gl_InstanceID];
+        gl_Position = vec4(posXY, 0.0, 1.0);
       })";
 
-    static char const * g_textShader_fs = R"(
-     in vec2 texCoord;
-     out vec4 FragColor;
-     uniform sampler2D textureAtlas;
-     void main()
-     {
-       FragColor = vec4(texture(textureAtlas, texCoord);
-     })";
+      static char const * g_textShader_fs = R"(
+      #version 430
+      in vec2 texCoord;
+      out vec4 FragColor;
+      uniform sampler2D textureAtlas;
+      uniform vec4 textColour;
+      void main()
+      {
+        ivec2 texDim = textureSize(textureAtlas, sampler, 0);
+        vec2 texCoordn = texCoord / vec2(float(texDim.x), float(texDim.y));
+        FragColor = vec4(textColour.x, textColour.y, textColour.z, textColour.w * texture(textureAtlas, texCoordn).x);
+      })";
 
-    static float const g_boxVerts[] =
-    {
-      0.0f, 0.0f,
-      0.0f, 1.0f,
-      1.0f, 1.0f,
-      1.0f, 0.0f,
-    };
+      static float const g_boxVerts[] =
+      {
+        0.0f, 0.0f,
+        0.0f, 1.0f,
+        1.0f, 1.0f,
+        1.0f, 0.0f,
+      };
 
-    static int const g_boxIndices[] ={1, 2, 3, 3, 0, 1};
+      static int const g_boxIndices[] ={0, 1, 2, 0, 2, 3};
 
-    struct Renderable
-    {
-      Ref<Material>     material;
-      Ref<VertexBuffer> vb;
-      Ref<IndexBuffer>  ib;
-      Ref<VertexArray>  va;
-    };
+      struct RenderContext
+      {
+        Ref<IFontAtlas> fontAtlas;
+        FontID defaultFont;
 
-    class Renderer::PIMPL
-    {
-    public:
+        Ref<VertexBuffer> vb_box;
+        Ref<IndexBuffer>  ib_box;
+        Ref<VertexArray>  va_box;
 
-      PIMPL();
-      ~PIMPL();
+        Ref<Material>     materialColourBox;
+        //Ref<Material>     materialText;
+      };
 
-      Dg::ErrorCode Init();
+      static RenderContext *s_pRenderContext = nullptr;
 
-      void SetScreenSize(vec2 const &);
-      //void DrawText(std::string const &, UIAABB const &, TextOptions const &);
-      //void DrawText(std::string const &, UIAABB const &, TextOptions const &, Ref<IFontAtlas>, FontID);
-      void DrawBox(UIAABB const &, Colour colour);
+      static void InitBoxVA()
+      {
+        s_pRenderContext->vb_box = VertexBuffer::Create(g_boxVerts, SIZEOF32(g_boxVerts));
+        s_pRenderContext->vb_box->SetLayout(
+          {
+            { Engine::ShaderDataType::VEC2, "inPos" }
+          });
 
-    private:
+        s_pRenderContext->ib_box = Engine::IndexBuffer::Create(g_boxIndices, SIZEOF32(g_boxIndices));
+        s_pRenderContext->va_box = Engine::VertexArray::Create();
 
-      void InitBox();
+        s_pRenderContext->va_box->AddVertexBuffer(s_pRenderContext->vb_box);
+        s_pRenderContext->va_box->SetIndexBuffer(s_pRenderContext->ib_box);
+      }
 
-    private:
+      static void InitBox()
+      {
+        Engine::ShaderData * pSD = new ShaderData({
+            { Engine::ShaderDomain::Vertex, Engine::StrType::Source, g_flatShader_vs },
+            { Engine::ShaderDomain::Fragment, Engine::StrType::Source, g_flatShader_fs }
+          });
 
-      FontID m_defaultFont;
-      Ref<IFontAtlas> m_fontAtlas;
-      Renderable m_renBox;
-      Renderable m_renText;
-    };
+        ResourceManager::Instance()->RegisterResource(ir_GUIBoxShader, pSD);
+        Ref<Engine::RendererProgram> refProg;
+        refProg = Engine::RendererProgram::Create(ir_GUIBoxShader);
+        s_pRenderContext->materialColourBox = Material::Create(refProg);
+      }
 
-    //------------------------------------------------------------------------
-    // PIMPL
-    //------------------------------------------------------------------------
+      //static void InitText()
+      //{
+      //  Engine::ShaderData * pSD = new ShaderData({
+      //      { Engine::ShaderDomain::Vertex, Engine::StrType::Source, g_textShader_vs },
+      //      { Engine::ShaderDomain::Fragment, Engine::StrType::Source, g_textShader_fs }
+      //    });
+      //
+      //  ResourceManager::Instance()->RegisterResource(ir_GUITextShader, pSD);
+      //  Ref<Engine::RendererProgram> refProg;
+      //  refProg = Engine::RendererProgram::Create(ir_GUITextShader);
+      //  s_pRenderContext->materialText = Material::Create(refProg);
+      //}
 
-    Renderer * Renderer::s_pInstance = nullptr;
+      Dg::ErrorCode Init()
+      {
+        Dg::ErrorCode result;
 
-    Renderer::PIMPL::PIMPL()
-      : m_defaultFont(0)
-    {
+        DG_ERROR_IF(s_pRenderContext != nullptr, Dg::ErrorCode::Disallowed);
+        s_pRenderContext = new RenderContext();
 
-    }
+        s_pRenderContext->defaultFont = 0;
+        s_pRenderContext->fontAtlas = Framework::Instance()->CreateFontAtlas();
 
-    Renderer::PIMPL::~PIMPL()
-    {
+        DG_ERROR_CHECK(s_pRenderContext->fontAtlas->RegisterFont(DEFAULT_FONT_PATH, s_pRenderContext->defaultFont));
+        s_pRenderContext->fontAtlas->SetTextureDimension(FONTATLAS_DEFAULT_TEXTURE_DIMENSION);
+        s_pRenderContext->fontAtlas->BeginLoad();
+        DG_ERROR_CHECK(s_pRenderContext->fontAtlas->RegisterAllGlyphs(s_pRenderContext->defaultFont, DEFAULT_FONT_SIZE));
+        DG_ERROR_CHECK(s_pRenderContext->fontAtlas->CommitLoad());
 
-    }
+        InitBoxVA();
+        InitBox();
+        //InitText();
 
-    Dg::ErrorCode Renderer::PIMPL::Init()
-    {
-      Dg::ErrorCode result;
+        result = Dg::ErrorCode::None;
+      epilogue:
+        return result;
+      }
 
-      InitBox();
-      m_fontAtlas = Framework::Instance()->CreateFontAtlas();
+      void Destroy()
+      {
+        delete s_pRenderContext;
+        s_pRenderContext = nullptr;
+      }
 
-      DG_ERROR_CHECK(m_fontAtlas->RegisterFont(DEFAULT_FONT_PATH, m_defaultFont));
-      m_fontAtlas->BeginLoad();
-      DG_ERROR_CHECK(m_fontAtlas->RegisterAllGlyphs(m_defaultFont, DEFAULT_FONT_SIZE));
-      DG_ERROR_CHECK(m_fontAtlas->CommitLoad());
+      void SetScreenSize(vec2 const & a_size)
+      {
+        s_pRenderContext->materialColourBox->SetUniform("windowSize", a_size.GetData(), sizeof(a_size));
+        //s_pRenderContext->materialText->SetUniform("windowSize", a_size.GetData(), sizeof(a_size));
+      }
 
-      result = Dg::ErrorCode::None;
-    epilogue:
-      return result;
-    }
+      void DrawBox(UIAABB const & a_aabb, Colour a_colour)
+      {
+        float clr[4] ={a_colour.fr(), a_colour.fg(), a_colour.fb(), a_colour.fa()};
 
-    void Renderer::PIMPL::InitBox()
-    {
-      m_renBox.vb = VertexBuffer::Create(g_boxVerts, SIZEOF32(g_boxVerts));
-      m_renBox.vb->SetLayout(
-        {
-          { Engine::ShaderDataType::VEC2, "inPos" }
-        });
+        s_pRenderContext->materialColourBox->SetUniform("colour", clr, sizeof(clr));
+        s_pRenderContext->materialColourBox->SetUniform("offset", a_aabb.position.GetData(), sizeof(a_aabb.position));
+        s_pRenderContext->materialColourBox->SetUniform("scale", a_aabb.size.GetData(), sizeof(a_aabb.size));
 
-      m_renBox.ib = Engine::IndexBuffer::Create(g_boxIndices, SIZEOF32(g_boxIndices));
-      m_renBox.va = Engine::VertexArray::Create();
+        s_pRenderContext->materialColourBox->Bind();
+        s_pRenderContext->va_box->Bind();
 
-      m_renBox.va->AddVertexBuffer(m_renBox.vb);
-      m_renBox.va->SetIndexBuffer(m_renBox.ib);
+        ::Engine::Renderer::DrawIndexed(6, false);
+      }
 
-      Engine::ShaderData * pSD = new ShaderData({
-          { Engine::ShaderDomain::Vertex, Engine::StrType::Source, g_flatShader_vs },
-          { Engine::ShaderDomain::Fragment, Engine::StrType::Source, g_flatShader_fs }
-        });
+      void DrawText(uint16_t a_textureID, Colour a_colour, uint32_t a_count, void * a_pVerts)
+      {
+        /*float clr[4] ={a_colour.fr(), a_colour.fg(), a_colour.fb(), a_colour.fa()};
 
-      ResourceManager::Instance()->RegisterResource(ir_GUIShaderData, pSD);
-      Ref<Engine::RendererProgram> refProg;
-      refProg = Engine::RendererProgram::Create(ir_GUIShaderData);
-      m_renBox.material = Material::Create(refProg);
-    }
+        Ref<Texture2D> texture;
+        if (s_pRenderContext->fontAtlas->GetTexture(a_textureID, texture) != Dg::ErrorCode::None)
+          return;
 
-    void Renderer::PIMPL::SetScreenSize(vec2 const & a_size)
-    {
-      m_renBox.material->SetUniform("windowSize", a_size.GetData(), sizeof(a_size));
-    }
+        s_pRenderContext->renText.material->SetUniform("textColour ", clr, sizeof(clr));
+        s_pRenderContext->renText.material->SetTexture("textureAtlas", texture);
 
-    void Renderer::PIMPL::DrawBox(UIAABB const & a_aabb, Colour a_colour)
-    {
-      float clr[4] ={a_colour.fr(), a_colour.fg(), a_colour.fb(), a_colour.fa()};
+        s_pRenderContext->renText.material->Bind();
+        s_pRenderContext->renText.va->Bind();
 
-      m_renBox.material->SetUniform("colour", clr, sizeof(clr));
-      m_renBox.material->SetUniform("offset", a_aabb.position.GetData(), sizeof(a_aabb.position));
-      m_renBox.material->SetUniform("scale", a_aabb.size.GetData(), sizeof(a_aabb.size));
+        ::Engine::Renderer::DrawIndexed(a_count * 6, false);*/
+      }
 
-      m_renBox.material->Bind();
-      m_renBox.va->Bind();
+      GlyphData * GetGlyphData(CodePoint a_cp)
+      {
+        return s_pRenderContext->fontAtlas->GetGlyphData(s_pRenderContext->defaultFont, a_cp, DEFAULT_FONT_SIZE);
+      }
 
-      ::Engine::Renderer::DrawIndexed(6, false);
-    }
-
-    /*void Renderer::PIMPL::DrawText(std::string const & a_str, UIAABB const & a_aabb, TextOptions const & a_options)
-    {
-
-    }
-
-    void Renderer::PIMPL::DrawText(std::string const & a_str, UIAABB const & a_aabb, TextOptions const & a_options, Ref<IFontAtlas> a_fontAtlas, FontID a_id)
-    {
-
-    }*/
-
-    //------------------------------------------------------------------------
-    // Renderer
-    //------------------------------------------------------------------------
-
-    Dg::ErrorCode Renderer::Init()
-    {
-      BSR_ASSERT(s_pInstance == nullptr, "Renderer already initialised!");
-      s_pInstance = new Renderer();
-      return s_pInstance->m_pimpl->Init();
-    }
-
-    void Renderer::Destroy()
-    {
-      delete s_pInstance;
-      s_pInstance = nullptr;
-    }
-
-    Renderer * Renderer::Instance()
-    {
-      BSR_ASSERT(s_pInstance != nullptr);
-      return s_pInstance;
-    }
-
-    Renderer::Renderer()
-      : m_pimpl(new PIMPL())
-    {
-
-    }
-
-    Renderer::~Renderer()
-    {
-      delete m_pimpl;
-    }
-
-    void Renderer::SetScreenSize(vec2 const & a_size)
-    {
-      m_pimpl->SetScreenSize(a_size);
-    }
-
-    /*void Renderer::DrawText(std::string const & a_str, UIAABB const & a_aabb, TextOptions const & a_options)
-    {
-      m_pimpl->DrawText(a_str, a_aabb, a_options);
-    }
-
-    void Renderer::DrawText(std::string const & a_str, UIAABB const & a_aabb, TextOptions const & a_options, Ref<IFontAtlas> a_fontAtlas, FontID a_id)
-    {
-      m_pimpl->DrawText(a_str, a_aabb, a_options, a_fontAtlas, a_id);
-    }*/
-
-    void Renderer::DrawBox(UIAABB const & a_aabb, Colour a_colour)
-    {
-      m_pimpl->DrawBox(a_aabb, a_colour);
+      void GetCharacterSizeRange(int16_t & a_ascent, int16_t & a_descent)
+      {
+        a_ascent = 0;
+        a_descent = 0;
+        Dg::ErrorCode result = s_pRenderContext->fontAtlas->GetCharacterSizeRange(s_pRenderContext->defaultFont, a_ascent, a_descent);
+        BSR_ASSERT(result == Dg::ErrorCode::None, "Default font malformed!");
+      }
     }
 
     //------------------------------------------------------------------------

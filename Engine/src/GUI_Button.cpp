@@ -112,7 +112,7 @@ namespace Engine
 
       ::Engine::Renderer::Enable(RenderFeature::Sissor);
       ::Engine::Renderer::SetSissorBox((int)viewableWindow.position.x(), (int)viewableWindow.position.y(), (int)viewableWindow.size.x(), (int)viewableWindow.size.y());
-      Renderer::Instance()->DrawBox({GetGlobalPosition(), GetSize()}, m_state == WidgetState::None ? m_clrDefault : m_clrHover);
+      Renderer::DrawBox({GetGlobalPosition(), GetSize()}, m_state == WidgetState::None ? m_clrDefault : m_clrHover);
       ::Engine::Renderer::Disable(RenderFeature::Sissor);
     }
 

@@ -64,7 +64,7 @@ public:
     m_vb = Engine::VertexBuffer::Create(verts, SIZEOF32(verts));
     m_vb->SetLayout(
       {
-        { Engine::ShaderDataType::VEC2, "inPos" }, //TODO make use of these strings. Maybe verify with rendererProgram?
+        { Engine::ShaderDataType::VEC2, "inPos" }, //TODO remove these strings.
         { Engine::ShaderDataType::VEC2, "inTexCoord" },
       });
 
@@ -168,8 +168,7 @@ public:
 
       Engine::GUI::Container * pWindow1b = Engine::GUI::Container::Create(nullptr, {400.f, 20.f}, {200.f, 100.f});
       pWindow1b->SetBackgroundColour(Engine::Colour(0, 255, 255, 255));
-      Engine::GUI::Text * pText1b = Engine::GUI::Text::Create(nullptr, "Hello", {10.f, 20.f}, {50.f, 20.f}, nullptr, {Engine::GUI::WidgetFlag::StretchHeight, Engine::GUI::WidgetFlag::StretchWidth});
-
+      
       Engine::GUI::Container * pWindow1 = Engine::GUI::Container::Create(nullptr, {20.f, 20.f}, {800.f, 400.f});
       pWindow1->SetBackgroundColour(Engine::Colour(255, 255, 255, 255));
       Engine::GUI::Button * pBtn1 = Engine::GUI::Button::Create(nullptr, "Hello", {10.f, 20.f}, {50.f, 20.f});
@@ -180,12 +179,15 @@ public:
       pBtn1->BindHoverOff([](){LOG_DEBUG("HOVER OFF 1");});
 
       pWindow1a->Add(pBtn1a);
-      pWindow1b->Add(pText1b);
       pWindow1->Add(pBtn1);
       pWindow1->Add(pWindow1a);
       pWindow1->Add(pWindow1b);
 
       pSysUI->AddWidget(pWindow1);
+
+      //Engine::GUI::Text * pText = Engine::GUI::Text::Create(nullptr, "Text", {100.0f, 100.0f}, {100.0f, 100.0f});
+      //pSysUI->AddWidget(pText);
+
     }
 
     Engine::System_Input * layer = static_cast<Engine::System_Input *>(GetSystem(Engine::System_Input::GetStaticID()));
