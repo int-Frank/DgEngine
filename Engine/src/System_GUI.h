@@ -13,7 +13,7 @@ namespace Engine
   {
   public:
 
-    ASSIGN_ID(static_cast<ID>(DefaultSystem::UI))
+    MAKE_SYSTEM_DECL
     
     System_GUI(int windowW, int windowH);
     ~System_GUI();

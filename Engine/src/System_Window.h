@@ -18,7 +18,7 @@ namespace Engine
 
   public:
 
-    ASSIGN_ID(static_cast<ID>(DefaultSystem::Window))
+    MAKE_SYSTEM_DECL
 
     System_Window(IWindow *);
     ~System_Window();

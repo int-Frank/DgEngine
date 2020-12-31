@@ -217,19 +217,19 @@ namespace Engine
 
       void DrawText(uint16_t a_textureID, Colour a_colour, uint32_t a_count, void * a_pVerts)
       {
-        /*float clr[4] ={a_colour.fr(), a_colour.fg(), a_colour.fb(), a_colour.fa()};
+        float clr[4] ={a_colour.fr(), a_colour.fg(), a_colour.fb(), a_colour.fa()};
 
         Ref<Texture2D> texture;
         if (s_pRenderContext->fontAtlas->GetTexture(a_textureID, texture) != Dg::ErrorCode::None)
           return;
 
-        s_pRenderContext->renText.material->SetUniform("textColour ", clr, sizeof(clr));
-        s_pRenderContext->renText.material->SetTexture("textureAtlas", texture);
+        s_pRenderContext->materialText->SetUniform("textColour ", clr, sizeof(clr));
+        s_pRenderContext->materialText->SetTexture("textureAtlas", texture);
 
-        s_pRenderContext->renText.material->Bind();
-        s_pRenderContext->renText.va->Bind();
+        s_pRenderContext->materialText->Bind();
+        s_pRenderContext->va_text->Bind();
 
-        ::Engine::Renderer::DrawIndexed(a_count * 6, false);*/
+        ::Engine::Renderer::DrawIndexed(s_pRenderContext->va_text, RenderMode::Triangles, a_count);
       }
 
       GlyphData * GetGlyphData(CodePoint a_cp)

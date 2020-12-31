@@ -15,7 +15,7 @@ namespace Engine
   {
   public:
 
-    ASSIGN_ID(static_cast<ID>(DefaultSystem::Application))
+    MAKE_SYSTEM_DECL
 
     System_Application();
     ~System_Application();

@@ -13,7 +13,7 @@ namespace Engine
   {
   public:
 
-    ASSIGN_ID(static_cast<ID>(DefaultSystem::Console))
+    MAKE_SYSTEM_DECL
 
     System_Console();
     ~System_Console();

@@ -18,6 +18,8 @@ namespace Engine
   // System_Input
   //------------------------------------------------------------------------------------
 
+  MAKE_SYSTEM_DEFINITION(System_Input)
+
   System_Input::System_Input()
     : m_pEventPoller(Framework::Instance()->GetEventPoller())
   {

@@ -24,7 +24,7 @@ namespace Engine
   {
   public:
 
-    ASSIGN_ID(static_cast<ID>(DefaultSystem::InputHandler))
+    MAKE_SYSTEM_DECL
 
     System_Input();
     ~System_Input();

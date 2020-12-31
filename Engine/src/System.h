@@ -7,21 +7,24 @@
 #include "MessageHandler.h"
 #include "Memory.h"
 
-#define ASSIGN_ID(id) ::Engine::System::ID GetID() override {return id;}\
-static ::Engine::System::ID GetStaticID() {return id;}
+#define MAKE_SYSTEM_DECL static ::Engine::System::ID GetStaticID();\
+::Engine::System::ID GetID() const override;
+
+#define MAKE_SYSTEM_DEFINITION(CLASS) ::Engine::System::ID CLASS::GetStaticID()\
+{\
+  static ID s_ID = 0;\
+  if (s_ID == 0)\
+    s_ID = _GetNewID();\
+  return s_ID;\
+}\
+::Engine::System::ID CLASS::GetID() const\
+{\
+  return GetStaticID();\
+}
 
 namespace Engine
 {
   class MessageBus;
-
-  enum class DefaultSystem
-  {
-    Application,
-    Console,
-    UI,
-    InputHandler,
-    Window,
-  };
 
   //TODO Subscribers should collect messages and process them on a single call
   //     to Update(). This way, we can throw the subscriber on a separate thread
@@ -34,7 +37,7 @@ namespace Engine
 
     virtual ~System(){}
 
-    virtual ID GetID() {return 0;}
+    virtual ID GetID() const = 0;
 
     virtual void OnAttach(){}
     virtual void OnDetach(){}
@@ -45,8 +48,7 @@ namespace Engine
 
   protected:
 
-    static ID s_currentID;
-    static ID GetNextID();
+    static ID _GetNewID();
 
     //System(System const &);
     //System & operator=(System const &);
