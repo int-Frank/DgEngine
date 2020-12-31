@@ -36,7 +36,7 @@ static char const * g_instance_fs = R"(
       out vec4 FragColour;
       void main()
       {
-        FragColour = vec4(1.0, 1.0, 1.0, 1.0);
+        FragColour = vec4(0.0, 1.0, 1.0, 1.0);
       })";
 
 Engine::Colour * GenerateTexture()
@@ -84,20 +84,56 @@ public:
       0.0f, 0.05f
     };
 
+    float offsets[] =
+    {
+      -0.5f, -0.5f,
+      -0.5f, 0.5f,
+      0.5f, 0.5f,
+      0.5f, -0.5f
+    };
+
     uint16_t indices[] = {0, 1, 2, 0, 2, 3};
 
-    //m_vb2 = Engine::VertexBuffer::Create(verts, SIZEOF32(verts2));
-    //m_vb2->SetLayout(
-    //  {
-    //    { Engine::ShaderDataType::VEC2 }, // inPos
-    //  });
+    {
+      m_vb2 = Engine::VertexBuffer::Create(verts2, SIZEOF32(verts2));
+      m_vb2->SetLayout(
+        {
+          { Engine::ShaderDataType::VEC2 }, // inPos
+        });
 
-    //m_ib2 = Engine::IndexBuffer::Create(indices, ARRAY_SIZE_32(indices));
-    //m_va2 = Engine::VertexArray::Create();
+      m_vb2i = Engine::VertexBuffer::Create(offsets, SIZEOF32(offsets));
+      m_vb2i->SetLayout(
+        {
+          { Engine::ShaderDataType::VEC2 }, // inOffset
+        });
 
-    //m_va2->AddVertexBuffer(m_vb2);
-    //m_va2->SetIndexBuffer(m_ib2);
-    //m_va2->SetVertexAttributeDivisor(2, 1);
+      m_ib2 = Engine::IndexBuffer::Create(indices, ARRAY_SIZE_32(indices));
+      m_va2 = Engine::VertexArray::Create();
+
+      m_va2->AddVertexBuffer(m_vb2);
+      m_va2->AddVertexBuffer(m_vb2i);
+      m_va2->SetIndexBuffer(m_ib2);
+      m_va2->SetVertexAttributeDivisor(1, 1);
+
+      Engine::ShaderData * pSD = new Engine::ShaderData({
+        { Engine::ShaderDomain::Vertex, Engine::StrType::Source, g_instance_vs },
+        { Engine::ShaderDomain::Fragment, Engine::StrType::Source, g_instance_fs }
+        });
+
+      Engine::ResourceID sdID = 12346;
+      Engine::ResourceManager::Instance()->RegisterResource(sdID, pSD);
+
+      Engine::Ref<Engine::RendererProgram> refProg;
+      refProg = Engine::RendererProgram::Create(sdID);
+
+      m_material2 = Engine::Material::Create(refProg);
+    }
+
+
+
+
+
+
 
     m_vb = Engine::VertexBuffer::Create(verts, SIZEOF32(verts));
     m_vb->SetLayout(
@@ -162,11 +198,17 @@ public:
     m_va->Bind();
 
     Engine::Renderer::DrawIndexed(m_va, Engine::RenderMode::Triangles, 1);
+
+    m_material2->Bind();
+    m_va2->Bind();
+
+    Engine::Renderer::DrawIndexed(m_va2, Engine::RenderMode::Triangles, 4);
   }
 
 private:
 
   Engine::Ref<Engine::VertexBuffer>     m_vb2;
+  Engine::Ref<Engine::VertexBuffer>     m_vb2i;
   Engine::Ref<Engine::IndexBuffer>      m_ib2;
   Engine::Ref<Engine::VertexArray>      m_va2;
   Engine::Ref<Engine::Material>         m_material2;
