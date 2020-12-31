@@ -38,6 +38,45 @@ namespace Engine
     }
   }
 
+  static GLenum GetOpenGLMode(RenderMode a_mode)
+  {
+    static GLenum const s_Values[static_cast<size_t>(RenderMode::COUNT)] =
+    {
+      GL_POINTS, GL_LINES, GL_TRIANGLES
+    };
+    return s_Values[static_cast<size_t>(a_mode)];
+  }
+
+  static GLenum GetOpenGLIndexDataType(IndexDataType a_type)
+  {
+    static GLenum const s_Values[static_cast<size_t>(IndexDataType::COUNT)] =
+    {
+      GL_UNSIGNED_BYTE, GL_UNSIGNED_SHORT, GL_UNSIGNED_INT
+    };
+    return s_Values[static_cast<size_t>(a_type)];
+  }
+
+  RenderAPICapabilities::RenderAPICapabilities()
+    : vendor()
+    , renderer()
+    , version()
+    , maxSamples(-1)
+    , maxAnisotropy(-1.f)
+    , maxTextureUnits(-1)
+    , maxVertexUniformBlocks(-1)
+    , maxFragmentUniformBlocks(-1)
+    , maxGeometryUniformBlocks(-1)
+    , maxUniformBlockSize(-1)
+    , maxUniformBufferBindings(-1)
+    , maxVertexShaderStorageBlocks(-1)
+    , maxFragmentShaderStorageBlocks(-1)
+    , maxGeometryShaderStorageBlocks(-1)
+    , maxShaderStorageBlockSize(-1)
+    , maxShaderStorageBufferBindings(-1)
+  {
+
+  }
+
   void RendererAPI::Init()
   {
     glDebugMessageCallback(OpenGLLogMessage, nullptr);
@@ -85,6 +124,7 @@ namespace Engine
       error = glGetError();
     }
 
+    Enable(RenderFeature::DepthTest);
     LoadRequiredAssets();
   }
 
@@ -112,15 +152,12 @@ namespace Engine
     glClearColor(r, g, b, a);
   }
 
-  void RendererAPI::DrawIndexed(unsigned int count, bool depthTest)
+  void RendererAPI::DrawIndexed(RenderMode a_mode, IndexDataType a_dataType, uint32_t a_instanceCount, uint32_t a_elementCount)
   {
-    if (!depthTest)
-      glDisable(GL_DEPTH_TEST);
-
-    glDrawElements(GL_TRIANGLES, count, GL_UNSIGNED_INT, nullptr);
-
-    if (!depthTest)
-      glEnable(GL_DEPTH_TEST);
+    if (a_instanceCount < 2)
+      glDrawElements(GetOpenGLMode(a_mode), a_elementCount, GetOpenGLIndexDataType(a_dataType), nullptr);
+    else
+      glDrawElementsInstanced(GetOpenGLMode(a_mode), a_elementCount, GetOpenGLIndexDataType(a_dataType), nullptr, a_instanceCount);
   }
 
   void RendererAPI::SetSissorBox(int x, int y, int w, int h)
@@ -136,6 +173,8 @@ namespace Engine
 
   void RendererAPI::Enable(RenderFeature a_feature)
   {
+    BSR_ASSERT(a_feature != RenderFeature::COUNT);
+
     switch (a_feature)
     {
       case RenderFeature::Sissor:
@@ -143,16 +182,28 @@ namespace Engine
         glEnable(GL_SCISSOR_TEST);
         break;
       }
+      case RenderFeature::DepthTest:
+      {
+        glEnable(GL_DEPTH_TEST);
+        break;
+      }
     }
   }
 
   void RendererAPI::Disable(RenderFeature a_feature)
   {
+    BSR_ASSERT(a_feature != RenderFeature::COUNT);
+
     switch (a_feature)
     {
       case RenderFeature::Sissor:
       {
         glDisable(GL_SCISSOR_TEST);
+        break;
+      }
+      case RenderFeature::DepthTest:
+      {
+        glDisable(GL_DEPTH_TEST);
         break;
       }
     }

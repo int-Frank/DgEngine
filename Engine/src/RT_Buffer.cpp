@@ -272,16 +272,6 @@ namespace Engine
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_rendererID);
   }
 
-  uint32_t RT_IndexBuffer::GetCount() const
-  {
-    return m_size / sizeof(intType);
-  }
-
-  uint32_t RT_IndexBuffer::GetSize() const
-  {
-    return m_size;
-  }
-
   RendererID RT_IndexBuffer::GetRendererID() const
   {
     return m_rendererID;

@@ -5,6 +5,7 @@
 #include "Options.h"
 #include "BSR_Assert.h"
 #include "GUI_Internal.h"
+#include "Renderer.h"
 
 namespace Engine
 {
@@ -46,7 +47,10 @@ namespace Engine
 
   void System_GUI::Render()
   {
+    GlobalRenderState *pState = Renderer::GetGlobalRenderState();
+    Renderer::Disable(RenderFeature::DepthTest);
     m_pScreen->Draw();
+    Renderer::SetRenderState(pState);
   }
 
   void System_GUI::ClearFrame()

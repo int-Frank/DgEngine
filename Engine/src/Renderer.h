@@ -29,12 +29,16 @@
 #include "Group.h"
 #include "RenderCommandQueue.h"
 #include "MemBuffer.h"
+#include "VertexArray.h"
+#include "RenderCommon.h"
 
 #define RENDER_SUBMIT(state, ...) ::Engine::Renderer::Instance()->Submit(state, __VA_ARGS__)
 #define RENDER_ALLOCATE(size) ::Engine::Renderer::Instance()->Allocate(size)
 
 namespace Engine
 {
+  struct GlobalRenderState;
+
   class Renderer
   {
   public:
@@ -49,10 +53,15 @@ namespace Engine
     static void Clear();
     static void Clear(float r, float g, float b, float a = 1.0f);
     static void SetClearColor(float r, float g, float b, float a = 1.0f);
-    static void DrawIndexed(unsigned int count, bool depthTest = true);
     static void SetSissorBox(int x, int y, int w, int h);
     static void Enable(RenderFeature);
     static void Disable(RenderFeature);
+    static void DrawIndexed(Ref<VertexArray> const &, RenderMode, uint32_t instanceCount, uint32_t elementCount = 0);
+
+    // Allocates on the temporary buffer. Do not delete!
+    // Will be cleared every frame!
+    static GlobalRenderState * GetGlobalRenderState();
+    static void SetRenderState(GlobalRenderState *);
 
     //Everything must happen between these two functions.
     void BeginScene();

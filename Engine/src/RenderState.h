@@ -88,6 +88,8 @@ namespace Engine
         SwapWindow,
         SetClearColor,
         SetSissor,
+        EnableDepthTest,
+        DisableDepthTest,
         EnableFeature,
         DisableFeature,
         Clear,
@@ -100,6 +102,7 @@ namespace Engine
         BufferSetLayout,
         Buffer_END,
 
+        VertexArray,
         VertexArrayCreate,
         VertexArrayDelete,
         VertexArrayBind,

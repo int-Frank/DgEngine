@@ -14,6 +14,7 @@
 
 #define BIT(x) (1 << x)
 #define SIZEOF32(x) static_cast<uint32_t>(sizeof(x))
+#define ARRAY_SIZE_32(x) static_cast<uint32_t>(sizeof(x) / sizeof(*x))
 
 namespace Engine
 {

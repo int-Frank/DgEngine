@@ -88,7 +88,7 @@ namespace Engine
         1.0f, 0.0f,
       };
 
-      static int const g_boxIndices[] ={0, 1, 2, 0, 2, 3};
+      static uint16_t const g_boxIndices[] ={0, 1, 2, 0, 2, 3};
 
       struct RenderContext
       {
@@ -110,10 +110,10 @@ namespace Engine
         s_pRenderContext->vb_box = VertexBuffer::Create(g_boxVerts, SIZEOF32(g_boxVerts));
         s_pRenderContext->vb_box->SetLayout(
           {
-            { Engine::ShaderDataType::VEC2, "inPos" }
+            { Engine::ShaderDataType::VEC2 }
           });
 
-        s_pRenderContext->ib_box = Engine::IndexBuffer::Create(g_boxIndices, SIZEOF32(g_boxIndices));
+        s_pRenderContext->ib_box = Engine::IndexBuffer::Create(g_boxIndices, ARRAY_SIZE_32(g_boxIndices));
         s_pRenderContext->va_box = Engine::VertexArray::Create();
 
         s_pRenderContext->va_box->AddVertexBuffer(s_pRenderContext->vb_box);
@@ -194,7 +194,7 @@ namespace Engine
         s_pRenderContext->materialColourBox->Bind();
         s_pRenderContext->va_box->Bind();
 
-        ::Engine::Renderer::DrawIndexed(6, false);
+        ::Engine::Renderer::DrawIndexed(s_pRenderContext->va_box, RenderMode::Triangles, 1);
       }
 
       void DrawText(uint16_t a_textureID, Colour a_colour, uint32_t a_count, void * a_pVerts)

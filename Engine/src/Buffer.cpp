@@ -30,9 +30,8 @@ namespace Engine
   //------------------------------------------------------------------------------------------------
   // BufferElement
   //------------------------------------------------------------------------------------------------
-  BufferElement::BufferElement(ShaderDataType a_type, std::string const& a_name, bool a_normalized)
-    : name(a_name)
-    , type(a_type)
+  BufferElement::BufferElement(ShaderDataType a_type, bool a_normalized)
+    : type(a_type)
     , size(SizeOfShaderDataType(type))
     , offset(0)
     , normalized(a_normalized)
@@ -47,8 +46,7 @@ namespace Engine
 
   size_t BufferElement::Size() const
   {
-    return size_t(SerializedSize(name))
-         + size_t(SerializedSize(type))
+    return size_t(SerializedSize(type))
          + size_t(SerializedSize(size))
          + size_t(SerializedSize(offset))
          + size_t(SerializedSize(normalized));
@@ -58,7 +56,6 @@ namespace Engine
   {
     void * pBuf = a_out;
     uint32_t type32 = static_cast<uint32_t>(type);
-    pBuf = ::Engine::Serialize(pBuf, &name);
     pBuf = ::Engine::Serialize(pBuf, &type32);
     pBuf = ::Engine::Serialize(pBuf, &size);
     pBuf = ::Engine::Serialize(pBuf, &offset);
@@ -70,7 +67,6 @@ namespace Engine
   {
     void const * pBuf = a_buf;
     uint32_t type32(0);
-    pBuf = ::Engine::Deserialize(pBuf, &name);
     pBuf = ::Engine::Deserialize(pBuf, &type32);
     type = uint_ToShaderDataType(type32);
     pBuf = ::Engine::Deserialize(pBuf, &size);
@@ -664,20 +660,22 @@ namespace Engine
   // IndexBuffer
   //------------------------------------------------------------------------------------------------
 
-  IndexBuffer::IndexBuffer(void const * a_pData, uint32_t a_size)
+  IndexBuffer::IndexBuffer(void const * a_pData, IndexDataType a_dataType, uint32_t a_count)
+    : m_dataType(a_dataType)
+    , m_elementCount(a_count)
   {
     BSR_ASSERT(a_pData != nullptr);
-
-    uint8_t* data = (uint8_t*)RENDER_ALLOCATE(a_size);
-    memcpy(data, a_pData, a_size);
+    uint32_t dataSize = GetIndexDataTypeSize(m_dataType) * a_count;
+    uint8_t* pData = (uint8_t*)RENDER_ALLOCATE(dataSize);
+    memcpy(pData, a_pData, dataSize);
 
     RenderState state = RenderState::Create();
     state.Set<RenderState::Attr::Type>(RenderState::Type::Command);
     state.Set<RenderState::Attr::Command>(RenderState::Command::BufferCreate);
 
-    RENDER_SUBMIT(state, [resID = m_id, size = a_size, data]()
+    RENDER_SUBMIT(state, [resID = m_id, pData, dataSize]()
       {
-        RT_IndexBuffer * pIB = RT_IndexBuffer::Create(data, size);
+        RT_IndexBuffer * pIB = RT_IndexBuffer::Create(pData, dataSize);
         if (pIB == nullptr)
         {
           LOG_WARN("RT_IndexBuffer::RT_IndexBuffer(): Failed to create index buffer!");
@@ -687,11 +685,22 @@ namespace Engine
       });
   }
 
-  Ref<IndexBuffer> IndexBuffer::Create(void const * a_pData, uint32_t a_size)
+  Ref<IndexBuffer> IndexBuffer::Create(uint8_t const * a_pData, uint32_t a_count)
   {
     BSR_ASSERT(a_pData != nullptr);
+    return Ref<IndexBuffer>(new IndexBuffer(a_pData, IndexDataType::unsigned_8, a_count));
+  }
 
-    return Ref<IndexBuffer>(new IndexBuffer(a_pData, a_size));
+  Ref<IndexBuffer> IndexBuffer::Create(uint16_t const * a_pData, uint32_t a_count)
+  {
+    BSR_ASSERT(a_pData != nullptr);
+    return Ref<IndexBuffer>(new IndexBuffer(a_pData, IndexDataType::unsigned_16, a_count));
+  }
+
+  Ref<IndexBuffer> IndexBuffer::Create(uint32_t const * a_pData, uint32_t a_count)
+  {
+    BSR_ASSERT(a_pData != nullptr);
+    return Ref<IndexBuffer>(new IndexBuffer(a_pData, IndexDataType::unsigned_32, a_count));
   }
 
   IndexBuffer::~IndexBuffer()
@@ -754,5 +763,15 @@ namespace Engine
 
         (*ppIB)->Bind();
       });
+  }
+
+  uint32_t IndexBuffer::ElementCount() const
+  {
+    return m_elementCount;
+  }
+
+  IndexDataType IndexBuffer::DataType() const
+  {
+    return m_dataType;
   }
 }

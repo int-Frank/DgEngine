@@ -153,7 +153,6 @@ namespace Engine
   {
     RT_IndexBuffer(void * data, uint32_t size);
   public:
-    typedef ::Engine::IndexBuffer::intType intType;
 
     ~RT_IndexBuffer();
 
@@ -162,8 +161,6 @@ namespace Engine
     void SetData(void* data, uint32_t size, uint32_t offset = 0);
     void Bind() const;
 
-    uint32_t GetCount() const;
-    uint32_t GetSize() const;
     RendererID GetRendererID() const;
 
   private:

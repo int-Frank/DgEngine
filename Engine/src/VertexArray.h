@@ -36,8 +36,16 @@ namespace Engine
     void Bind() const;
     void Unbind() const;
 
+    void SetVertexAttributeDivisor(uint32_t attrIndex, uint32_t divisor);
+
     void AddVertexBuffer(Ref<VertexBuffer> const &);
     void SetIndexBuffer(Ref<IndexBuffer> const &);
+
+    Ref<IndexBuffer> const & GetIndexBuffer();
+
+  private:
+
+    Ref<IndexBuffer> m_indexBuffer;
   };
 }
 

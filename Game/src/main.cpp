@@ -22,6 +22,23 @@
 #include "DgRNG_Local.h"
 #include "IFontAtlas.h"
 
+static char const * g_instance_vs = R"(
+      #version 430
+      layout(location = 0) in vec2 inPos;
+      layout(location = 1) in vec2 inOffset;
+      void main()
+      {
+        gl_Position = vec4(inPos, 0.0, 1.0) + vec4(inOffset, 0.0, 1.0);
+      })";
+
+static char const * g_instance_fs = R"(
+      #version 430
+      out vec4 FragColour;
+      void main()
+      {
+        FragColour = vec4(1.0, 1.0, 1.0, 1.0);
+      })";
+
 Engine::Colour * GenerateTexture()
 {
   Engine::Colour *pPixels = new Engine::Colour[FONTATLAS_DEFAULT_TEXTURE_DIMENSION * FONTATLAS_DEFAULT_TEXTURE_DIMENSION]{};
@@ -59,16 +76,37 @@ public:
       -1.0f, -0.66666f, 0.0, 1.0
     };
 
-    int indices[] = {0, 1, 2, 0, 2, 3};
+    float verts2[] =
+    {
+      0.0f, 0.0f,
+      0.05f, 0.0f,
+      0.05f, 0.05f,
+      0.0f, 0.05f
+    };
+
+    uint16_t indices[] = {0, 1, 2, 0, 2, 3};
+
+    //m_vb2 = Engine::VertexBuffer::Create(verts, SIZEOF32(verts2));
+    //m_vb2->SetLayout(
+    //  {
+    //    { Engine::ShaderDataType::VEC2 }, // inPos
+    //  });
+
+    //m_ib2 = Engine::IndexBuffer::Create(indices, ARRAY_SIZE_32(indices));
+    //m_va2 = Engine::VertexArray::Create();
+
+    //m_va2->AddVertexBuffer(m_vb2);
+    //m_va2->SetIndexBuffer(m_ib2);
+    //m_va2->SetVertexAttributeDivisor(2, 1);
 
     m_vb = Engine::VertexBuffer::Create(verts, SIZEOF32(verts));
     m_vb->SetLayout(
       {
-        { Engine::ShaderDataType::VEC2, "inPos" }, //TODO remove these strings.
-        { Engine::ShaderDataType::VEC2, "inTexCoord" },
+        { Engine::ShaderDataType::VEC2 }, // inPos
+        { Engine::ShaderDataType::VEC2 }, // inTexCoord
       });
 
-    m_ib = Engine::IndexBuffer::Create(indices, SIZEOF32(indices));
+    m_ib = Engine::IndexBuffer::Create(indices, ARRAY_SIZE_32(indices));
     m_va = Engine::VertexArray::Create();
 
     m_va->AddVertexBuffer(m_vb);
@@ -123,11 +161,15 @@ public:
     m_material->Bind();
     m_va->Bind();
 
-    Engine::Renderer::DrawIndexed(6, false);
-
+    Engine::Renderer::DrawIndexed(m_va, Engine::RenderMode::Triangles, 1);
   }
 
 private:
+
+  Engine::Ref<Engine::VertexBuffer>     m_vb2;
+  Engine::Ref<Engine::IndexBuffer>      m_ib2;
+  Engine::Ref<Engine::VertexArray>      m_va2;
+  Engine::Ref<Engine::Material>         m_material2;
 
   Engine::Ref<Engine::VertexBuffer>     m_vb;
   Engine::Ref<Engine::IndexBuffer>      m_ib;

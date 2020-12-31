@@ -22,6 +22,8 @@
 #include <stdint.h>
 #include <string>
 
+#include "RenderCommon.h"
+
 namespace Engine
 {
   using RendererID = uint32_t;
@@ -29,26 +31,7 @@ namespace Engine
 
   struct RenderAPICapabilities
   {
-    RenderAPICapabilities()
-      : vendor()
-      , renderer()
-      , version()
-      , maxSamples(-1)
-      , maxAnisotropy(-1.f)
-      , maxTextureUnits(-1)
-      , maxVertexUniformBlocks(-1)
-      , maxFragmentUniformBlocks(-1)
-      , maxGeometryUniformBlocks(-1)
-      , maxUniformBlockSize(-1)
-      , maxUniformBufferBindings(-1)
-      , maxVertexShaderStorageBlocks(-1)
-      , maxFragmentShaderStorageBlocks(-1)
-      , maxGeometryShaderStorageBlocks(-1)
-      , maxShaderStorageBlockSize(-1)
-      , maxShaderStorageBufferBindings(-1)
-    {
-    
-    }
+    RenderAPICapabilities();
 
     std::string vendor;
     std::string renderer;
@@ -71,13 +54,6 @@ namespace Engine
     int maxShaderStorageBufferBindings;
   };
 
-  enum class RenderFeature
-  {
-    Sissor,
-
-    COUNT
-  };
-
   class RendererAPI
   {
   private:
@@ -92,8 +68,7 @@ namespace Engine
     static void SetSissorBox(int x, int y, int w, int h);
     static void Enable(RenderFeature);
     static void Disable(RenderFeature);
-
-    static void DrawIndexed(unsigned int count, bool depthTest = true);
+    static void DrawIndexed(RenderMode, IndexDataType, uint32_t instanceCount, uint32_t elementCount);
 
     static void LoadRequiredAssets();
 

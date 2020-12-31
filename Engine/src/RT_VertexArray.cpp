@@ -53,6 +53,13 @@ namespace Engine
     glBindVertexArray(0);
   }
 
+  void RT_VertexArray::SetVertexAttributeDivisor(uint32_t a_attrIndex, uint32_t a_divisor)
+  {
+    Bind();
+    // TODO log OpenGL errors
+    glVertexAttribDivisor(a_attrIndex, a_divisor);
+  }
+
   void RT_VertexArray::AddVertexBuffer(RenderResourceID a_id)
   {
     RT_VertexBuffer** ppVB = RenderThreadData::Instance()->VBOs.at(a_id);
@@ -82,6 +89,7 @@ namespace Engine
       }
       else
       {
+        // TODO matrices need to be set row by row
         glVertexAttribPointer(m_vertexAttribIndex,
           it->GetComponentCount(),
           glBaseType,

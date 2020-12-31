@@ -28,6 +28,7 @@
 #include "RenderResource.h"
 #include "ShaderUniform.h"
 #include "ShaderUtils.h"
+#include "RenderCommon.h"
 
 namespace Engine 
 {
@@ -41,8 +42,6 @@ namespace Engine
 
   struct BufferElement
   {
-    //TODO Remove name. It has no context here.
-    std::string name;
     ShaderDataType type;
     uint32_t size;
     uint32_t offset;
@@ -54,7 +53,7 @@ namespace Engine
     void* Serialize(void*) const;
     void const* Deserialize(void const*);
 
-    BufferElement(ShaderDataType, std::string const & name, bool normalized = false);
+    BufferElement(ShaderDataType, bool normalized = false);
     uint32_t GetComponentCount() const;
   };
 
@@ -186,19 +185,32 @@ namespace Engine
 
   class IndexBuffer : public RenderResource
   {
-    IndexBuffer(void const * data, uint32_t size);
+    IndexBuffer(void const * a_pData, IndexDataType a_dataType, uint32_t a_count);
 
     IndexBuffer(IndexBuffer const&) = delete;
     IndexBuffer& operator=(IndexBuffer const&) = delete;
   public:
-    typedef uint16_t intType;
 
-    static Ref<IndexBuffer> Create(void const * a_pData, uint32_t a_size);
+    // TODO add flag to take ownership of the memory
+    //      persistant: can just pass pointer to RT_Buffer, but do not free
+    //      makeCopy: must copy data
+    //      dealloc: can take ownership and must free once done
+    static Ref<IndexBuffer> Create(uint8_t const * a_pData, uint32_t a_count);
+    static Ref<IndexBuffer> Create(uint16_t const * a_pData, uint32_t a_count);
+    static Ref<IndexBuffer> Create(uint32_t const * a_pData, uint32_t a_count);
 
      ~IndexBuffer();
 
+    uint32_t ElementCount() const;
+    IndexDataType DataType() const;
+
     void SetData(void const * data, uint32_t size, uint32_t offset);
     void Bind() const;
+
+  private:
+
+    IndexDataType m_dataType;
+    uint32_t m_elementCount;
   };
 
 }

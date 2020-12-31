@@ -23,9 +23,18 @@
 #include "Log.h"
 #include "RT_RendererAPI.h"
 #include "RenderThread.h"
+#include "Memory.h"
 
 namespace Engine
 {
+  struct GlobalRenderState
+  {
+    bool RenderFeatureState[(uint32_t)RenderFeature::COUNT];
+    int sissorBox[4];
+  };
+
+  GlobalRenderState g_renderState ={};
+
   Renderer* Renderer::s_instance = nullptr;
 
   Renderer * Renderer::Instance()
@@ -62,15 +71,18 @@ namespace Engine
 
   }
 
-  void Renderer::DrawIndexed(unsigned int a_count, bool a_depthTest)
+  void Renderer::DrawIndexed(Ref<VertexArray> const & a_va, RenderMode a_mode, uint32_t a_instanceCount, uint32_t a_elementCount)
   {
+    BSR_ASSERT(a_va.get() != nullptr);
     Engine::RenderState state = Engine::RenderState::Create();
     state.Set<Engine::RenderState::Attr::Type>(Engine::RenderState::Type::Command);
     state.Set<Engine::RenderState::Attr::Command>(Engine::RenderState::Command::Draw);
 
-    RENDER_SUBMIT(state, [count = a_count, depthTest = a_depthTest]()
+    uint32_t count = a_elementCount == 0 ? a_va->GetIndexBuffer()->ElementCount() : a_elementCount;
+
+    RENDER_SUBMIT(state, [a_mode, dataType = a_va->GetIndexBuffer()->DataType(), a_instanceCount, count]()
       {
-        RendererAPI::DrawIndexed(count, depthTest);
+        RendererAPI::DrawIndexed(a_mode, dataType, a_instanceCount, count);
       });
   }
 
@@ -120,6 +132,11 @@ namespace Engine
       {
         RendererAPI::SetSissorBox(x, y, w, h);
       });
+
+    g_renderState.sissorBox[0] = a_x;
+    g_renderState.sissorBox[1] = a_y;
+    g_renderState.sissorBox[2] = a_w;
+    g_renderState.sissorBox[3] = a_h;
   }
 
   void Renderer::Enable(RenderFeature a_feature)
@@ -128,14 +145,8 @@ namespace Engine
     state.Set<Engine::RenderState::Attr::Type>(Engine::RenderState::Type::Command);
     state.Set<Engine::RenderState::Attr::Command>(Engine::RenderState::Command::EnableFeature);
 
-    switch (a_feature)
-    {
-      case RenderFeature::Sissor:
-      {
-        RENDER_SUBMIT(state, [a_feature]() { RendererAPI::Enable(a_feature); });
-        break;
-      }
-    }
+    RENDER_SUBMIT(state, [a_feature]() { RendererAPI::Enable(a_feature); });
+    g_renderState.RenderFeatureState[static_cast<uint32_t>(a_feature)] = true;
   }
 
   void Renderer::Disable(RenderFeature a_feature)
@@ -144,14 +155,8 @@ namespace Engine
     state.Set<Engine::RenderState::Attr::Type>(Engine::RenderState::Type::Command);
     state.Set<Engine::RenderState::Attr::Command>(Engine::RenderState::Command::DisableFeature);
 
-    switch (a_feature)
-    {
-      case RenderFeature::Sissor:
-      {
-        RENDER_SUBMIT(state, [a_feature]() { RendererAPI::Disable(a_feature); });
-        break;
-      }
-    }
+    RENDER_SUBMIT(state, [a_feature]() { RendererAPI::Disable(a_feature); });
+    g_renderState.RenderFeatureState[static_cast<uint32_t>(a_feature)] = false;
   }
 
   void Renderer::BeginScene()
@@ -187,5 +192,32 @@ namespace Engine
   void Renderer::EndCurrentGroup()
   {
     m_group.EndCurrentGroup();
+  }
+
+  GlobalRenderState * Renderer::GetGlobalRenderState()
+  {
+    GlobalRenderState * pState = (GlobalRenderState *)TBUFAlloc(sizeof(GlobalRenderState));
+    new (pState) GlobalRenderState(g_renderState);
+    return pState;
+  }
+
+  void Renderer::SetRenderState(GlobalRenderState * a_state)
+  {
+    if (a_state == nullptr)
+      return;
+
+    for (uint32_t i = 0; i < static_cast<uint32_t>(RenderFeature::COUNT); i++)
+    {
+      if (g_renderState.RenderFeatureState[i] != a_state->RenderFeatureState[i])
+      {
+        if (a_state->RenderFeatureState[i])
+          Enable(static_cast<RenderFeature>(i));
+        else
+          Disable(static_cast<RenderFeature>(i));
+      }
+    }
+
+    for (uint32_t i = 0; i < 4; i++)
+      g_renderState.sissorBox[i] = a_state->sissorBox[i];
   }
 }

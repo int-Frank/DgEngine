@@ -30,8 +30,6 @@
 
 namespace Engine
 {
-  
-
   VertexArray::VertexArray()
   {
     RenderState state = RenderState::Create();
@@ -106,8 +104,27 @@ namespace Engine
       });
   }
 
+  void VertexArray::SetVertexAttributeDivisor(uint32_t a_attrIndex, uint32_t a_divisor)
+  {
+    RenderState state = RenderState::Create();
+    state.Set<RenderState::Attr::Type>(RenderState::Type::Command);
+    state.Set<RenderState::Attr::Command>(RenderState::Command::VertexArray);
+
+    RENDER_SUBMIT(state, [vaoID = m_id, a_attrIndex, a_divisor]()
+    {
+      RT_VertexArray ** ppVA =  RenderThreadData::Instance()->VAOs.at(vaoID);
+      if (ppVA == nullptr)
+      {
+        LOG_WARN("VertexArray::SetVertexAttributeDivisor(): RefID '{}' does not exist!", vaoID);
+        return;
+      }
+      (*ppVA)->SetVertexAttributeDivisor(a_attrIndex, a_divisor);
+    });
+  }
+
   void VertexArray::AddVertexBuffer(Ref<VertexBuffer> const & a_vertexBuffer)
   {
+    BSR_ASSERT(a_vertexBuffer.get() != nullptr);
     RenderState state = RenderState::Create();
     state.Set<RenderState::Attr::Type>(RenderState::Type::Command);
     state.Set<RenderState::Attr::Command>(RenderState::Command::VertexArrayAddVertexBuffer);
@@ -126,6 +143,9 @@ namespace Engine
 
   void VertexArray::SetIndexBuffer(Ref<IndexBuffer> const & a_indexBuffer)
   {
+    BSR_ASSERT(a_indexBuffer.get() != nullptr);
+    m_indexBuffer = a_indexBuffer;
+
     RenderState state = RenderState::Create();
     state.Set<RenderState::Attr::Type>(RenderState::Type::Command);
     state.Set<RenderState::Attr::Command>(RenderState::Command::VertexArraySetIndexBuffer);
@@ -140,5 +160,10 @@ namespace Engine
       }
       (*ppID)->SetIndexBuffer(iboID);
     });
+  }
+
+  Ref<IndexBuffer> const & VertexArray::GetIndexBuffer()
+  {
+    return m_indexBuffer;
   }
 }
