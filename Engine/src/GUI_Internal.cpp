@@ -65,12 +65,13 @@ namespace Engine
         gl_Position = vec4(posXY, 0.0, 1.0);
       })";
 
+      // TODO Having the textureAtlas before textColour crashes
       static char const * g_textShader_fs = R"(
       #version 430
       in vec2 texCoord;
       out vec4 FragColor;
-      uniform sampler2D textureAtlas;
       uniform vec4 textColour;
+      uniform sampler2D textureAtlas;
       void main()
       {
         ivec2 texDim = textureSize(textureAtlas, 0);
@@ -223,7 +224,9 @@ namespace Engine
         if (s_pRenderContext->fontAtlas->GetTexture(a_textureID, texture) != Dg::ErrorCode::None)
           return;
 
-        s_pRenderContext->materialText->SetUniform("textColour ", clr, sizeof(clr));
+        s_pRenderContext->vb_textInstance->SetData(a_pVerts, a_count * sizeof(float) * 6, 0);
+
+        s_pRenderContext->materialText->SetUniform("textColour", clr, sizeof(clr));
         s_pRenderContext->materialText->SetTexture("textureAtlas", texture);
 
         s_pRenderContext->materialText->Bind();

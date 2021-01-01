@@ -45,7 +45,7 @@ public:
     }
     else
     {
-      Engine::GUI::Container * pWindow1a = Engine::GUI::Container::Create(nullptr, {20.f, 20.f}, {200.f, 100.f});
+      /*Engine::GUI::Container * pWindow1a = Engine::GUI::Container::Create(nullptr, {20.f, 20.f}, {200.f, 100.f});
       pWindow1a->SetBackgroundColour(Engine::Colour(0, 255, 0, 255));
       Engine::GUI::Button * pBtn1a = Engine::GUI::Button::Create(nullptr, "Hello", {10.f, 20.f}, {50.f, 20.f});
       pBtn1a->SetBackgroundColour(Engine::Colour(64, 0, 128, 255));
@@ -71,11 +71,13 @@ public:
       pWindow1->Add(pWindow1a);
       pWindow1->Add(pWindow1b);
 
-      pSysUI->AddWidget(pWindow1);
+      pSysUI->AddWidget(pWindow1);*/
 
-      //Engine::GUI::Text * pText = Engine::GUI::Text::Create(nullptr, "Text", {100.0f, 100.0f}, {100.0f, 100.0f});
-      //pSysUI->AddWidget(pText);
-
+      Engine::GUI::Button * pBtn = Engine::GUI::Button::Create(nullptr, "", {100.0f, 100.0f}, {100.0f, 100.0f});
+      pBtn->SetBackgroundColour(Engine::Colour(128, 0, 0, 128));
+      Engine::GUI::Text * pText = Engine::GUI::Text::Create(nullptr, "T", {100.0f, 100.0f}, {100.0f, 100.0f});
+      pSysUI->AddWidget(pText);
+      pSysUI->AddWidget(pBtn);
     }
 
     Engine::System_Input * layer = static_cast<Engine::System_Input *>(GetSystem(Engine::System_Input::GetStaticID()));

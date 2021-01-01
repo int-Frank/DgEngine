@@ -45,7 +45,7 @@ namespace Engine
 
     // Global buffers to avoid excessive memory allocating to render text
     // TODO This still requires copying to render memory. Perhaps we can write directly to a chunk of Render memory.
-    // [{x, y, tx, ty}, {...}, {...}, {...}]
+    // [x, y, tx, ty, sizex, sizey], ...
     static float s_textVertexBuffer[MAX_TEXT_CHARACTERS * 4 * 4] = {};
     static CPData s_glyphData[MAX_TEXT_CHARACTERS] = {};
     static uint16_t s_textureIDs[MAX_TEXTURES] = {};
@@ -135,18 +135,18 @@ namespace Engine
       GlyphData * pData = &s_glyphData[context.cpCurrentPosition].data;
       if (CPInsideDiv(context) && (pData->textureID == context.currentTextureID))
       {
-        float y = float(context.lineY);
-        float x = float(context.posX);
+        float x = float(context.posX + pData->bearingX);
+        float y = float(context.lineY + pData->bearingY - pData->height);
 
-        for (int i = 0; i < 4; i++)
-        {
-          uint32_t ind = context.writtenCPs * 16;
+        uint32_t ind = context.writtenCPs * 6;
 
-          s_textVertexBuffer[ind + 0] = x + float(pData->bearingX + pData->width * (i & 1));
-          s_textVertexBuffer[ind + 1] = y + float(-pData->bearingY + pData->height * (i >> 1));
-          s_textVertexBuffer[ind + 2] = float(pData->posX + pData->width * (i & 1));
-          s_textVertexBuffer[ind + 3] = float(pData->posY + pData->height * (i >> 1));
-        }
+        s_textVertexBuffer[ind + 0] = x;
+        s_textVertexBuffer[ind + 1] = y;
+        s_textVertexBuffer[ind + 2] = pData->posX;
+        s_textVertexBuffer[ind + 3] = pData->posY;
+        s_textVertexBuffer[ind + 4] = pData->width;
+        s_textVertexBuffer[ind + 5] = pData->height;
+
         context.writtenCPs++;
       }
 
@@ -177,7 +177,7 @@ namespace Engine
     // Return word length. 0 if EOL or EOT reached
     static int FindNextWord(TextContext & context)
     {
-      bool wordFound = false;
+      int cpCount = 0;
 
       for (; context.cpCurrentPosition < context.cpCount; context.cpCurrentPosition++)
       {
@@ -192,14 +192,13 @@ namespace Engine
           break;
         }
 
-        wordFound = true;
+        cpCount = 1;
         break;
       }
       
-      int cpCount = 0;
-      if (wordFound)
+      if (cpCount == 1)
       {
-        for (; context.cpCurrentPosition < context.cpCount; context.cpCurrentPosition++)
+        for (; (context.cpCurrentPosition + 1) < context.cpCount; context.cpCurrentPosition++)
         {
           CodePoint cp = s_glyphData[context.cpCurrentPosition + cpCount].cp;
           if (IsWhiteSpace(cp) || IsNewLine(cp))
@@ -221,11 +220,15 @@ namespace Engine
       {
         int32_t wordLen = GetLength(context.cpCurrentPosition, cpCount);
         bool wordWritten = false;
-        while ((context.posX + wordLen) <= context.div.size.x())
+        while ((context.posX + wordLen) <= (context.div.position.x() + context.div.size.x()))
         {
           wordWritten = true;
           WriteBlock(context, cpCount);
           cpCount = FindNextWord(context);
+
+          if (cpCount == 0)
+            break;
+
           wordLen = GetLength(context.cpCurrentPosition, cpCount);
         }
 
@@ -234,7 +237,7 @@ namespace Engine
           WriteCharacter(context);
       }
 
-      return context.cpCurrentPosition == context.cpCount;
+      return context.cpCurrentPosition < context.cpCount;
     }
 
     static void WriteText(TextContext & context)
@@ -312,6 +315,7 @@ namespace Engine
         // TODO these need to come from settings
         m_attributes.size = DEFAULT_FONT_SIZE;
         m_attributes.colourText = 0xFFFFFFFF;
+        m_attributes.lineSpacing = 1.0f;
         m_attributes.horizontalAlign = TextAlignment::Min;
         m_attributes.verticalAlign = TextAlignment::Min;
         m_attributes.wrapText = true;
@@ -345,7 +349,7 @@ namespace Engine
       Renderer::GetCharacterSizeRange(ascent, descent);
 
       TextContext context;
-      context.div = {m_pParent->GetContentDivPosition(), m_pParent->GetContentDivSize()};
+      context.div = {GetGlobalPosition(), GetSize()};
 
       if (!m_attributes.wrapText)
         context.div.size.y() = std::numeric_limits<float>::max();
@@ -355,7 +359,8 @@ namespace Engine
       context.lineSpacing = int16_t(m_attributes.lineSpacing * (ascent - descent));
       context.cpCount = DecodeText(m_text, textureCount);
       
-      ::Engine::Renderer::Enable(RenderFeature::Sissor);
+      // TODO remove div border from root container widget.
+      // TODO Set render state before any GUI drawing. We shouldn't need to Enable or DIsable anything from here
       ::Engine::Renderer::SetSissorBox((int)viewableWindow.position.x(), (int)viewableWindow.position.y(), (int)viewableWindow.size.x(), (int)viewableWindow.size.y());
       
       for (uint32_t i = 0; i < textureCount; i++)
@@ -368,8 +373,6 @@ namespace Engine
 
         Renderer::DrawText(context.currentTextureID, m_attributes.colourText, context.writtenCPs, s_textVertexBuffer);
       }
-      
-      ::Engine::Renderer::Disable(RenderFeature::Sissor);
     }
     
     WidgetState Text::QueryState() const

@@ -51,6 +51,7 @@ namespace Engine
   {
     GlobalRenderState *pState = Renderer::GetGlobalRenderState();
     Renderer::Disable(RenderFeature::DepthTest);
+    Renderer::Enable(RenderFeature::Sissor);
     m_pScreen->Draw();
     Renderer::SetRenderState(pState);
   }
