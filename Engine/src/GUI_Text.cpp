@@ -136,7 +136,7 @@ namespace Engine
       if (CPInsideDiv(context) && (pData->textureID == context.currentTextureID))
       {
         float x = float(context.posX + pData->bearingX);
-        float y = float(context.lineY + pData->bearingY - pData->height);
+        float y = float(context.lineY - pData->bearingY);
 
         uint32_t ind = context.writtenCPs * 6;
 
@@ -167,7 +167,7 @@ namespace Engine
         return result;
 
       for (uint32_t i = a_index; (i + 1) < a_index + a_count; i++)
-        result = (int32_t) s_glyphData[i].data.advance;
+        result += (int32_t)s_glyphData[i].data.advance;
 
       result += ((int32_t)s_glyphData[a_index + a_count - 1].data.bearingX + (int32_t)s_glyphData[a_index + a_count - 1].data.width);
 
@@ -184,7 +184,10 @@ namespace Engine
         CodePoint cp = s_glyphData[context.cpCurrentPosition].cp;
 
         if (IsWhiteSpace(cp))
+        {
+          context.posX += int32_t(s_glyphData[context.cpCurrentPosition].data.advance);
           continue;
+        }
 
         if (IsNewLine(cp))
         {
@@ -198,9 +201,9 @@ namespace Engine
       
       if (cpCount == 1)
       {
-        for (; (context.cpCurrentPosition + 1) < context.cpCount; context.cpCurrentPosition++)
+        for (uint32_t i = context.cpCurrentPosition + 1; i < context.cpCount; i++)
         {
-          CodePoint cp = s_glyphData[context.cpCurrentPosition + cpCount].cp;
+          CodePoint cp = s_glyphData[i].cp;
           if (IsWhiteSpace(cp) || IsNewLine(cp))
             break;
           cpCount++;
@@ -254,7 +257,7 @@ namespace Engine
         line++;
         context.posX = posX;
         context.lineY = lineY + line * context.lineSpacing;
-        if (context.lineY > context.divViewable.size.y())
+        if (context.lineY > (context.div.position.y() + context.divViewable.size.y()))
           break;
       }
     }
@@ -360,13 +363,12 @@ namespace Engine
       context.cpCount = DecodeText(m_text, textureCount);
       
       // TODO remove div border from root container widget.
-      // TODO Set render state before any GUI drawing. We shouldn't need to Enable or DIsable anything from here
       ::Engine::Renderer::SetSissorBox((int)viewableWindow.position.x(), (int)viewableWindow.position.y(), (int)viewableWindow.size.x(), (int)viewableWindow.size.y());
       
       for (uint32_t i = 0; i < textureCount; i++)
       {
         context.posX = int16_t(context.div.position.x());
-        context.lineY = int16_t(context.div.position.y() + ascent);
+        context.lineY = int16_t(context.div.position.y()) + ascent;
         context.currentTextureID = s_textureIDs[i];
 
         WriteText(context);

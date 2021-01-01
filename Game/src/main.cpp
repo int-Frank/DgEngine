@@ -73,11 +73,20 @@ public:
 
       pSysUI->AddWidget(pWindow1);*/
 
-      Engine::GUI::Button * pBtn = Engine::GUI::Button::Create(nullptr, "", {100.0f, 100.0f}, {100.0f, 100.0f});
-      pBtn->SetBackgroundColour(Engine::Colour(128, 0, 0, 128));
-      Engine::GUI::Text * pText = Engine::GUI::Text::Create(nullptr, "T", {100.0f, 100.0f}, {100.0f, 100.0f});
-      pSysUI->AddWidget(pText);
-      pSysUI->AddWidget(pBtn);
+      Engine::GUI::Container * pWindow = Engine::GUI::Container::Create(nullptr, {20.f, 20.f}, {200.f, 200.f});
+      pWindow->SetBackgroundColour(Engine::Colour(128, 0, 0, 128));
+
+      Engine::GUI::TextAttributes attr = {};
+      attr.size = DEFAULT_FONT_SIZE;
+      attr.colourText = 0xFFFFFFFF;
+      attr.lineSpacing = 1.0f;
+      attr.horizontalAlign = Engine::GUI::TextAlignment::Min;
+      attr.verticalAlign = Engine::GUI::TextAlignment::Min;
+      attr.wrapText = true;
+      Engine::GUI::Text * pText = Engine::GUI::Text::Create(nullptr, "The quick brown fox jumps over the lazy dog\nAnd here is another line.", {100.0f, 100.0f}, {100.0f, 100.0f}, &attr, 
+        {Engine::GUI::WidgetFlag::StretchHeight, Engine::GUI::WidgetFlag::StretchWidth});
+      pWindow->Add(pText);
+      pSysUI->AddWidget(pWindow);
     }
 
     Engine::System_Input * layer = static_cast<Engine::System_Input *>(GetSystem(Engine::System_Input::GetStaticID()));
