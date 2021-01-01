@@ -83,7 +83,10 @@ public:
       attr.horizontalAlign = Engine::GUI::TextAlignment::Min;
       attr.verticalAlign = Engine::GUI::TextAlignment::Min;
       attr.wrapText = true;
-      Engine::GUI::Text * pText = Engine::GUI::Text::Create(nullptr, "The quick brown fox jumps over the lazy dog\nAnd here is another line.", {100.0f, 100.0f}, {100.0f, 100.0f}, &attr, 
+
+      char const str[] = "The quick brown fox jumps over the lazy dog\n\nAnd here is another line.";
+
+      Engine::GUI::Text * pText = Engine::GUI::Text::Create(nullptr, str, {100.0f, 100.0f}, {100.0f, 100.0f}, &attr, 
         {Engine::GUI::WidgetFlag::StretchHeight, Engine::GUI::WidgetFlag::StretchWidth});
       pWindow->Add(pText);
       pSysUI->AddWidget(pWindow);

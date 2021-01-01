@@ -70,6 +70,7 @@ namespace Engine
       return count;
     }
 
+    // Discard control characters
     static bool ShouldDiscard(CodePoint a_cp)
     {
       bool discard = false;
@@ -120,12 +121,19 @@ namespace Engine
     static bool CPInsideDiv(TextContext & context)
     {
       GlyphData * pData = &s_glyphData[context.cpCurrentPosition].data;
-      vec2 position(float(context.posX) + float(pData->bearingX + pData->width), 
-                    float(context.lineY) + float(pData->height - pData->bearingY));
+      vec2 position(float(context.posX) + float(pData->bearingX), 
+                    float(context.lineY) + float(pData->height));
       vec2 size(float(pData->width), float(pData->height));
       UIAABB glyphBounds = {position, size};
       UIAABB result = {};
       return Intersection(context.divViewable, glyphBounds, result);
+    }
+
+    static void AdvanceOne(TextContext & context)
+    {
+      GlyphData * pData = &s_glyphData[context.cpCurrentPosition].data;
+      context.posX += int32_t(pData->advance);
+      context.cpCurrentPosition++;
     }
 
     // Writes character and moves to the next.
@@ -149,9 +157,7 @@ namespace Engine
 
         context.writtenCPs++;
       }
-
-      context.posX += int32_t(pData->advance);
-      context.cpCurrentPosition++;
+      AdvanceOne(context);
     }
 
     static void WriteBlock(TextContext & context, uint32_t cpCount)
@@ -174,8 +180,14 @@ namespace Engine
       return result;
     }
 
+    static bool CharacterFitsX(TextContext const & context)
+    {
+      GlyphData * pData = &s_glyphData[context.cpCurrentPosition].data;
+      return (context.posX + pData->bearingX + pData->width) <= int32_t(context.div.position.x() + context.div.size.x());
+    }
+
     // Return word length. 0 if EOL or EOT reached
-    static int FindNextWord(TextContext & context)
+    static int FindNextWord(TextContext & context, bool advanceOnWhiteSpace)
     {
       int cpCount = 0;
 
@@ -185,7 +197,8 @@ namespace Engine
 
         if (IsWhiteSpace(cp))
         {
-          context.posX += int32_t(s_glyphData[context.cpCurrentPosition].data.advance);
+          if (advanceOnWhiteSpace)
+            context.posX += int32_t(s_glyphData[context.cpCurrentPosition].data.advance);
           continue;
         }
 
@@ -216,18 +229,19 @@ namespace Engine
     // Returns true if more lines to process
     static bool WriteNextLine(TextContext & context)
     {
-      int cpCount = FindNextWord(context);
+      int cpCount = FindNextWord(context, false);
 
       // Line contained only whitespace
       if (cpCount > 0)
       {
         int32_t wordLen = GetLength(context.cpCurrentPosition, cpCount);
         bool wordWritten = false;
-        while ((context.posX + wordLen) <= (context.div.position.x() + context.div.size.x()))
+
+        while ((context.posX + wordLen) <= int32_t(context.div.position.x() + context.div.size.x()))
         {
           wordWritten = true;
           WriteBlock(context, cpCount);
-          cpCount = FindNextWord(context);
+          cpCount = FindNextWord(context, true);
 
           if (cpCount == 0)
             break;
@@ -235,9 +249,12 @@ namespace Engine
           wordLen = GetLength(context.cpCurrentPosition, cpCount);
         }
 
-        // We need at least 1 character on the line, regardless if it fits or not.
+        // If this is the first word, write as much as possible
         if (!wordWritten)
-          WriteCharacter(context);
+        {
+          while (CharacterFitsX(context))
+            WriteCharacter(context);
+        }
       }
 
       return context.cpCurrentPosition < context.cpCount;

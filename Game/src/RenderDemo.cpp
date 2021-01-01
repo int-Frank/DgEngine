@@ -155,8 +155,6 @@ void RenderDemo::OnAttach()
 
 void RenderDemo::Render()
 {
-  //Engine::Renderer::Clear(1.0f, 0.0f, 1.0f);
-
   m_material->Bind();
   m_va->Bind();
 
