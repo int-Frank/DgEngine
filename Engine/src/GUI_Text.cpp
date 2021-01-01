@@ -26,6 +26,8 @@ namespace Engine
       TextAlignment horizontalAlign;
       int16_t lineSpacing;
       uint32_t cpCount;
+      int16_t ascent;
+      int16_t descent;
 
       // Vars...
       int32_t posX;
@@ -122,7 +124,7 @@ namespace Engine
     {
       GlyphData * pData = &s_glyphData[context.cpCurrentPosition].data;
       vec2 position(float(context.posX) + float(pData->bearingX), 
-                    float(context.lineY) + float(pData->height));
+                    float(context.lineY) - float(pData->bearingY));
       vec2 size(float(pData->width), float(pData->height));
       UIAABB glyphBounds = {position, size};
       UIAABB result = {};
@@ -137,7 +139,7 @@ namespace Engine
     }
 
     // Writes character and moves to the next.
-    // Assumes will not overflow.
+    // Assumes will not overflow s_textVertexBuffer.
     static void WriteCharacter(TextContext & context)
     {
       GlyphData * pData = &s_glyphData[context.cpCurrentPosition].data;
@@ -274,7 +276,7 @@ namespace Engine
         line++;
         context.posX = posX;
         context.lineY = lineY + line * context.lineSpacing;
-        if (context.lineY > (context.div.position.y() + context.divViewable.size.y()))
+        if ((context.lineY - context.ascent) > (context.div.position.y() + context.div.size.y()))
           break;
       }
     }
@@ -363,20 +365,19 @@ namespace Engine
       if (!GetGlobalAABB(viewableWindow))
         return;
 
-      int16_t ascent, descent;
       uint32_t textureCount;
 
-      Renderer::GetCharacterSizeRange(ascent, descent);
 
       TextContext context;
       context.div = {GetGlobalPosition(), GetSize()};
+      Renderer::GetCharacterSizeRange(context.ascent, context.descent);
 
       if (!m_attributes.wrapText)
         context.div.size.y() = std::numeric_limits<float>::max();
 
       context.divViewable = viewableWindow;
       context.horizontalAlign = m_attributes.horizontalAlign;
-      context.lineSpacing = int16_t(m_attributes.lineSpacing * (ascent - descent));
+      context.lineSpacing = int16_t(m_attributes.lineSpacing * (context.ascent - context.descent));
       context.cpCount = DecodeText(m_text, textureCount);
       
       // TODO remove div border from root container widget.
@@ -385,7 +386,7 @@ namespace Engine
       for (uint32_t i = 0; i < textureCount; i++)
       {
         context.posX = int16_t(context.div.position.x());
-        context.lineY = int16_t(context.div.position.y()) + ascent;
+        context.lineY = int16_t(context.div.position.y()) + context.ascent;
         context.currentTextureID = s_textureIDs[i];
 
         WriteText(context);
