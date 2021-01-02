@@ -1,7 +1,5 @@
 //@group GUI
 
-#include <limits>
-
 #include "GUI_Text.h"
 #include "Options.h"
 #include "MessageHandler.h"
@@ -28,10 +26,14 @@ namespace Engine
       uint32_t cpCount;
       int16_t ascent;
       int16_t descent;
+      bool wrap;
 
       // Vars...
       int32_t posX;
       int32_t lineY;
+
+      uint32_t lineBeginIndex;
+      uint32_t lineEndIndex;
 
       uint32_t cpCurrentPosition;
       uint32_t writtenCPs;
@@ -228,6 +230,13 @@ namespace Engine
       return cpCount;
     }
 
+    static bool WordFitsOnLine(TextContext const & context, int32_t wordLen)
+    {
+      if (!context.wrap)
+        return true;
+      return (context.posX + wordLen) <= int32_t(context.div.position.x() + context.div.size.x());
+    }
+
     // Returns true if more lines to process
     static bool WriteNextLine(TextContext & context)
     {
@@ -239,7 +248,7 @@ namespace Engine
         int32_t wordLen = GetLength(context.cpCurrentPosition, cpCount);
         bool wordWritten = false;
 
-        while ((context.posX + wordLen) <= int32_t(context.div.position.x() + context.div.size.x()))
+        while (WordFitsOnLine(context, wordLen))
         {
           wordWritten = true;
           WriteBlock(context, cpCount);
@@ -254,6 +263,8 @@ namespace Engine
         // If this is the first word, write as much as possible
         if (!wordWritten)
         {
+          // Wirte at lest one character so we don't end up in an infinite loop.
+          WriteCharacter(context);
           while (CharacterFitsX(context))
             WriteCharacter(context);
         }
@@ -367,14 +378,11 @@ namespace Engine
 
       uint32_t textureCount;
 
-
       TextContext context;
       context.div = {GetGlobalPosition(), GetSize()};
       Renderer::GetCharacterSizeRange(context.ascent, context.descent);
 
-      if (!m_attributes.wrapText)
-        context.div.size.y() = std::numeric_limits<float>::max();
-
+      context.wrap = m_attributes.wrapText;
       context.divViewable = viewableWindow;
       context.horizontalAlign = m_attributes.horizontalAlign;
       context.lineSpacing = int16_t(m_attributes.lineSpacing * (context.ascent - context.descent));
