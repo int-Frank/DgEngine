@@ -80,7 +80,7 @@ public:
       attr.size = DEFAULT_FONT_SIZE;
       attr.colourText = 0xFFFFFFFF;
       attr.lineSpacing = 1.0f;
-      attr.horizontalAlign = Engine::GUI::HorizontalAlignment::Left;
+      attr.horizontalAlign = Engine::GUI::HorizontalAlignment::Centre;
       attr.verticalAlign = Engine::GUI::VerticalAlignment::Top;
       attr.wrapText = true;
 

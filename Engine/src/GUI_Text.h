@@ -13,7 +13,7 @@ namespace Engine
     enum class HorizontalAlignment
     {
       Left,
-      Center,
+      Centre,
       Right
     };
 

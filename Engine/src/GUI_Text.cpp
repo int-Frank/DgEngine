@@ -44,6 +44,9 @@ namespace Engine
       int32_t lineY;
 
       uint32_t nextLineBegin;
+      uint32_t lineBegin;
+      uint32_t lineSize;
+
       uint32_t writtenCPs;
 
       uint16_t currentTextureID;
@@ -143,17 +146,17 @@ namespace Engine
 
     // Writes character and moves to the next.
     // Assumes will not overflow s_textVertexBuffer.
-    static void WriteCharacter(TextContext & context, uint32_t index)
+    static void WriteCharacter(TextContext & context, uint32_t index, float offsetX)
     {
       GlyphData * pData = &s_glyphData[index].data;
       if (CPInsideDiv(context, index) && (pData->textureID == context.currentTextureID))
       {
-        float x = float(context.posX + pData->bearingX);
+        float x = float(context.posX + pData->bearingX) + offsetX;
         float y = float(context.lineY - pData->bearingY);
 
         uint32_t ind = context.writtenCPs * 6;
 
-        s_textVertexBuffer[ind + 0] = x;
+        s_textVertexBuffer[ind + 0] = round(x);
         s_textVertexBuffer[ind + 1] = y;
         s_textVertexBuffer[ind + 2] = pData->posX;
         s_textVertexBuffer[ind + 3] = pData->posY;
@@ -165,10 +168,10 @@ namespace Engine
       context.posX += int32_t(pData->advance);
     }
 
-    static void WriteBlock(TextContext & context, uint32_t cpBegin, uint32_t cpCount)
+    static void WriteBlock(TextContext & context, float offsetX)
     {
-      for (uint32_t i = cpBegin; i < (cpBegin + cpCount); i++)
-        WriteCharacter(context, i);
+      for (uint32_t i = context.lineBegin; i < (context.lineBegin + context.lineSize); i++)
+        WriteCharacter(context, i, offsetX);
     }
 
     static bool LineTooLong(TextContext const & context, int32_t lineLen)
@@ -177,16 +180,20 @@ namespace Engine
     }
 
     // Returns true if more lines to process
-    static bool WriteNextLine(TextContext & context)
+    static bool GetNextLineWrap(TextContext & context)
     {
+      if (context.nextLineBegin >= context.cpCount)
+        return false;
+
       int32_t lineLength = 0;
-      uint32_t lineBegin = context.nextLineBegin;
+      context.lineBegin = context.nextLineBegin;
       uint32_t lineEnd = context.nextLineBegin;
       uint32_t lineEndBkup = context.nextLineBegin;
+      uint32_t pos = context.nextLineBegin;
 
       bool done = false;
 
-      for (uint32_t pos = context.nextLineBegin; pos < context.cpCount; pos++)
+      for (;pos < context.cpCount; pos++)
       {
         if (done)
           break;
@@ -235,10 +242,6 @@ namespace Engine
               {
                 context.state = ParseState::Word;
               }
-            }
-            else
-            {
-              lineEnd = pos + 1;
             }
             break;
           }
@@ -320,8 +323,25 @@ namespace Engine
         }
       }
 
-      WriteBlock(context, lineBegin, lineEnd - lineBegin);
-      return lineEnd < context.cpCount;
+      if (pos == context.cpCount)
+        context.nextLineBegin = context.cpCount;
+
+      context.lineSize = lineEnd - context.lineBegin;
+      return true;
+    }
+
+    static uint32_t LineLength(TextContext const & context)
+    {
+      if (context.lineSize == 0)
+        return 0;
+
+      uint32_t result = 0;
+      for (uint32_t i = context.lineBegin; (i + 1) < (context.lineBegin + context.lineSize); i++)
+        result += s_glyphData[i].data.advance;
+
+      GlyphData * pData = &s_glyphData[context.lineBegin + context.lineSize - 1].data;
+      result += (pData->bearingX + pData->width);
+      return result;
     }
 
     static void WriteText(TextContext & context)
@@ -333,8 +353,15 @@ namespace Engine
       int32_t posX = context.posX;
       int32_t lineY = context.lineY;
 
-      while (WriteNextLine(context))
+      while (GetNextLineWrap(context))
       {
+        float offsetX = 0.f;
+        if (context.horizontalAlign == HorizontalAlignment::Right)
+          offsetX = context.div.size.x() - (float)LineLength(context);
+        else if (context.horizontalAlign == HorizontalAlignment::Centre)
+          offsetX = (context.div.size.x() - (float)LineLength(context)) / 2.0f;
+
+        WriteBlock(context, offsetX);
         line++;
         context.posX = posX;
         context.lineY = lineY + line * context.lineSpacing;
