@@ -219,6 +219,7 @@ namespace Engine
             }
             else
             {
+              lineEnd = pos + 1;
               context.state = ParseState::Word;
             }
             break;
@@ -235,7 +236,7 @@ namespace Engine
             }
             else if (!IsWhiteSpace(data.cp))
             {
-              lineEnd = pos;
+              lineEnd = pos + 1;
               context.state = ParseState::Word;
             }
             break;
@@ -251,7 +252,7 @@ namespace Engine
             }
             else if (!IsWhiteSpace(data.cp))
             {
-              lineEnd = pos;
+              lineEnd = pos + 1;
               context.state = ParseState::Word;
             }
             break;
@@ -329,6 +330,7 @@ namespace Engine
             }
             else
             {
+              lineEnd = pos + 1;
               context.state = ParseState::BreakableWord;
             }
             break;
@@ -352,6 +354,7 @@ namespace Engine
               }
               else
               {
+                lineEnd = pos + 1;
                 context.state = ParseState::Word;
               }
             }
@@ -373,6 +376,7 @@ namespace Engine
             }
             else if (!IsWhiteSpace(data.cp))
             {
+              lineEnd = pos + 1;
               context.state = ParseState::Word;
             }
             break;
