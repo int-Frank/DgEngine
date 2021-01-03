@@ -133,10 +133,10 @@ namespace Engine
       return a_cp == 0x0A;
     }
 
-    static bool CPInsideDiv(TextContext & context, uint32_t index)
+    static bool CPInsideDiv(TextContext const & context, uint32_t index, float offsetX)
     {
       GlyphData * pData = &s_glyphData[index].data;
-      vec2 position(float(context.posX) + float(pData->bearingX), 
+      vec2 position(float(context.posX) + float(pData->bearingX) + offsetX, 
                     float(context.lineY) - float(pData->bearingY));
       vec2 size(float(pData->width), float(pData->height));
       UIAABB glyphBounds = {position, size};
@@ -149,14 +149,14 @@ namespace Engine
     static void WriteCharacter(TextContext & context, uint32_t index, float offsetX)
     {
       GlyphData * pData = &s_glyphData[index].data;
-      if (CPInsideDiv(context, index) && (pData->textureID == context.currentTextureID))
+      if (CPInsideDiv(context, index, offsetX) && (pData->textureID == context.currentTextureID))
       {
         float x = float(context.posX + pData->bearingX) + offsetX;
         float y = float(context.lineY - pData->bearingY);
 
         uint32_t ind = context.writtenCPs * 6;
 
-        s_textVertexBuffer[ind + 0] = round(x);
+        s_textVertexBuffer[ind + 0] = x;
         s_textVertexBuffer[ind + 1] = y;
         s_textVertexBuffer[ind + 2] = pData->posX;
         s_textVertexBuffer[ind + 3] = pData->posY;
@@ -168,6 +168,12 @@ namespace Engine
       context.posX += int32_t(pData->advance);
     }
 
+    static void AdjustY(TextContext const & context, float offsetY)
+    {
+      for (uint32_t i = 0; i < context.writtenCPs; i++)
+        s_textVertexBuffer[i * 6 + 1] += offsetY;
+    }
+
     static void WriteBlock(TextContext & context, float offsetX)
     {
       for (uint32_t i = context.lineBegin; i < (context.lineBegin + context.lineSize); i++)
@@ -177,6 +183,112 @@ namespace Engine
     static bool LineTooLong(TextContext const & context, int32_t lineLen)
     {
       return (context.wrap && float(lineLen) > context.div.size.x());
+    }
+
+    static bool GetNextLine(TextContext & context)
+    {
+      if (context.nextLineBegin >= context.cpCount)
+        return false;
+
+      context.lineBegin = context.nextLineBegin;
+      uint32_t lineEnd = context.nextLineBegin;
+      uint32_t pos = context.nextLineBegin;
+
+      bool done = false;
+
+      for (; pos < context.cpCount; pos++)
+      {
+        if (done)
+          break;
+
+        CPData const & data = s_glyphData[pos];
+
+        switch (context.state)
+        {
+          case ParseState::NewLine:
+          {
+            if (IsNewLine(data.cp))
+            {
+              context.nextLineBegin = pos + 1;
+              context.state = ParseState::NewLine;
+              done = true;
+            }
+            else if (IsWhiteSpace(data.cp))
+            {
+              context.state = ParseState::PersistantWhiteSpace;
+            }
+            else
+            {
+              context.state = ParseState::Word;
+            }
+            break;
+          }
+
+          case ParseState::PersistantWhiteSpace:
+          {
+            context.nextLineBegin = pos;
+            if (IsNewLine(data.cp))
+            {
+              context.nextLineBegin++;
+              context.state = ParseState::NewLine;
+              done = true;
+            }
+            else if (!IsWhiteSpace(data.cp))
+            {
+              lineEnd = pos;
+              context.state = ParseState::Word;
+            }
+            break;
+          }
+
+          case ParseState::WhiteSpace:
+          {
+            if (IsNewLine(data.cp))
+            {
+              context.nextLineBegin = pos + 1;
+              context.state = ParseState::NewLine;
+              done = true;
+            }
+            else if (!IsWhiteSpace(data.cp))
+            {
+              lineEnd = pos;
+              context.state = ParseState::Word;
+            }
+            break;
+          }
+
+          case ParseState::Word:
+          {
+            if (IsNewLine(data.cp))
+            {
+              context.nextLineBegin = pos + 1;
+              context.state = ParseState::NewLine;
+              done = true;
+            }
+            else if (IsWhiteSpace(data.cp))
+            {
+              lineEnd = pos;
+              context.state = ParseState::WhiteSpace;
+            }
+            else
+            {
+              lineEnd = pos + 1;
+            }
+            break;
+          }
+
+          default:
+          {
+            BSR_ASSERT(false, "Malformed state machine!");
+          }
+        }
+      }
+
+      if (pos == context.cpCount)
+        context.nextLineBegin = context.cpCount;
+
+      context.lineSize = lineEnd - context.lineBegin;
+      return true;
     }
 
     // Returns true if more lines to process
@@ -348,18 +460,30 @@ namespace Engine
     {
       context.nextLineBegin = 0;
       context.writtenCPs = 0;
+      context.state = ParseState::NewLine;
 
       int32_t line = 0;
       int32_t posX = context.posX;
       int32_t lineY = context.lineY;
 
-      while (GetNextLineWrap(context))
+      while (true)
       {
-        float offsetX = 0.f;
+        bool lineRead = false;
+        if (context.wrap)
+          lineRead = GetNextLineWrap(context);
+        else
+          lineRead = GetNextLine(context);
+
+        if (!lineRead)
+          break;
+
+        float offsetX = 0.0f;
         if (context.horizontalAlign == HorizontalAlignment::Right)
           offsetX = context.div.size.x() - (float)LineLength(context);
         else if (context.horizontalAlign == HorizontalAlignment::Centre)
           offsetX = (context.div.size.x() - (float)LineLength(context)) / 2.0f;
+
+        offsetX = round(offsetX);
 
         WriteBlock(context, offsetX);
         line++;
@@ -367,6 +491,13 @@ namespace Engine
         context.lineY = lineY + line * context.lineSpacing;
         if ((context.lineY - context.ascent) > (context.div.position.y() + context.div.size.y()))
           break;
+      }
+
+      if (context.verticalAlign == VerticalAlignment::Centre)
+      {
+        float ySize = (float)context.lineSpacing * line;
+        if (ySize < context.div.size.y())
+          AdjustY(context, round((context.div.size.y() - ySize) / 2.0f));
       }
     }
 
@@ -460,7 +591,6 @@ namespace Engine
       context.div = {GetGlobalPosition(), GetSize()};
       Renderer::GetCharacterSizeRange(context.ascent, context.descent);
 
-      context.state = ParseState::NewLine;
       context.wrap = m_attributes.wrapText;
       context.divViewable = viewableWindow;
       context.horizontalAlign = m_attributes.horizontalAlign;

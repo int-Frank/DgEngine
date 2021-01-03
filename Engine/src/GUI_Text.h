@@ -20,7 +20,7 @@ namespace Engine
     enum class VerticalAlignment
     {
       Top,
-      Center
+      Centre
     };
 
     struct TextAttributes

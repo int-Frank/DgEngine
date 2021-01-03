@@ -81,8 +81,8 @@ public:
       attr.colourText = 0xFFFFFFFF;
       attr.lineSpacing = 1.0f;
       attr.horizontalAlign = Engine::GUI::HorizontalAlignment::Centre;
-      attr.verticalAlign = Engine::GUI::VerticalAlignment::Top;
-      attr.wrapText = true;
+      attr.verticalAlign = Engine::GUI::VerticalAlignment::Centre;
+      attr.wrapText = false;
 
       char const str[] = "The quick brown a fox jumps over the lazy dog\n   \nAnd here is another line.   ";
       //char const str[] = "T \n\n  ";
