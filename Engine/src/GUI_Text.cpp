@@ -21,8 +21,8 @@ namespace Engine
       NewLine,
       WhiteSpace,
       PersistantWhiteSpace,
-      BreakableWord,
-      Word
+      Word,
+      BreakableWord
     };
 
     struct TextContext
@@ -236,6 +236,10 @@ namespace Engine
                 context.state = ParseState::Word;
               }
             }
+            else
+            {
+              lineEnd = pos + 1;
+            }
             break;
           }
 
@@ -317,7 +321,7 @@ namespace Engine
       }
 
       WriteBlock(context, lineBegin, lineEnd - lineBegin);
-      return (context.state != ParseState::WhiteSpace) && (lineEnd < context.cpCount);
+      return lineEnd < context.cpCount;
     }
 
     static void WriteText(TextContext & context)
