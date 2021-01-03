@@ -10,19 +10,25 @@ namespace Engine
 {
   namespace GUI
   {
-    enum class TextAlignment
+    enum class HorizontalAlignment
     {
-      Min,    // left/top
+      Left,
       Center,
-      Max     // right/bottom
+      Right
+    };
+
+    enum class VerticalAlignment
+    {
+      Top,
+      Center
     };
 
     struct TextAttributes
     {
       uint32_t size;
       Colour colourText;
-      TextAlignment horizontalAlign;
-      TextAlignment verticalAlign;
+      HorizontalAlignment horizontalAlign;
+      VerticalAlignment verticalAlign;
       float lineSpacing;
       bool wrapText;
     };

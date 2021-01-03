@@ -16,12 +16,22 @@ namespace Engine
 {
   namespace GUI
   {
+    enum class ParseState
+    {
+      NewLine,
+      WhiteSpace,
+      PersistantWhiteSpace,
+      BreakableWord,
+      Word
+    };
+
     struct TextContext
     {
       // Constants...
       UIAABB div;
       UIAABB divViewable;
-      TextAlignment horizontalAlign;
+      HorizontalAlignment horizontalAlign;
+      VerticalAlignment verticalAlign;
       int16_t lineSpacing;
       uint32_t cpCount;
       int16_t ascent;
@@ -29,13 +39,11 @@ namespace Engine
       bool wrap;
 
       // Vars...
+      ParseState state;
       int32_t posX;
       int32_t lineY;
 
-      uint32_t lineBeginIndex;
-      uint32_t lineEndIndex;
-
-      uint32_t cpCurrentPosition;
+      uint32_t nextLineBegin;
       uint32_t writtenCPs;
 
       uint16_t currentTextureID;
@@ -122,9 +130,9 @@ namespace Engine
       return a_cp == 0x0A;
     }
 
-    static bool CPInsideDiv(TextContext & context)
+    static bool CPInsideDiv(TextContext & context, uint32_t index)
     {
-      GlyphData * pData = &s_glyphData[context.cpCurrentPosition].data;
+      GlyphData * pData = &s_glyphData[index].data;
       vec2 position(float(context.posX) + float(pData->bearingX), 
                     float(context.lineY) - float(pData->bearingY));
       vec2 size(float(pData->width), float(pData->height));
@@ -133,19 +141,12 @@ namespace Engine
       return Intersection(context.divViewable, glyphBounds, result);
     }
 
-    static void AdvanceOne(TextContext & context)
-    {
-      GlyphData * pData = &s_glyphData[context.cpCurrentPosition].data;
-      context.posX += int32_t(pData->advance);
-      context.cpCurrentPosition++;
-    }
-
     // Writes character and moves to the next.
     // Assumes will not overflow s_textVertexBuffer.
-    static void WriteCharacter(TextContext & context)
+    static void WriteCharacter(TextContext & context, uint32_t index)
     {
-      GlyphData * pData = &s_glyphData[context.cpCurrentPosition].data;
-      if (CPInsideDiv(context) && (pData->textureID == context.currentTextureID))
+      GlyphData * pData = &s_glyphData[index].data;
+      if (CPInsideDiv(context, index) && (pData->textureID == context.currentTextureID))
       {
         float x = float(context.posX + pData->bearingX);
         float y = float(context.lineY - pData->bearingY);
@@ -161,121 +162,167 @@ namespace Engine
 
         context.writtenCPs++;
       }
-      AdvanceOne(context);
+      context.posX += int32_t(pData->advance);
     }
 
-    static void WriteBlock(TextContext & context, uint32_t cpCount)
+    static void WriteBlock(TextContext & context, uint32_t cpBegin, uint32_t cpCount)
     {
-      for (uint32_t i = 0; i < cpCount; i++)
-        WriteCharacter(context);
+      for (uint32_t i = cpBegin; i < (cpBegin + cpCount); i++)
+        WriteCharacter(context, i);
     }
 
-    static int32_t GetLength(uint32_t a_index, uint32_t a_count)
+    static bool LineTooLong(TextContext const & context, int32_t lineLen)
     {
-      int32_t result = 0;
-      if (a_count == 0)
-        return result;
-
-      for (uint32_t i = a_index; (i + 1) < a_index + a_count; i++)
-        result += (int32_t)s_glyphData[i].data.advance;
-
-      result += ((int32_t)s_glyphData[a_index + a_count - 1].data.bearingX + (int32_t)s_glyphData[a_index + a_count - 1].data.width);
-
-      return result;
-    }
-
-    static bool CharacterFitsX(TextContext const & context)
-    {
-      GlyphData * pData = &s_glyphData[context.cpCurrentPosition].data;
-      return (context.posX + pData->bearingX + pData->width) <= int32_t(context.div.position.x() + context.div.size.x());
-    }
-
-    // Return word length. 0 if EOL or EOT reached
-    static int FindNextWord(TextContext & context, bool advanceOnWhiteSpace)
-    {
-      int cpCount = 0;
-
-      for (; context.cpCurrentPosition < context.cpCount; context.cpCurrentPosition++)
-      {
-        CodePoint cp = s_glyphData[context.cpCurrentPosition].cp;
-
-        if (IsWhiteSpace(cp))
-        {
-          if (advanceOnWhiteSpace)
-            context.posX += int32_t(s_glyphData[context.cpCurrentPosition].data.advance);
-          continue;
-        }
-
-        if (IsNewLine(cp))
-        {
-          context.cpCurrentPosition++;
-          break;
-        }
-
-        cpCount = 1;
-        break;
-      }
-      
-      if (cpCount == 1)
-      {
-        for (uint32_t i = context.cpCurrentPosition + 1; i < context.cpCount; i++)
-        {
-          CodePoint cp = s_glyphData[i].cp;
-          if (IsWhiteSpace(cp) || IsNewLine(cp))
-            break;
-          cpCount++;
-        }
-      }
-
-      return cpCount;
-    }
-
-    static bool WordFitsOnLine(TextContext const & context, int32_t wordLen)
-    {
-      if (!context.wrap)
-        return true;
-      return (context.posX + wordLen) <= int32_t(context.div.position.x() + context.div.size.x());
+      return (context.wrap && float(lineLen) > context.div.size.x());
     }
 
     // Returns true if more lines to process
     static bool WriteNextLine(TextContext & context)
     {
-      int cpCount = FindNextWord(context, false);
+      int32_t lineLength = 0;
+      uint32_t lineBegin = context.nextLineBegin;
+      uint32_t lineEnd = context.nextLineBegin;
+      uint32_t lineEndBkup = context.nextLineBegin;
 
-      // Line contained only whitespace
-      if (cpCount > 0)
+      bool done = false;
+
+      for (uint32_t pos = context.nextLineBegin; pos < context.cpCount; pos++)
       {
-        int32_t wordLen = GetLength(context.cpCurrentPosition, cpCount);
-        bool wordWritten = false;
+        if (done)
+          break;
 
-        while (WordFitsOnLine(context, wordLen))
+        CPData const & data = s_glyphData[pos];
+        lineLength += data.data.advance;
+
+        switch (context.state)
         {
-          wordWritten = true;
-          WriteBlock(context, cpCount);
-          cpCount = FindNextWord(context, true);
-
-          if (cpCount == 0)
+          case ParseState::NewLine:
+          {
+            if (IsNewLine(data.cp))
+            {
+              context.nextLineBegin = pos + 1;
+              context.state = ParseState::NewLine;
+              done = true;
+            }
+            else if (IsWhiteSpace(data.cp))
+            {
+              context.state = ParseState::PersistantWhiteSpace;
+            }
+            else
+            {
+              context.state = ParseState::BreakableWord;
+            }
             break;
+          }
 
-          wordLen = GetLength(context.cpCurrentPosition, cpCount);
-        }
+          case ParseState::WhiteSpace:
+          {
+            if (IsNewLine(data.cp))
+            {
+              context.nextLineBegin = pos + 1;
+              context.state = ParseState::NewLine;
+              done = true;
+            }
+            else if (!IsWhiteSpace(data.cp))
+            {
+              context.nextLineBegin = pos;
+              if (LineTooLong(context, lineLength))
+              {
+                done = true;
+                context.state = ParseState::BreakableWord;
+              }
+              else
+              {
+                context.state = ParseState::Word;
+              }
+            }
+            break;
+          }
 
-        // If this is the first word, write as much as possible
-        if (!wordWritten)
-        {
-          // Wirte at lest one character so we don't end up in an infinite loop.
-          WriteCharacter(context);
-          while (CharacterFitsX(context))
-            WriteCharacter(context);
+          case ParseState::PersistantWhiteSpace:
+          {
+            context.nextLineBegin = pos;
+            if (IsNewLine(data.cp))
+            {
+              context.nextLineBegin++;
+              context.state = ParseState::NewLine;
+              done = true;
+            }
+            else if (LineTooLong(context, lineLength))
+            {
+              done = true;
+            }
+            else if (!IsWhiteSpace(data.cp))
+            {
+              context.state = ParseState::Word;
+            }
+            break;
+          }
+
+          case ParseState::Word:
+          {
+            if (IsNewLine(data.cp))
+            {
+              context.nextLineBegin = pos + 1;
+              context.state = ParseState::NewLine;
+              done = true;
+            }
+            else if (IsWhiteSpace(data.cp))
+            {
+              lineEnd = pos;
+              lineEndBkup = pos;
+              context.state = ParseState::WhiteSpace;
+            }
+            else if (LineTooLong(context, lineLength))
+            {
+              lineEnd = lineEndBkup;
+              context.state = ParseState::BreakableWord;
+              done = true;
+            }
+            else
+            {
+              lineEnd = pos + 1;
+            }
+            break;
+          }
+
+          case ParseState::BreakableWord:
+          {
+            if (IsNewLine(data.cp))
+            {
+              lineEnd = pos;
+              context.nextLineBegin = pos + 1;
+              context.state = ParseState::NewLine;
+              done = true;
+            }
+            else if (IsWhiteSpace(data.cp))
+            {
+              lineEnd = pos;
+              lineEndBkup = pos;
+              context.state = ParseState::WhiteSpace;
+            }
+            else if (LineTooLong(context, lineLength))
+            {
+              lineEnd = pos;
+              context.nextLineBegin = pos;
+              done = true;
+            }
+            else
+            {
+              lineEnd = pos + 1;
+            }
+            break;
+          }
         }
       }
 
-      return context.cpCurrentPosition < context.cpCount;
+      WriteBlock(context, lineBegin, lineEnd - lineBegin);
+      return (context.state != ParseState::WhiteSpace) && (lineEnd < context.cpCount);
     }
 
     static void WriteText(TextContext & context)
     {
-      context.cpCurrentPosition = 0;
+      context.nextLineBegin = 0;
       context.writtenCPs = 0;
 
       int32_t line = 0;
@@ -349,8 +396,8 @@ namespace Engine
         m_attributes.size = DEFAULT_FONT_SIZE;
         m_attributes.colourText = 0xFFFFFFFF;
         m_attributes.lineSpacing = 1.0f;
-        m_attributes.horizontalAlign = TextAlignment::Min;
-        m_attributes.verticalAlign = TextAlignment::Min;
+        m_attributes.horizontalAlign = HorizontalAlignment::Left;
+        m_attributes.verticalAlign = VerticalAlignment::Top;
         m_attributes.wrapText = true;
       }
     }
@@ -382,9 +429,11 @@ namespace Engine
       context.div = {GetGlobalPosition(), GetSize()};
       Renderer::GetCharacterSizeRange(context.ascent, context.descent);
 
+      context.state = ParseState::NewLine;
       context.wrap = m_attributes.wrapText;
       context.divViewable = viewableWindow;
       context.horizontalAlign = m_attributes.horizontalAlign;
+      context.verticalAlign = m_attributes.verticalAlign;
       context.lineSpacing = int16_t(m_attributes.lineSpacing * (context.ascent - context.descent));
       context.cpCount = DecodeText(m_text, textureCount);
       

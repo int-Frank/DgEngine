@@ -80,11 +80,12 @@ public:
       attr.size = DEFAULT_FONT_SIZE;
       attr.colourText = 0xFFFFFFFF;
       attr.lineSpacing = 1.0f;
-      attr.horizontalAlign = Engine::GUI::TextAlignment::Max;
-      attr.verticalAlign = Engine::GUI::TextAlignment::Min;
+      attr.horizontalAlign = Engine::GUI::HorizontalAlignment::Left;
+      attr.verticalAlign = Engine::GUI::VerticalAlignment::Top;
       attr.wrapText = true;
 
-      char const str[] = "The quick brown fox jumps over the lazy dog\n\nAnd here is another line.";
+      char const str[] = "The quick brown fox jumps over the lazy dog\n   \nAnd here is another line.   \n";
+      //char const str[] = "T \n\n  ";
 
       Engine::GUI::Text * pText = Engine::GUI::Text::Create(nullptr, str, {100.0f, 100.0f}, {100.0f, 100.0f}, &attr, 
         {Engine::GUI::WidgetFlag::StretchHeight, Engine::GUI::WidgetFlag::StretchWidth});
