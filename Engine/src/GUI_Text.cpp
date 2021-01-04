@@ -421,7 +421,9 @@ namespace Engine
               lineEndBkup = pos;
               context.state = ParseState::WhiteSpace;
             }
-            else if (LineTooLong(context, lineLength))
+            else if (LineTooLong(context, lineLength) 
+              // If there is one character on the line and it is the only one left, we don't split.
+              && !(((lineEnd - context.lineBegin) == 0) && ((pos + 1) == context.cpCount)))
             {
               lineEnd = pos;
               context.nextLineBegin = pos;
