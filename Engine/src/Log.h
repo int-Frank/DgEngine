@@ -8,7 +8,6 @@
 #include "spdlog/spdlog.h"
 #include "LogLevel.h"
 
-// TODO do not use spdlog. Write your own
 namespace Engine
 {
   namespace impl

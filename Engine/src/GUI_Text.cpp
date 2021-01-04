@@ -39,7 +39,6 @@ namespace Engine
       bool wrap;
 
       // Vars...
-      ParseState state;
       int32_t posX;
       int32_t lineY;
 
@@ -193,6 +192,7 @@ namespace Engine
       context.lineBegin = context.nextLineBegin;
       uint32_t lineEnd = context.nextLineBegin;
       uint32_t pos = context.nextLineBegin;
+      ParseState state = ParseState::NewLine;
 
       bool done = false;
 
@@ -200,24 +200,23 @@ namespace Engine
       {
         CPData const & data = s_glyphData[pos];
 
-        switch (context.state)
+        switch (state)
         {
           case ParseState::NewLine:
           {
             if (IsNewLine(data.cp))
             {
               context.nextLineBegin = pos + 1;
-              context.state = ParseState::NewLine;
               done = true;
             }
             else if (IsWhiteSpace(data.cp))
             {
-              context.state = ParseState::PersistantWhiteSpace;
+              state = ParseState::PersistantWhiteSpace;
             }
             else
             {
               lineEnd = pos + 1;
-              context.state = ParseState::Word;
+              state = ParseState::Word;
             }
             break;
           }
@@ -228,13 +227,12 @@ namespace Engine
             if (IsNewLine(data.cp))
             {
               context.nextLineBegin++;
-              context.state = ParseState::NewLine;
               done = true;
             }
             else if (!IsWhiteSpace(data.cp))
             {
               lineEnd = pos + 1;
-              context.state = ParseState::Word;
+              state = ParseState::Word;
             }
             break;
           }
@@ -244,13 +242,12 @@ namespace Engine
             if (IsNewLine(data.cp))
             {
               context.nextLineBegin = pos + 1;
-              context.state = ParseState::NewLine;
               done = true;
             }
             else if (!IsWhiteSpace(data.cp))
             {
               lineEnd = pos + 1;
-              context.state = ParseState::Word;
+              state = ParseState::Word;
             }
             break;
           }
@@ -260,13 +257,12 @@ namespace Engine
             if (IsNewLine(data.cp))
             {
               context.nextLineBegin = pos + 1;
-              context.state = ParseState::NewLine;
               done = true;
             }
             else if (IsWhiteSpace(data.cp))
             {
               lineEnd = pos;
-              context.state = ParseState::WhiteSpace;
+              state = ParseState::WhiteSpace;
             }
             else
             {
@@ -303,6 +299,7 @@ namespace Engine
       uint32_t lineEnd = context.nextLineBegin;
       uint32_t lineEndBkup = context.nextLineBegin;
       uint32_t pos = context.nextLineBegin;
+      ParseState state = ParseState::NewLine;
 
       bool done = false;
 
@@ -311,24 +308,23 @@ namespace Engine
         CPData const & data = s_glyphData[pos];
         lineLength += data.data.advance;
 
-        switch (context.state)
+        switch (state)
         {
           case ParseState::NewLine:
           {
             if (IsNewLine(data.cp))
             {
               context.nextLineBegin = pos + 1;
-              context.state = ParseState::NewLine;
               done = true;
             }
             else if (IsWhiteSpace(data.cp))
             {
-              context.state = ParseState::PersistantWhiteSpace;
+              state = ParseState::PersistantWhiteSpace;
             }
             else
             {
               lineEnd = pos + 1;
-              context.state = ParseState::BreakableWord;
+              state = ParseState::BreakableWord;
             }
             break;
           }
@@ -338,7 +334,6 @@ namespace Engine
             if (IsNewLine(data.cp))
             {
               context.nextLineBegin = pos + 1;
-              context.state = ParseState::NewLine;
               done = true;
             }
             else if (!IsWhiteSpace(data.cp))
@@ -347,12 +342,11 @@ namespace Engine
               if (LineTooLong(context, lineLength))
               {
                 done = true;
-                context.state = ParseState::BreakableWord;
               }
               else
               {
                 lineEnd = pos + 1;
-                context.state = ParseState::Word;
+                state = ParseState::Word;
               }
             }
             break;
@@ -364,7 +358,6 @@ namespace Engine
             if (IsNewLine(data.cp))
             {
               context.nextLineBegin++;
-              context.state = ParseState::NewLine;
               done = true;
             }
             else if (LineTooLong(context, lineLength))
@@ -374,7 +367,7 @@ namespace Engine
             else if (!IsWhiteSpace(data.cp))
             {
               lineEnd = pos + 1;
-              context.state = ParseState::Word;
+              state = ParseState::Word;
             }
             break;
           }
@@ -384,19 +377,17 @@ namespace Engine
             if (IsNewLine(data.cp))
             {
               context.nextLineBegin = pos + 1;
-              context.state = ParseState::NewLine;
               done = true;
             }
             else if (IsWhiteSpace(data.cp))
             {
               lineEnd = pos;
               lineEndBkup = pos;
-              context.state = ParseState::WhiteSpace;
+              state = ParseState::WhiteSpace;
             }
             else if (LineTooLong(context, lineLength))
             {
               lineEnd = lineEndBkup;
-              context.state = ParseState::BreakableWord;
               done = true;
             }
             else
@@ -412,18 +403,15 @@ namespace Engine
             {
               lineEnd = pos;
               context.nextLineBegin = pos + 1;
-              context.state = ParseState::NewLine;
               done = true;
             }
             else if (IsWhiteSpace(data.cp))
             {
               lineEnd = pos;
               lineEndBkup = pos;
-              context.state = ParseState::WhiteSpace;
+              state = ParseState::WhiteSpace;
             }
-            else if (LineTooLong(context, lineLength) 
-              // If there is one character on the line and it is the only one left, we don't split.
-              && !(((lineEnd - context.lineBegin) == 0) && ((pos + 1) == context.cpCount)))
+            else if (LineTooLong(context, lineLength))
             {
               lineEnd = pos;
               context.nextLineBegin = pos;
@@ -466,7 +454,6 @@ namespace Engine
     {
       context.nextLineBegin = 0;
       context.writtenCPs = 0;
-      context.state = ParseState::NewLine;
 
       int32_t line = 0;
       int32_t posX = context.posX;

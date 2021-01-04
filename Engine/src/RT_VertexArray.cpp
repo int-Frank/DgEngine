@@ -56,7 +56,6 @@ namespace Engine
   void RT_VertexArray::SetVertexAttributeDivisor(uint32_t a_attrIndex, uint32_t a_divisor)
   {
     Bind();
-    // TODO log OpenGL errors
     glVertexAttribDivisor(a_attrIndex, a_divisor);
   }
 

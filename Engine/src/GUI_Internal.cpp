@@ -65,7 +65,6 @@ namespace Engine
         gl_Position = vec4(posXY, 0.0, 1.0);
       })";
 
-      // TODO Having the textureAtlas before textColour crashes
       static char const * g_textShader_fs = R"(
       #version 430
       in vec2 texCoord;

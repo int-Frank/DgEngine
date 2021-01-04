@@ -26,9 +26,6 @@ namespace Engine
 {
   class MessageBus;
 
-  //TODO Subscribers should collect messages and process them on a single call
-  //     to Update(). This way, we can throw the subscriber on a separate thread
-  //     and update.
   class System : public MessageHandler
   {
   public: 

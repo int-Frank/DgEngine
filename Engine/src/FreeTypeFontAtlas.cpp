@@ -14,8 +14,6 @@
 #include <ft2build.h>
 #include FT_FREETYPE_H
 
-uint8_t * g_pPixels_DEBUG = nullptr; // TODO DEBUG!!!
-
 namespace Engine
 {
   typedef uint64_t GlyphID;
@@ -376,7 +374,6 @@ epilogue:
     while ((remaining > 0) && (previousRemaining != remaining))
     {
       uint8_t * pBuffer = new uint8_t[m_textureDimension * m_textureDimension]{};
-      g_pPixels_DEBUG = pBuffer; // TODO DEBUG!!!
 
       std::function<void(Dg::BinPacker<uint32_t, GlyphID>::Item const &)> callback = 
         [ &charMap = this->m_charMap,
@@ -433,7 +430,7 @@ epilogue:
       attrs.SetPixelType(TexturePixelType::R8);
 
       texture->Set(m_textureDimension, m_textureDimension, pBuffer, attrs);
-      texture->Upload(false); //TODO Should be true! flase for DEBUG
+      texture->Upload(true);
 
       m_textures.push_back(texture);
     }
