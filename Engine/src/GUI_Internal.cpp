@@ -218,6 +218,9 @@ namespace Engine
 
       void DrawText(uint16_t a_textureID, Colour a_colour, uint32_t a_count, void * a_pVerts)
       {
+        if (a_count == 0 || a_pVerts == nullptr)
+          return;
+
         float clr[4] ={a_colour.fr(), a_colour.fg(), a_colour.fb(), a_colour.fa()};
 
         Ref<Texture2D> texture;

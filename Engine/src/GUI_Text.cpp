@@ -198,9 +198,6 @@ namespace Engine
 
       for (; pos < context.cpCount; pos++)
       {
-        if (done)
-          break;
-
         CPData const & data = s_glyphData[pos];
 
         switch (context.state)
@@ -283,6 +280,9 @@ namespace Engine
             BSR_ASSERT(false, "Malformed state machine!");
           }
         }
+
+        if (done)
+          break;
       }
 
       if (pos == context.cpCount)
@@ -308,9 +308,6 @@ namespace Engine
 
       for (;pos < context.cpCount; pos++)
       {
-        if (done)
-          break;
-
         CPData const & data = s_glyphData[pos];
         lineLength += data.data.advance;
 
@@ -437,6 +434,9 @@ namespace Engine
             break;
           }
         }
+
+        if (done)
+          break;
       }
 
       if (pos == context.cpCount)
