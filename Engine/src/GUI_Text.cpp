@@ -547,7 +547,7 @@ namespace Engine
       }
       else
       {
-        // TODO these need to come from settings
+        // TODO UI defaults should be defined in one place
         m_attributes.size = DEFAULT_FONT_SIZE;
         m_attributes.colourText = 0xFFFFFFFF;
         m_attributes.lineSpacing = 1.0f;
@@ -591,7 +591,6 @@ namespace Engine
       context.lineSpacing = int16_t(m_attributes.lineSpacing * (context.ascent - context.descent));
       context.cpCount = DecodeText(m_text, textureCount);
       
-      // TODO remove div border from root container widget.
       ::Engine::Renderer::SetSissorBox((int)viewableWindow.position.x(), (int)viewableWindow.position.y(), (int)viewableWindow.size.x(), (int)viewableWindow.size.y());
       
       for (uint32_t i = 0; i < textureCount; i++)

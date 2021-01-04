@@ -16,6 +16,7 @@ namespace Engine
     , m_pScreen(nullptr)
   {
     m_pScreen = GUI::Container::Create(nullptr, {0.f, 0.f}, {(float)a_windowW, (float)a_windowH}, {GUI::WidgetFlag::NoBackground});
+    m_pScreen->SetDivBorder(0.0f, 0.0f, 0.0f, 0.0f);
   }
 
   System_GUI::~System_GUI()

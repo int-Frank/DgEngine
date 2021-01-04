@@ -164,7 +164,6 @@ namespace Engine
       for (auto it = m_pimpl->systemStack.begin(); it != m_pimpl->systemStack.end(); it++)
         it->second->Update(dt);
 
-      // TODO this should be an option
       Renderer::Clear();
 
       auto it = m_pimpl->systemStack.end();

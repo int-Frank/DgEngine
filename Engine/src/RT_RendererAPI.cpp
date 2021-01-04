@@ -165,6 +165,7 @@ namespace Engine
     // TODO This is a bit awkward. OpenGL screen pixel coords are [0, 0] bottom left,
     //      but most of our other systems are [0, 0] top left. And so we have to get the 
     //      window height to flip the y in this call. Is there a better way?
+    //      Yes! Use somethign like glOrtho()
 
     int wh, ww;
     Framework::Instance()->GetWindow()->GetDimensions(ww, wh);

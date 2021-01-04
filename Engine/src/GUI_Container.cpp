@@ -42,6 +42,7 @@ namespace Engine
       void Clear();
 
       void SetBackgroundColour(Colour);
+      void SetDivBorder(float left, float top, float right, float bottom);
 
       void Add(Widget * a_pWgt);
       void Remove(Widget * a_pWgt);
@@ -243,6 +244,14 @@ namespace Engine
         size.Zero();
 
       return size;
+    }
+
+    void Container::ContainerState::SetDivBorder(float left, float top, float right, float bottom)
+    {
+      m_pData->contentBorder[0] = left;
+      m_pData->contentBorder[1] = top;
+      m_pData->contentBorder[2] = right;
+      m_pData->contentBorder[3] = bottom;
     }
 
     //------------------------------------------------------------------------------------
@@ -655,6 +664,11 @@ namespace Engine
     vec2 Container::GetContentDivSize()
     {
       return m_pState->GetContentDivSize();
+    }
+
+    void Container::SetDivBorder(float left, float top, float right, float bottom)
+    {
+      m_pState->SetDivBorder(left, top, right, bottom)
     }
   }
 }

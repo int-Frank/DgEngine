@@ -21,6 +21,7 @@ namespace Engine
       ~Container();
 
       void SetBackgroundColour(Colour);
+      void SetDivBorder(float left, float top, float right, float bottom);
       //void SetHoverOnBackgroundColour(Colour);
 
       void Clear();

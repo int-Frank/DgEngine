@@ -90,6 +90,8 @@ namespace Engine
   // VertexBuffer
   //------------------------------------------------------------------------------------------------
 
+  // TODO Add option to Create buffers using memory allocated from the render heap.
+  //      This way we eliminate the need to do any copying.
   class VertexBuffer : public RenderResource
   {
   private:

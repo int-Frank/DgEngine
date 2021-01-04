@@ -186,7 +186,6 @@ namespace Engine
 
     RENDER_SUBMIT(state, [resID = m_id, size = a_size, usage = a_usage, data]()
       {
-      //TODO all of these RT_* should be obtained through Framework, or through a GraphicsFramework class.
         ::Engine::RT_VertexBuffer * pVB = ::Engine::RT_VertexBuffer::Create(data, size, usage);
         if (pVB == nullptr)
         {
