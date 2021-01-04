@@ -25,7 +25,6 @@
 #include "ShaderUniform.h"
 #include "RT_RendererAPI.h"
 #include "ShaderSource.h"
-#include "DgOpenHashMap.h"
 #include "ResourceManager.h"
 
 namespace Engine
@@ -35,7 +34,6 @@ namespace Engine
   class RT_RendererProgram
   {
     typedef uint32_t Index;
-    typedef int32_t  TextureUnit;
 
     //RT_RendererProgram();
     RT_RendererProgram(ResourceID shaderDataID);
@@ -66,7 +64,7 @@ namespace Engine
 
     int32_t GetUniformLocation(std::string const& name) const;
     void UploadUniform(uint32_t index, void const * buf, uint32_t count);
-    void UploadTexture(TextureUnit textureUnit, RenderResourceID const * textureIDs, uint32_t count);
+    void UploadTexture(uint32_t textureUnit, RenderResourceID const * textureIDs, uint32_t count);
     void UploadUniformSingle(int location, ShaderDataType, void const* buf);
     void UploadUniformArray(int location, ShaderDataType, void const* buf, uint32_t count);
 
@@ -77,7 +75,6 @@ namespace Engine
     std::string m_name;
     ShaderData const * m_pShaderData;
     Dg::DynamicArray<int32_t> m_uniformLocations;
-    Dg::OpenHashMap<Index, TextureUnit> m_textureBindingPoints;
   };
 }
 

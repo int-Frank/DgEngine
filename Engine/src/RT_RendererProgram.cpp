@@ -183,7 +183,7 @@ namespace Engine
 
     glUseProgram(m_rendererID);
 
-    uint32_t sampler = 0;
+    int32_t sampler = 0;
     Index ind = 0;
     ShaderUniformList const & rUniforms(m_pShaderData->GetUniforms());
     for (ShaderUniformList::const_iterator it = rUniforms.cbegin(); it != rUniforms.cend(); it++)
@@ -191,8 +191,7 @@ namespace Engine
       if (it->GetType() == ShaderDataType::TEXTURE2D)
       {
         int32_t location = GetUniformLocation(it->GetName());
-        m_textureBindingPoints.insert(ind, sampler);
-        m_uniformLocations.push_back(0xdeadbeef); // TODO Maybe use a map here so we don't need to do this? But then again, this hack allows us to use a flat array for m_uniformLocations...
+        m_uniformLocations.push_back(sampler);
 
         if (it->GetCount() == 1)
         {
@@ -227,7 +226,7 @@ namespace Engine
     return result;
   }
 
-  void RT_RendererProgram::UploadTexture(TextureUnit a_textureUnit, RenderResourceID const * a_textureIDs, uint32_t a_count)
+  void RT_RendererProgram::UploadTexture(uint32_t a_textureUnit, RenderResourceID const * a_textureIDs, uint32_t a_count)
   {
     uint32_t textureUnit = a_textureUnit;
     for (uint32_t i = 0; i < a_count; i++)
@@ -261,9 +260,7 @@ namespace Engine
       uint32_t count = header.GetSize() / SizeOfShaderDataType(pdecl->GetType());
       if (pdecl->GetType() == ShaderDataType::TEXTURE2D)
       {
-        TextureUnit const * pUnit = m_textureBindingPoints.at(i);
-        if (pUnit != nullptr)
-          UploadTexture(*pUnit, (RenderResourceID *)buf, count);
+        UploadTexture((uint32_t)m_uniformLocations[i], (RenderResourceID *)buf, count);
       }
       else
       {
