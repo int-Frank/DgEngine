@@ -70,8 +70,8 @@ namespace Engine
       #version 430
       in vec2 texCoord;
       out vec4 FragColor;
-      uniform vec4 textColour;
       uniform sampler2D textureAtlas;
+      uniform vec4 textColour;
       void main()
       {
         ivec2 texDim = textureSize(textureAtlas, 0);

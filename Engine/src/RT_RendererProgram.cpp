@@ -192,6 +192,7 @@ namespace Engine
       {
         int32_t location = GetUniformLocation(it->GetName());
         m_textureBindingPoints.insert(ind, sampler);
+        m_uniformLocations.push_back(0xdeadbeef); // TODO Maybe use a map here so we don't need to do this? But then again, this hack allows us to use a flat array for m_uniformLocations...
 
         if (it->GetCount() == 1)
         {
