@@ -33,8 +33,6 @@ namespace Engine
       void BindHoverOff(std::function<void()> a_fn);
       void BindSelect(std::function<void()> a_fn);
 
-      void HandleMessage(Message *) override;
-
       void Draw() override;
       WidgetState QueryState() const override;
       Widget * GetParent() const override;
@@ -44,6 +42,8 @@ namespace Engine
       vec2 GetContentDivSize() override;
 
     private:
+
+      void _HandleMessage(Message *) override;
 
       void HandleMessage(Message_GUI_PointerDown *);
       void HandleMessage(Message_GUI_PointerMove *);

@@ -28,8 +28,6 @@ namespace Engine
       void Add(Widget *);
       void Remove(Widget *);
 
-      void HandleMessage(Message *);
-
       void Draw() override;
 
       WidgetState QueryState() const override;
@@ -43,6 +41,8 @@ namespace Engine
       class ContainerState;
 
     private:
+
+      void _HandleMessage(Message *) override;
 
       void UpdateState(ContainerState *);
 

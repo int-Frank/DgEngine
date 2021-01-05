@@ -145,5 +145,13 @@ namespace Engine
 
       _SetSize(a_size);
     }
+
+    void Widget::HandleMessage(Message * a_pMsg)
+    {
+      if (HasFlag(WidgetFlag::NotResponsive))
+        return;
+
+      _HandleMessage(a_pMsg);
+    }
   }
 }

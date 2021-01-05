@@ -41,6 +41,8 @@ namespace Engine
 
     enum class WidgetFlag
     {
+      NotResponsive,
+
       StretchWidth,
       StretchHeight,
 
@@ -57,7 +59,7 @@ namespace Engine
       Widget(std::initializer_list<WidgetFlag> flags = {});
       virtual ~Widget();
 
-      virtual void HandleMessage(Message *) { };
+      void HandleMessage(Message *);
       virtual void Draw() { }
       virtual WidgetState QueryState() const = 0;
       virtual Widget * GetParent() const = 0;
@@ -82,6 +84,8 @@ namespace Engine
       bool HasFlag(WidgetFlag) const;
 
     protected:
+
+      virtual void _HandleMessage(Message *) = 0;
 
       // All these will do is get/set the raw vec2.
       virtual void _SetLocalPosition(vec2 const &) = 0;

@@ -322,7 +322,9 @@ namespace Engine
 
       if (m_pData->pGrab != nullptr)
       {
-        m_pData->pGrab->HandleMessage((Message *)a_pMsg);
+        Widget * pWgt(m_pData->pGrab);
+        pWgt->HandleMessage(a_pMsg);
+
         if (m_pData->grabPressed)
         {
           m_pData->grabPressed = false;
@@ -383,7 +385,10 @@ namespace Engine
       vec2 point((float)a_pMsg->x, (float)a_pMsg->y);
 
       if (m_pData->pGrab != nullptr)
-        m_pData->pGrab->HandleMessage((Message *)a_pMsg);
+      {
+        Widget * pWgt(m_pData->pGrab);
+        pWgt->HandleMessage(a_pMsg);
+      }
 
       for (Widget * pWidget : m_pData->children)
       {
@@ -576,7 +581,7 @@ namespace Engine
       return new Container(a_pParent, a_position, a_size, a_flags);
     }
 
-    void Container::HandleMessage(Message * a_pMsg)
+    void Container::_HandleMessage(Message * a_pMsg)
     {
       UpdateState(m_pState->HandleMessage(a_pMsg));
     }
@@ -668,7 +673,7 @@ namespace Engine
 
     void Container::SetDivBorder(float left, float top, float right, float bottom)
     {
-      m_pState->SetDivBorder(left, top, right, bottom)
+      m_pState->SetDivBorder(left, top, right, bottom);
     }
   }
 }

@@ -44,8 +44,6 @@ namespace Engine
 
       void SetText(std::string const &);
 
-      void HandleMessage(Message *) override;
-
       //void SetFont(FontID fontID, uint32_t size);
       void Draw() override;
       WidgetState QueryState() const override;
@@ -53,6 +51,8 @@ namespace Engine
       void SetParent(Widget *) override;
 
     private:
+
+      void _HandleMessage(Message *) override;
 
       void HandleMessage(Message_GUI_PointerDown *);
       void HandleMessage(Message_GUI_PointerMove *);

@@ -19,14 +19,6 @@ namespace Engine
   {
     namespace Renderer
     {
-      enum Mesh
-      {
-        uiM_Box,
-        uiM_RoundedBox,
-
-        uiM_COUNT
-      };
-
       static char const * g_flatShader_vs = R"(
       #version 430
       layout(location = 0) in vec2 inPos;

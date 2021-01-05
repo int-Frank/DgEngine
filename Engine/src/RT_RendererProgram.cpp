@@ -352,9 +352,7 @@ namespace Engine
     uint32_t elementSize = SizeOfShaderDataType(pdecl->GetType());
     uint32_t count = a_size / elementSize;
 
-    //TODO should this be here, or do we leave it up to the user to bind before uploading uniforms?
     Bind();
-
     UploadUniform(index, a_pbuf, count);
   }
 }

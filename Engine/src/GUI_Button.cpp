@@ -51,7 +51,7 @@ namespace Engine
       m_clbk_Select = a_fn;
     }
 
-    void Button::HandleMessage(Message * a_pMsg)
+    void Button::_HandleMessage(Message * a_pMsg)
     {
       if (a_pMsg->GetCategory() != MC_GUI)
         return;

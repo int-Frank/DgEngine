@@ -620,7 +620,7 @@ namespace Engine
       m_pParent = a_pParent;
     }
 
-    void Text::HandleMessage(Message * a_pMsg)
+    void Text::_HandleMessage(Message * a_pMsg)
     {
       if (a_pMsg->GetCategory() != MC_GUI)
         return;

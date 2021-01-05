@@ -89,7 +89,7 @@ public:
       //char const str[] = "       T";
 
       Engine::GUI::Text * pText = Engine::GUI::Text::Create(nullptr, str, {100.0f, 100.0f}, {100.0f, 100.0f}, &attr, 
-        {Engine::GUI::WidgetFlag::StretchHeight, Engine::GUI::WidgetFlag::StretchWidth});
+        {Engine::GUI::WidgetFlag::StretchHeight, Engine::GUI::WidgetFlag::StretchWidth, Engine::GUI::WidgetFlag::NotResponsive});
       pWindow->Add(pText);
       pSysUI->AddWidget(pWindow);
     }
