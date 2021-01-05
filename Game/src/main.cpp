@@ -84,8 +84,8 @@ public:
       attr.verticalAlign = Engine::GUI::VerticalAlignment::Top;
       attr.wrapText = true;
 
-      char const str[] = "The quick brown a fox jumps over the lazy dog\n   \nAnd here is another line.   ";
-      //char const str[] = {0xE2, 0x9C, 0x93};
+      //char const str[] = "The quick brown a fox jumps over the lazy dog\n   \nAnd here is another line.   ";
+      char const str[] = {0xE2, 0x9C, 0x94, 0xE2, 0x97, 0x89, 0xE2, 0x97, 0x8B, 0xE2, 0x98, 0x90, 0xEE, 0x80, 0x80};
       //char const str[] = "       T";
 
       Engine::GUI::Text * pText = Engine::GUI::Text::Create(nullptr, str, {100.0f, 100.0f}, {100.0f, 100.0f}, &attr, 

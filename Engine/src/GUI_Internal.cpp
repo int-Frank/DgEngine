@@ -11,7 +11,7 @@
 #include "Renderer.h"
 #include <algorithm>
 
-#define DEFAULT_FONT_PATH "../Engine/assets/fonts/NotoSans-Regular.ttf"
+#define DEFAULT_FONT_PATH "../Engine/assets/fonts/NotoSans-BSR.ttf"
 
 namespace Engine
 {
