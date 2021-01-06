@@ -43,6 +43,7 @@ namespace Engine
       ~Text();
 
       void SetText(std::string const &);
+      void SetColour(Colour);
 
       //void SetFont(FontID fontID, uint32_t size);
       void Draw() override;

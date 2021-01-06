@@ -26,8 +26,9 @@
 
 // Fonts and text...
 #define FONTATLAS_DEFAULT_TEXTURE_DIMENSION 1024
-#define DEFAULT_FONT_SIZE 64
 #define MAX_TEXT_CHARACTERS 65536
+
+// GUI defaults have their own file
 
 //----------------------------------------------------------------------------
 // Logging

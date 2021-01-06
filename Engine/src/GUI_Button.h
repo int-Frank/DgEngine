@@ -10,6 +10,8 @@ namespace Engine
 {
   namespace GUI
   {
+    class Text;
+
     class Button : public Widget
     {
       Button(Widget * pParent, std::string const & text, vec2 const & position, vec2 const & size, std::initializer_list<WidgetFlag> flags);
@@ -24,8 +26,9 @@ namespace Engine
 
       //void SetFont(uint32_t fontID);
       //void SetText(std::string const &);
-      //void SetTextColour(Colour);
-      //void SetHoverOnTextColour(Colour);
+      void SetTextColour(Colour);
+      void SetHoverOnTextColour(Colour);
+      //void SetDivBorder(float);
 
       void ClearBindings();
 
@@ -55,9 +58,11 @@ namespace Engine
 
     private:
 
-      std::string m_text;
+      Text * m_pText;
       Colour m_clrDefault;
       Colour m_clrHover;
+      Colour m_clrTextDefault;
+      Colour m_clrTextHover;
       UIAABB m_aabb;
       WidgetState m_state;
       float m_contentBoarder;

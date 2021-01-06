@@ -1,7 +1,7 @@
 //@group GUI
 
 #include "GUI_Text.h"
-#include "Options.h"
+#include "GUI.h"
 #include "MessageHandler.h"
 #include "GUI_Internal.h"
 #include "Renderer.h"
@@ -140,7 +140,7 @@ namespace Engine
       vec2 size(float(pData->width), float(pData->height));
       UIAABB glyphBounds = {position, size};
       UIAABB result = {};
-      return Intersection(context.divViewable, glyphBounds, result);
+      return Intersection(context.div, glyphBounds, result);
     }
 
     // Writes character and moves to the next.
@@ -548,7 +548,7 @@ namespace Engine
       else
       {
         // TODO UI defaults should be defined in one place
-        m_attributes.size = DEFAULT_FONT_SIZE;
+        m_attributes.size = GUI_FONT_SIZE;
         m_attributes.colourText = 0xFFFFFFFF;
         m_attributes.lineSpacing = 1.0f;
         m_attributes.horizontalAlign = HorizontalAlignment::Left;
@@ -570,6 +570,11 @@ namespace Engine
     void Text::SetText(std::string const & a_str)
     {
       m_text = a_str;
+    }
+
+    void Text::SetColour(Colour a_clr)
+    {
+      m_attributes.colourText = a_clr;
     }
 
     void Text::Draw()

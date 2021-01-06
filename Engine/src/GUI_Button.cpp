@@ -3,6 +3,8 @@
 #include "GUI_Button.h"
 #include "MessageHandler.h"
 #include "GUI_Internal.h"
+#include "GUI.h"
+#include "GUI_Text.h"
 #include "Renderer.h"
 
 namespace Engine
@@ -12,23 +14,33 @@ namespace Engine
 
     Button::Button(Widget * a_pParent, std::string const & a_text, vec2 const & a_position, vec2 const & a_size, std::initializer_list<WidgetFlag> flags)
       : Widget(flags)
-      , m_text(a_text)
-      , m_clrDefault(0xFF0000FF)
-      , m_clrHover(0xFF00FFFF)
+      , m_pText(nullptr)
+      , m_clrDefault(GetStyle().colours[col_Button])
+      , m_clrHover(GetStyle().colours[col_ButtonHover])
+      , m_clrTextDefault(GetStyle().colours[col_ButtonText])
+      , m_clrTextHover(GetStyle().colours[col_ButtonTextHover])
       , m_aabb{a_position, a_size}
       , m_state(WidgetState::None)
-      , m_contentBoarder(4.0f)
+      , m_contentBoarder(-4.f)
       , m_pParent(a_pParent)
       , m_clbk_HoverOn(nullptr)
       , m_clbk_HoverOff(nullptr)
       , m_clbk_Select(nullptr)
     {
+      TextAttributes attr = {};
+      attr.colourText = GetStyle().colours[col_ButtonText];
+      attr.horizontalAlign = HorizontalAlignment::Centre;
+      attr.verticalAlign = VerticalAlignment::Centre;
+      attr.lineSpacing = GetStyle().textLineSpacing;
+      attr.wrapText = true;
 
+      m_pText = Text::Create(this, a_text, {0.f, 0.f}, a_size, &attr, 
+        {WidgetFlag::NotResponsive, WidgetFlag::StretchHeight, WidgetFlag::StretchWidth});
     }
 
     Button::~Button()
     {
-
+      delete m_pText;
     }
 
     Button * Button::Create(Widget * pParent, std::string const & text, vec2 const & position, vec2 const & size, std::initializer_list<WidgetFlag> flags)
@@ -112,6 +124,9 @@ namespace Engine
 
       ::Engine::Renderer::SetSissorBox((int)viewableWindow.position.x(), (int)viewableWindow.position.y(), (int)viewableWindow.size.x(), (int)viewableWindow.size.y());
       Renderer::DrawBox({GetGlobalPosition(), GetSize()}, m_state == WidgetState::None ? m_clrDefault : m_clrHover);
+
+      m_pText->SetColour(m_state == WidgetState::None ? m_clrTextDefault : m_clrTextHover);
+      m_pText->Draw();
     }
 
     WidgetState Button::QueryState() const
@@ -172,6 +187,16 @@ namespace Engine
     void Button::SetHoverOnBackgroundColour(Colour a_clr)
     {
       m_clrHover = a_clr;
+    }
+
+    void Button::SetTextColour(Colour a_clr)
+    {
+      m_clrTextDefault = a_clr;
+    }
+
+    void Button::SetHoverOnTextColour(Colour a_clr)
+    {
+      m_clrTextHover = a_clr;
     }
   }
 }

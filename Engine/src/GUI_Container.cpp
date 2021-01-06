@@ -1,6 +1,7 @@
 //@group GUI
 
 #include "DgDoublyLinkedList.h"
+#include "GUI.h"
 #include "GUI_Internal.h"
 #include "GUI_Container.h"
 #include "GUI_Button.h"
@@ -546,7 +547,7 @@ namespace Engine
       , m_pState(nullptr)
     {
       ContainerState::Data * pData = new ContainerState::Data();
-      pData->clrBackground = 0xBB000000;
+      pData->clrBackground = GetStyle().colours[col_ContainerBackground];
       pData->pParent = a_pParent;
       pData->pContainer = this;
       pData->aabb ={a_position, a_size};
@@ -560,10 +561,12 @@ namespace Engine
 
       if (HasFlag(WidgetFlag::Resizable))
       {
-        pData->pGrab = Button::Create(this, "", a_size - grabSize, grabSize);
+        pData->pGrab = Button::Create(this, "\xEE\x80\x80", a_size - grabSize, grabSize);
         pData->pGrab->BindSelect([pBool = &pData->grabPressed](){*pBool = true; });
-        pData->pGrab->SetBackgroundColour(Colour(43, 145, 175, 255));
-        pData->pGrab->SetHoverOnBackgroundColour(Colour(63, 195, 225, 255));
+        pData->pGrab->SetBackgroundColour(0);
+        pData->pGrab->SetHoverOnBackgroundColour(0);
+        pData->pGrab->SetTextColour(GetStyle().colours[col_ContainerGrab]);
+        pData->pGrab->SetHoverOnTextColour(GetStyle().colours[col_ContainerGrabHover]);
       }
 
       m_pState = new StaticState(pData);

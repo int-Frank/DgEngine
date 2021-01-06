@@ -17,6 +17,7 @@
 #include "Memory.h"
 #include "Renderer.h"
 #include "ResourceManager.h"
+#include "GUI.h"
 #include "GUI_Internal.h"
 
 #include "System_Console.h"
@@ -101,7 +102,7 @@ namespace Engine
     int windowWidth, windowHeight;
     m_pimpl->pWindow->GetDimensions(windowWidth, windowHeight);
 
-    if (GUI::Renderer::Init() != Dg::ErrorCode::None)
+    if (GUI::Init() != Dg::ErrorCode::None)
       throw std::runtime_error("Failed to initialise GUI Renderer!");
 
     GUI::Renderer::SetScreenSize(vec2((float)windowWidth, (float)windowHeight));
@@ -117,7 +118,7 @@ namespace Engine
 
   Application::~Application()
   {
-    GUI::Renderer::Destroy();
+    GUI::ShutDown();
     RenderThread::ShutDown();
     Renderer::ShutDown();
 

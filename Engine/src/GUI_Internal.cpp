@@ -1,7 +1,7 @@
 //@group GUI
 
+#include "GUI.h"
 #include "GUI_Internal.h"
-
 #include "BSR_Assert.h"
 #include "Framework.h"
 #include "Material.h"
@@ -11,6 +11,7 @@
 #include "Renderer.h"
 #include <algorithm>
 
+// TODO This needs to come from input args or something
 #define DEFAULT_FONT_PATH "../Engine/assets/fonts/NotoSans-BSR.ttf"
 
 namespace Engine
@@ -169,7 +170,7 @@ namespace Engine
         DG_ERROR_CHECK(s_pRenderContext->fontAtlas->RegisterFont(DEFAULT_FONT_PATH, s_pRenderContext->defaultFont));
         s_pRenderContext->fontAtlas->SetTextureDimension(FONTATLAS_DEFAULT_TEXTURE_DIMENSION);
         s_pRenderContext->fontAtlas->BeginLoad();
-        DG_ERROR_CHECK(s_pRenderContext->fontAtlas->RegisterAllGlyphs(s_pRenderContext->defaultFont, DEFAULT_FONT_SIZE));
+        DG_ERROR_CHECK(s_pRenderContext->fontAtlas->RegisterAllGlyphs(s_pRenderContext->defaultFont, GUI_FONT_SIZE));
         DG_ERROR_CHECK(s_pRenderContext->fontAtlas->CommitLoad());
 
         InitBoxVA();
@@ -231,7 +232,7 @@ namespace Engine
 
       GlyphData * GetGlyphData(CodePoint a_cp)
       {
-        return s_pRenderContext->fontAtlas->GetGlyphData(s_pRenderContext->defaultFont, a_cp, DEFAULT_FONT_SIZE);
+        return s_pRenderContext->fontAtlas->GetGlyphData(s_pRenderContext->defaultFont, a_cp, GUI_FONT_SIZE);
       }
 
       void GetCharacterSizeRange(int16_t & a_ascent, int16_t & a_descent)
