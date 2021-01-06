@@ -19,21 +19,31 @@ namespace Engine
   typedef uint64_t GlyphID;
   typedef Dg::BinPacker<uint32_t, GlyphID> BinPacker;
 
+  class FontSizeData
+  {
+  public:
+
+    FontSizeData()
+      : greatestAscent(0)
+      , greatestDescent(0)
+    {}
+
+    int16_t greatestAscent;
+    int16_t greatestDescent;
+  };
+
   class FontData
   {
   public:
 
     FontData(std::string const & a_path)
       : path(a_path)
-      , greatestAscent(0)
-      , greatestDescent(0)
     {
     
     }
 
     std::string path;
-    int16_t greatestAscent;
-    int16_t greatestDescent;
+    Dg::Map_AVL<uint32_t, FontSizeData> fontSizeData;
   };
 
   static std::vector<FontData> s_Fonts;
@@ -150,14 +160,18 @@ namespace Engine
     m_textureDimension = a_uv;
   }
 
-  Dg::ErrorCode IFontAtlas::GetCharacterSizeRange(FontID a_id, int16_t & a_ascent, int16_t & a_descent)
+  Dg::ErrorCode IFontAtlas::GetCharacterSizeRange(FontID a_id, uint32_t a_size, int16_t & a_ascent, int16_t & a_descent)
   {
     Dg::ErrorCode result;
+    Dg::Map_AVL<uint32_t, FontSizeData>::iterator it;
 
     DG_ERROR_IF((size_t)a_id >= s_Fonts.size(), Dg::ErrorCode::OutOfBounds);
 
-    a_ascent = s_Fonts[a_id].greatestAscent;
-    a_descent = s_Fonts[a_id].greatestDescent;
+    it = s_Fonts[a_id].fontSizeData.find(a_size);
+    DG_ERROR_IF(it == s_Fonts[a_id].fontSizeData.end(), Dg::ErrorCode::Failure);
+
+    a_ascent = it->second.greatestAscent;
+    a_descent = it->second.greatestDescent;
 
     result = Dg::ErrorCode::None;
   epilogue:
@@ -313,10 +327,12 @@ epilogue:
           int16_t ascent = gData.bearingY;
           int16_t descent = gData.bearingY - gData.height;
 
-          if (ascent > s_Fonts[i].greatestAscent)
-            s_Fonts[i].greatestAscent = ascent;
-          if (descent < s_Fonts[i].greatestDescent)
-            s_Fonts[i].greatestDescent = descent;
+          FontSizeData & fsData = s_Fonts[i].fontSizeData[it->size];
+
+          if (ascent > fsData.greatestAscent)
+            fsData.greatestAscent = ascent;
+          if (descent < fsData.greatestDescent)
+            fsData.greatestDescent = descent;
 
           hasFailed = false;
         } while (false);

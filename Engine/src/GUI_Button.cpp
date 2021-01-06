@@ -28,6 +28,7 @@ namespace Engine
       , m_clbk_Select(nullptr)
     {
       TextAttributes attr = {};
+      attr.size = GUI_FONT_SIZE;
       attr.colourText = GetStyle().colours[col_ButtonText];
       attr.horizontalAlign = HorizontalAlignment::Centre;
       attr.verticalAlign = VerticalAlignment::Centre;

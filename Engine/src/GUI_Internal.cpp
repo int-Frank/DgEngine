@@ -169,8 +169,16 @@ namespace Engine
 
         DG_ERROR_CHECK(s_pRenderContext->fontAtlas->RegisterFont(DEFAULT_FONT_PATH, s_pRenderContext->defaultFont));
         s_pRenderContext->fontAtlas->SetTextureDimension(FONTATLAS_DEFAULT_TEXTURE_DIMENSION);
+
         s_pRenderContext->fontAtlas->BeginLoad();
+
         DG_ERROR_CHECK(s_pRenderContext->fontAtlas->RegisterAllGlyphs(s_pRenderContext->defaultFont, GUI_FONT_SIZE));
+        DG_ERROR_CHECK(s_pRenderContext->fontAtlas->RegisterGlyph(s_pRenderContext->defaultFont, GUI_FONT_SIZE_GRAB,  0xE000));
+        DG_ERROR_CHECK(s_pRenderContext->fontAtlas->RegisterGlyph(s_pRenderContext->defaultFont, GUI_FONT_SIZE_RADIO, 0x25C9)); // Checked radio
+        DG_ERROR_CHECK(s_pRenderContext->fontAtlas->RegisterGlyph(s_pRenderContext->defaultFont, GUI_FONT_SIZE_RADIO, 0x25CB)); // Radio
+        DG_ERROR_CHECK(s_pRenderContext->fontAtlas->RegisterGlyph(s_pRenderContext->defaultFont, GUI_FONT_SIZE_BOX,   0x2610));
+        DG_ERROR_CHECK(s_pRenderContext->fontAtlas->RegisterGlyph(s_pRenderContext->defaultFont, GUI_FONT_SIZE_TICK,  0x2714));
+
         DG_ERROR_CHECK(s_pRenderContext->fontAtlas->CommitLoad());
 
         InitBoxVA();
@@ -230,17 +238,17 @@ namespace Engine
         ::Engine::Renderer::DrawIndexed(s_pRenderContext->va_text, RenderMode::Triangles, a_count);
       }
 
-      GlyphData * GetGlyphData(CodePoint a_cp)
+      GlyphData * GetGlyphData(CodePoint a_cp, uint32_t a_size)
       {
-        return s_pRenderContext->fontAtlas->GetGlyphData(s_pRenderContext->defaultFont, a_cp, GUI_FONT_SIZE);
+        return s_pRenderContext->fontAtlas->GetGlyphData(s_pRenderContext->defaultFont, a_cp, a_size);
       }
 
-      void GetCharacterSizeRange(int16_t & a_ascent, int16_t & a_descent)
+      void GetCharacterSizeRange(uint32_t a_size, int16_t & a_ascent, int16_t & a_descent)
       {
         a_ascent = 0;
         a_descent = 0;
-        Dg::ErrorCode result = s_pRenderContext->fontAtlas->GetCharacterSizeRange(s_pRenderContext->defaultFont, a_ascent, a_descent);
-        BSR_ASSERT(result == Dg::ErrorCode::None, "Default font malformed!");
+        Dg::ErrorCode result = s_pRenderContext->fontAtlas->GetCharacterSizeRange(s_pRenderContext->defaultFont, a_size, a_ascent, a_descent);
+        BSR_ASSERT(result == Dg::ErrorCode::None, "No glyphs for size!");
       }
     }
 

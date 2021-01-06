@@ -30,13 +30,24 @@ void GUIDemo::BuildGUI()
     return;
   }
 
-  const char * pStr = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum";
 
+  // Main window
   Container * pMainWindow = Container::Create(nullptr, {20.f, 20.f}, {768.f, 512.f});
-  Container * pTextWindow = Container::Create(nullptr, {400.f, 20.f}, {300.f, 200.f});
 
+  // Controls
+  Container * pControlsWindow = Container::Create(nullptr, {20.f, 20.f}, {250.f, 200.f});
+  Button * pBtnReset = Button::Create(nullptr, "Reset", {10.f, 20.f}, {70.f, 30.f});
+  pBtnReset->BindSelect([](){LOG_WARN("PRESSED");});
+  pControlsWindow->Add(pBtnReset);
+
+  // Text window
+  char const pStr[] ={0xE2, 0x9C, 0x94, 0xE2, 0x97, 0x89, 0xE2, 0x97, 0x8B, 0xE2, 0x98, 0x90};
+  //char const pStr[] ={0xE2, 0x9C, 0x94, 0xE2, 0x97, 0x89, 0xE2, 0x97, 0x8B, 0xE2, 0x98, 0x90, 0xEE, 0x80, 0x80};
+  //const char * pStr = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum";
+  Container * pTextWindow = Container::Create(nullptr, {400.f, 20.f}, {300.f, 200.f});
   TextAttributes attr ={};
-  attr.size = GUI_FONT_SIZE;
+  //attr.size = GUI_FONT_SIZE;
+  attr.size = 32;
   attr.colourText = GetStyle().colours[col_Text];
   attr.lineSpacing = GetStyle().textLineSpacing;
   attr.horizontalAlign = Engine::GUI::HorizontalAlignment::Centre;
@@ -44,8 +55,10 @@ void GUIDemo::BuildGUI()
   attr.wrapText = true;
   Text *pText = Text::Create(pTextWindow, pStr, {0.0, 0.0}, {0.0, 0.0}, &attr, {WidgetFlag::StretchHeight, WidgetFlag::StretchWidth, WidgetFlag::NotResponsive});
 
+  // Hooking it all up
   pTextWindow->Add(pText);
   pMainWindow->Add(pTextWindow);
+  pMainWindow->Add(pControlsWindow);
   pSysUI->AddWidget(pMainWindow);
 
   /*char const str[] ={0xEE, 0x80, 0x80};

@@ -494,7 +494,7 @@ namespace Engine
       }
     }
 
-    static uint32_t DecodeText(std::string const & a_str, uint32_t & a_textureCount)
+    static uint32_t DecodeText(std::string const & a_str, uint32_t & a_textureCount, uint32_t a_size)
     {
       uint32_t count = 0;
       uint32_t countRenderable = 0;
@@ -515,9 +515,9 @@ namespace Engine
           }
           else
           {
-            GlyphData * pData = Renderer::GetGlyphData(cp);
+            GlyphData * pData = Renderer::GetGlyphData(cp, a_size);
             if (pData == nullptr)
-              pData = Renderer::GetGlyphData(uint32_t('?'));
+              pData = Renderer::GetGlyphData(uint32_t('?'), a_size);
             BSR_ASSERT(pData != nullptr, "Default font atlas missing '?' character");
             s_glyphData[count].cp = cp;
             s_glyphData[count].data = *pData;
@@ -587,14 +587,14 @@ namespace Engine
 
       TextContext context;
       context.div = {GetGlobalPosition(), GetSize()};
-      Renderer::GetCharacterSizeRange(context.ascent, context.descent);
+      Renderer::GetCharacterSizeRange(m_attributes.size, context.ascent, context.descent);
 
       context.wrap = m_attributes.wrapText;
       context.divViewable = viewableWindow;
       context.horizontalAlign = m_attributes.horizontalAlign;
       context.verticalAlign = m_attributes.verticalAlign;
       context.lineSpacing = int16_t(m_attributes.lineSpacing * (context.ascent - context.descent));
-      context.cpCount = DecodeText(m_text, textureCount);
+      context.cpCount = DecodeText(m_text, textureCount, m_attributes.size);
       
       ::Engine::Renderer::SetSissorBox((int)viewableWindow.position.x(), (int)viewableWindow.position.y(), (int)viewableWindow.size.x(), (int)viewableWindow.size.y());
       
@@ -610,6 +610,11 @@ namespace Engine
       }
     }
     
+    void Text::SetGlyphSize(uint32_t a_size)
+    {
+      m_attributes.size = a_size;
+    }
+
     WidgetState Text::QueryState() const
     {
       return WidgetState::None;

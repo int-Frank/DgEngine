@@ -7,6 +7,10 @@
 #include "DgError.h"
 
 #define GUI_FONT_SIZE 16
+#define GUI_FONT_SIZE_GRAB 16
+#define GUI_FONT_SIZE_BOX 32
+#define GUI_FONT_SIZE_TICK 32
+#define GUI_FONT_SIZE_RADIO 32
 
 namespace Engine
 {

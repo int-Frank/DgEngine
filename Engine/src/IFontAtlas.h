@@ -35,7 +35,7 @@ namespace Engine
     virtual ~IFontAtlas(){}
 
     static Dg::ErrorCode RegisterFont(std::string const & fontPath, FontID & out);
-    static Dg::ErrorCode GetCharacterSizeRange(FontID, int16_t & ascent, int16_t & descent);
+    static Dg::ErrorCode GetCharacterSizeRange(FontID, uint32_t size, int16_t & ascent, int16_t & descent);
 
     virtual Dg::ErrorCode GetTexture(uint16_t, Ref<Texture2D> & out) = 0;
     virtual void SetTextureDimension(uint32_t) = 0;

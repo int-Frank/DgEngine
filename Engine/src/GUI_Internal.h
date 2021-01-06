@@ -15,10 +15,10 @@ namespace Engine
       Dg::ErrorCode Init();
       void Destroy();
 
-      void GetCharacterSizeRange(int16_t & ascent, int16_t & descent);
+      void GetCharacterSizeRange(uint32_t size, int16_t & ascent, int16_t & descent);
 
       // Get the glyph data for the default font and size
-      GlyphData * GetGlyphData(CodePoint);
+      GlyphData * GetGlyphData(CodePoint, uint32_t size);
       void SetScreenSize(vec2 const &);
       void DrawBox(UIAABB const &, Colour colour);
       void DrawText(uint16_t textureID, Colour colour, uint32_t count, void * pData);

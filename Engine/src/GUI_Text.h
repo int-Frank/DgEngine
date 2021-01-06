@@ -25,12 +25,13 @@ namespace Engine
 
     struct TextAttributes
     {
-      uint32_t size;
       Colour colourText;
       HorizontalAlignment horizontalAlign;
       VerticalAlignment verticalAlign;
       float lineSpacing;
       bool wrapText;
+
+      uint32_t size; // Internal use for now
     };
 
     class Text : public Widget
@@ -46,6 +47,7 @@ namespace Engine
       void SetColour(Colour);
 
       //void SetFont(FontID fontID, uint32_t size);
+      void SetGlyphSize(uint32_t size);
       void Draw() override;
       WidgetState QueryState() const override;
       Widget * GetParent() const override;
