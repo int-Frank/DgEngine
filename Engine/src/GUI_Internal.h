@@ -21,6 +21,7 @@ namespace Engine
       GlyphData * GetGlyphData(CodePoint, uint32_t size);
       void SetScreenSize(vec2 const &);
       void DrawBox(UIAABB const &, Colour colour);
+      void DrawBoxBorder(UIAABB const & inner, float thickness, Colour colour);
       void DrawText(uint16_t textureID, Colour colour, uint32_t count, void * pData);
     }
 

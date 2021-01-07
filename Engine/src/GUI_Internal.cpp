@@ -33,6 +33,17 @@ namespace Engine
         gl_Position = vec4(xy, 0.0, 1.0);
       })";
 
+      static char const * g_boxBorderShader_vs = R"(
+      #version 430
+      layout(location = 0) in vec2 inPos;
+      uniform vec2 windowSize;
+      void main()
+      {
+        vec2 xy = (inPos  / windowSize  - vec2(0.5, 0.5)) * 2.0;
+        xy.y = -xy.y;
+        gl_Position = vec4(xy, 0.0, 1.0);
+      })";
+
       static char const * g_flatShader_fs = R"(
       #version 430
       uniform vec4 colour;
@@ -81,16 +92,28 @@ namespace Engine
 
       static uint16_t const g_unitBoxIndices[] ={0, 1, 2, 0, 2, 3};
 
+      static uint16_t const g_boxBorderIndices[] =
+      {
+        0, 5, 4,  0, 5, 1,
+        1, 6, 5,  1, 6, 2,
+        2, 7, 6,  2, 7, 3,
+        3, 4, 7,  3, 4, 0
+      };
+
       struct RenderContext
       {
         Ref<IFontAtlas> fontAtlas;
         FontID defaultFont;
 
-        Ref<VertexBuffer> vb_unitBoxPos;
+        Ref<VertexBuffer> vb_unitBox;
         Ref<IndexBuffer>  ib_unitBox;
         Ref<VertexArray>  va_unitBox;
-
         Ref<Material>     materialColourBox;
+
+        Ref<VertexBuffer> vb_boxBorder;
+        Ref<IndexBuffer>  ib_boxBorder;
+        Ref<VertexArray>  va_boxBorder;
+        Ref<Material>     materialBoxBorder;
 
         Ref<VertexBuffer> vb_textInstance;
         Ref<VertexArray>  va_text;
@@ -99,10 +122,10 @@ namespace Engine
 
       static RenderContext *s_pRenderContext = nullptr;
 
-      static void InitBoxVA()
+      static void InitBox()
       {
-        s_pRenderContext->vb_unitBoxPos = VertexBuffer::Create(g_unitBoxVerts, SIZEOF32(g_unitBoxVerts));
-        s_pRenderContext->vb_unitBoxPos->SetLayout(
+        s_pRenderContext->vb_unitBox = VertexBuffer::Create(g_unitBoxVerts, SIZEOF32(g_unitBoxVerts));
+        s_pRenderContext->vb_unitBox->SetLayout(
           {
             { Engine::ShaderDataType::VEC2 }
           });
@@ -110,12 +133,9 @@ namespace Engine
         s_pRenderContext->ib_unitBox = Engine::IndexBuffer::Create(g_unitBoxIndices, ARRAY_SIZE_32(g_unitBoxIndices));
         s_pRenderContext->va_unitBox = Engine::VertexArray::Create();
 
-        s_pRenderContext->va_unitBox->AddVertexBuffer(s_pRenderContext->vb_unitBoxPos);
+        s_pRenderContext->va_unitBox->AddVertexBuffer(s_pRenderContext->vb_unitBox);
         s_pRenderContext->va_unitBox->SetIndexBuffer(s_pRenderContext->ib_unitBox);
-      }
 
-      static void InitBox()
-      {
         Engine::ShaderData * pSD = new ShaderData({
             { Engine::ShaderDomain::Vertex, Engine::StrType::Source, g_flatShader_vs },
             { Engine::ShaderDomain::Fragment, Engine::StrType::Source, g_flatShader_fs }
@@ -125,6 +145,31 @@ namespace Engine
         Ref<Engine::RendererProgram> refProg;
         refProg = Engine::RendererProgram::Create(ir_GUIBoxShader);
         s_pRenderContext->materialColourBox = Material::Create(refProg);
+      }
+
+      static void InitBoxBorder()
+      {
+        s_pRenderContext->vb_boxBorder = VertexBuffer::Create(sizeof(float) * 2 * 8);
+        s_pRenderContext->vb_boxBorder->SetLayout(
+          {
+            { Engine::ShaderDataType::VEC2 }
+          });
+
+        s_pRenderContext->ib_boxBorder = Engine::IndexBuffer::Create(g_boxBorderIndices, ARRAY_SIZE_32(g_boxBorderIndices));
+        s_pRenderContext->va_boxBorder = Engine::VertexArray::Create();
+
+        s_pRenderContext->va_boxBorder->AddVertexBuffer(s_pRenderContext->vb_boxBorder);
+        s_pRenderContext->va_boxBorder->SetIndexBuffer(s_pRenderContext->ib_boxBorder);
+
+        Engine::ShaderData * pSD = new ShaderData({
+            { Engine::ShaderDomain::Vertex, Engine::StrType::Source, g_boxBorderShader_vs },
+            { Engine::ShaderDomain::Fragment, Engine::StrType::Source, g_flatShader_fs }
+          });
+
+        ResourceManager::Instance()->RegisterResource(ir_GUIBoxBorderShader, pSD);
+        Ref<Engine::RendererProgram> refProg;
+        refProg = Engine::RendererProgram::Create(ir_GUIBoxBorderShader);
+        s_pRenderContext->materialBoxBorder = Material::Create(refProg);
       }
 
       static void InitText()
@@ -139,7 +184,7 @@ namespace Engine
 
         s_pRenderContext->va_text = Engine::VertexArray::Create();
 
-        s_pRenderContext->va_text->AddVertexBuffer(s_pRenderContext->vb_unitBoxPos);
+        s_pRenderContext->va_text->AddVertexBuffer(s_pRenderContext->vb_unitBox);
         s_pRenderContext->va_text->AddVertexBuffer(s_pRenderContext->vb_textInstance);
         s_pRenderContext->va_text->SetIndexBuffer(s_pRenderContext->ib_unitBox);
         s_pRenderContext->va_text->SetVertexAttributeDivisor(1, 1);
@@ -182,8 +227,8 @@ namespace Engine
 
         DG_ERROR_CHECK(s_pRenderContext->fontAtlas->CommitLoad());
 
-        InitBoxVA();
         InitBox();
+        InitBoxBorder();
         InitText();
 
         result = Dg::ErrorCode::None;
@@ -200,6 +245,7 @@ namespace Engine
       void SetScreenSize(vec2 const & a_size)
       {
         s_pRenderContext->materialColourBox->SetUniform("windowSize", a_size.GetData(), sizeof(a_size));
+        s_pRenderContext->materialBoxBorder->SetUniform("windowSize", a_size.GetData(), sizeof(a_size));
         s_pRenderContext->materialText->SetUniform("windowSize", a_size.GetData(), sizeof(a_size));
       }
 
@@ -215,6 +261,33 @@ namespace Engine
         s_pRenderContext->va_unitBox->Bind();
 
         ::Engine::Renderer::DrawIndexed(s_pRenderContext->va_unitBox, RenderMode::Triangles, 1);
+      }
+
+      void DrawBoxBorder(UIAABB const & a_inner, float a_thickness, Colour a_colour)
+      {
+        float verts[16] = 
+        {
+          a_inner.position.x(),                    a_inner.position.y(),
+          a_inner.position.x() + a_inner.size.x(), a_inner.position.y(),
+          a_inner.position.x() + a_inner.size.x(), a_inner.position.y() + a_inner.size.y(),
+          a_inner.position.x(),                    a_inner.position.y() + a_inner.size.y(),
+
+          a_inner.position.x() - a_thickness,                    a_inner.position.y() - a_thickness,
+          a_inner.position.x() + a_inner.size.x() + a_thickness, a_inner.position.y() - a_thickness,
+          a_inner.position.x() + a_inner.size.x() + a_thickness, a_inner.position.y() + a_inner.size.y() + a_thickness,
+          a_inner.position.x() - a_thickness,                    a_inner.position.y() + a_inner.size.y() + a_thickness,
+        };
+
+        float clr[4] ={a_colour.fr(), a_colour.fg(), a_colour.fb(), a_colour.fa()};
+
+        s_pRenderContext->vb_boxBorder->SetData(verts, sizeof(float) * 16, 0);
+
+        s_pRenderContext->materialBoxBorder->SetUniform("colour", clr, sizeof(clr));
+
+        s_pRenderContext->materialBoxBorder->Bind();
+        s_pRenderContext->va_boxBorder->Bind();
+
+        ::Engine::Renderer::DrawIndexed(s_pRenderContext->va_boxBorder, RenderMode::Triangles, 1);
       }
 
       void DrawText(uint16_t a_textureID, Colour a_colour, uint32_t a_count, void * a_pVerts)

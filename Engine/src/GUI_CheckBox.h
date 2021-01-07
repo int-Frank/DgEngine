@@ -50,10 +50,8 @@ namespace Engine
     private:
 
       bool m_isSelected;
-      Text * m_pTextBox;
       Text * m_pTextTick;
-      Colour m_clrDefault;
-      Colour m_clrHover;
+      Colour m_clrBox;
       Colour m_clrTick;
       UIAABB m_aabb;
       WidgetState m_state;

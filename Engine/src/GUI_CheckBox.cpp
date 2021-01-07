@@ -16,33 +16,19 @@ namespace Engine
     CheckBox::CheckBox(Widget * a_pParent, vec2 const & a_position, std::initializer_list<WidgetFlag> flags)
       : Widget(flags)
       , m_isSelected(false)
-      , m_pTextBox(nullptr)
       , m_pTextTick(nullptr)
-      , m_clrDefault(GetStyle().colours[col_CheckboxBox])
-      , m_clrHover(GetStyle().colours[col_CheckboxBoxHover])
+      , m_clrBox(GetStyle().colours[col_Checkbox])
       , m_clrTick(GetStyle().colours[col_CheckboxTick])
       , m_aabb{a_position, CHECKBOX_SIZE}
       , m_pParent(a_pParent)
       , m_state(WidgetState::None)
       , m_clbk_ChangeSelected(nullptr)
     {
-      // Box
-      TextAttributes attr ={};
-      attr.size = GUI_FONT_SIZE_BOX;
-      attr.colourText = m_clrDefault;
-      attr.horizontalAlign = HorizontalAlignment::Left;
-      attr.verticalAlign = VerticalAlignment::Top;
-      attr.lineSpacing = GetStyle().textLineSpacing;
-      attr.wrapText = false;
-
-      m_pTextBox = Text::Create(this, "\xE2\x98\x90", {0.f, 0.f}, CHECKBOX_SIZE, &attr,
-        {WidgetFlag::NotResponsive, WidgetFlag::StretchHeight, WidgetFlag::StretchWidth});
-
-      // Tick
+      TextAttributes attr = {};
       attr.size = GUI_FONT_SIZE_TICK;
       attr.colourText = m_clrTick;
-      attr.horizontalAlign = HorizontalAlignment::Left;
-      attr.verticalAlign = VerticalAlignment::Top;
+      attr.horizontalAlign = HorizontalAlignment::Centre;
+      attr.verticalAlign = VerticalAlignment::Centre;
       attr.lineSpacing = GetStyle().textLineSpacing;
       attr.wrapText = false;
 
@@ -52,7 +38,6 @@ namespace Engine
 
     CheckBox::~CheckBox()
     {
-      delete m_pTextBox;
       delete m_pTextTick;
     }
 
@@ -118,10 +103,10 @@ namespace Engine
 
       ::Engine::Renderer::SetSissorBox((int)viewableWindow.position.x(), (int)viewableWindow.position.y(), (int)viewableWindow.size.x(), (int)viewableWindow.size.y());
 
-      Renderer::DrawBox({GetGlobalPosition(), GetSize()}, 0xFF00FFFF);
-
-      m_pTextBox->SetColour(m_state == WidgetState::None ? m_clrDefault : m_clrHover);
-      m_pTextBox->Draw();
+      float th = GetStyle().checkboxThickness;
+      vec2 pos = GetGlobalPosition() + vec2(th, th);
+      vec2 size = GetSize() - 2.0f * vec2(th, th);
+      Renderer::DrawBoxBorder({pos, size}, th, m_clrBox);
 
       if (m_isSelected)
         m_pTextTick->Draw();
@@ -164,12 +149,12 @@ namespace Engine
 
     vec2 CheckBox::GetContentDivPosition()
     {
-      return vec2(-2.0f, -1.0f);
+      return vec2(0.0f, 0.0f);
     }
 
     vec2 CheckBox::GetContentDivSize()
     {
-      return CHECKBOX_SIZE + vec2(6.0f, 6.0f);
+      return CHECKBOX_SIZE;
     }
   }
 }

@@ -9,7 +9,7 @@
 #define GUI_FONT_SIZE 16
 #define GUI_FONT_SIZE_GRAB 16
 #define GUI_FONT_SIZE_BOX 32
-#define GUI_FONT_SIZE_TICK 24
+#define GUI_FONT_SIZE_TICK 22
 #define GUI_FONT_SIZE_RADIO 32
 
 namespace Engine
@@ -26,8 +26,7 @@ namespace Engine
       col_ButtonHover,
       col_ButtonText,
       col_ButtonTextHover,
-      col_CheckboxBox,
-      col_CheckboxBoxHover,
+      col_Checkbox,
       col_CheckboxTick,
 
       col_COUNT
@@ -40,6 +39,7 @@ namespace Engine
       float contentBorder;
       float textLineSpacing;
       bool textWrap;
+      float checkboxThickness = 3.0f;
     };
 
     Dg::ErrorCode Init();
