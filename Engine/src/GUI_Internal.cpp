@@ -172,6 +172,7 @@ namespace Engine
 
         s_pRenderContext->fontAtlas->BeginLoad();
 
+        // TODO allow the user to load other fonts and font sizes
         DG_ERROR_CHECK(s_pRenderContext->fontAtlas->RegisterAllGlyphs(s_pRenderContext->defaultFont, GUI_FONT_SIZE));
         DG_ERROR_CHECK(s_pRenderContext->fontAtlas->RegisterGlyph(s_pRenderContext->defaultFont, GUI_FONT_SIZE_GRAB,  0xE000));
         DG_ERROR_CHECK(s_pRenderContext->fontAtlas->RegisterGlyph(s_pRenderContext->defaultFont, GUI_FONT_SIZE_RADIO, 0x25C9)); // Checked radio

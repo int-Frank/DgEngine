@@ -25,7 +25,7 @@ namespace Engine
       //void SetHoverOnBackgroundColour(Colour);
 
       void Clear();
-      void Add(Widget *);
+      void Add(Widget *); // TODO Add check if widget already exists.
       void Remove(Widget *);
 
       void Draw() override;

@@ -23,6 +23,9 @@ namespace Engine
       s_pStyle->colours[col_ButtonHover]          = 0xFFFF0000;
       s_pStyle->colours[col_ButtonText]           = 0xFF888888;
       s_pStyle->colours[col_ButtonTextHover]      = 0xFF888888;
+      s_pStyle->colours[col_CheckboxBox]          = 0xFF444444;
+      s_pStyle->colours[col_CheckboxBoxHover]     = 0xFF888888;
+      s_pStyle->colours[col_CheckboxTick]         = 0xFF00FF00;
     }
 
     Dg::ErrorCode Init()

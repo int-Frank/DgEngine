@@ -9,7 +9,7 @@
 #define GUI_FONT_SIZE 16
 #define GUI_FONT_SIZE_GRAB 16
 #define GUI_FONT_SIZE_BOX 32
-#define GUI_FONT_SIZE_TICK 32
+#define GUI_FONT_SIZE_TICK 24
 #define GUI_FONT_SIZE_RADIO 32
 
 namespace Engine
@@ -26,6 +26,9 @@ namespace Engine
       col_ButtonHover,
       col_ButtonText,
       col_ButtonTextHover,
+      col_CheckboxBox,
+      col_CheckboxBoxHover,
+      col_CheckboxTick,
 
       col_COUNT
     };

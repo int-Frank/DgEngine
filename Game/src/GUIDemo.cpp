@@ -9,6 +9,7 @@
 #include "GUI_Container.h"
 #include "GUI_Button.h"
 #include "GUI_Text.h"
+#include "GUI_Checkbox.h"
 
 using namespace Engine;
 using namespace Engine::GUI;
@@ -41,19 +42,29 @@ void GUIDemo::BuildGUI()
   pControlsWindow->Add(pBtnReset);
 
   // Text window
-  char const pStr[] ={0xE2, 0x9C, 0x94, 0xE2, 0x97, 0x89, 0xE2, 0x97, 0x8B, 0xE2, 0x98, 0x90};
+  //char const pStr[] ={0xE2, 0x9C, 0x94, 0xE2, 0x97, 0x89, 0xE2, 0x97, 0x8B, 0xE2, 0x98, 0x90};
   //char const pStr[] ={0xE2, 0x9C, 0x94, 0xE2, 0x97, 0x89, 0xE2, 0x97, 0x8B, 0xE2, 0x98, 0x90, 0xEE, 0x80, 0x80};
-  //const char * pStr = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum";
+  const char * pStr = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum";
   Container * pTextWindow = Container::Create(nullptr, {400.f, 20.f}, {300.f, 200.f});
   TextAttributes attr ={};
   //attr.size = GUI_FONT_SIZE;
-  attr.size = 32;
+  attr.size = GUI_FONT_SIZE; // TODO This should not be exposed
   attr.colourText = GetStyle().colours[col_Text];
   attr.lineSpacing = GetStyle().textLineSpacing;
   attr.horizontalAlign = Engine::GUI::HorizontalAlignment::Centre;
   attr.verticalAlign = Engine::GUI::VerticalAlignment::Centre;
   attr.wrapText = true;
   Text *pText = Text::Create(pTextWindow, pStr, {0.0, 0.0}, {0.0, 0.0}, &attr, {WidgetFlag::StretchHeight, WidgetFlag::StretchWidth, WidgetFlag::NotResponsive});
+
+  CheckBox *pChkboxWrap = CheckBox::Create(pControlsWindow, {20.0f, 100.0f});
+  pChkboxWrap->BindChangeSelected([](bool a_selected)
+    {
+      if (a_selected)
+        LOG_DEBUG("ON");
+      else
+        LOG_DEBUG("OFF");
+    });
+  pControlsWindow->Add(pChkboxWrap);
 
   // Hooking it all up
   pTextWindow->Add(pText);
