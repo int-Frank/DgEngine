@@ -57,7 +57,7 @@ namespace Engine
     {
     public:
 
-      Widget(std::initializer_list<WidgetFlag> flags = {});
+      Widget(std::initializer_list<WidgetFlag> allowedFlags, std::initializer_list<WidgetFlag> flags);
       virtual ~Widget();
 
       void HandleMessage(Message *);
@@ -82,6 +82,8 @@ namespace Engine
       vec2 GetSize();
       virtual bool IsContainer() const;
 
+      // Returns true if flag set, false if flag disallowed
+      bool SetFlag(WidgetFlag, bool);
       bool HasFlag(WidgetFlag) const;
 
     protected:
@@ -96,6 +98,7 @@ namespace Engine
 
     private:
 
+      uint32_t m_allowedFlags;
       uint32_t m_flags;
     };
   }

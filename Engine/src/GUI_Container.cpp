@@ -543,7 +543,13 @@ namespace Engine
     vec2 const Container::s_minSize = vec2(50.f, 20.f);
 
     Container::Container(Widget * a_pParent, vec2 const a_position, vec2 const & a_size, std::initializer_list<WidgetFlag> a_flags)
-      : Widget(a_flags)
+      : Widget({ WidgetFlag::NotResponsive,
+                 WidgetFlag::StretchWidth,
+                 WidgetFlag::StretchHeight,
+                 WidgetFlag::Resizable,
+                 WidgetFlag::Movable,
+                 WidgetFlag::NoBackground
+               }, a_flags)
       , m_pState(nullptr)
     {
       ContainerState::Data * pData = new ContainerState::Data();

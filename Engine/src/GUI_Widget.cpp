@@ -8,11 +8,16 @@ namespace Engine
 {
   namespace GUI
   {
-    Widget::Widget(std::initializer_list<WidgetFlag> a_flags)
-      : m_flags(0)
+    Widget::Widget(std::initializer_list<WidgetFlag> a_allowedFlags,
+                   std::initializer_list<WidgetFlag> a_flags)
+      : m_allowedFlags(0)
+      , m_flags(0)
     {
+      for (WidgetFlag flag : a_allowedFlags)
+        m_allowedFlags |= (1ul << (uint32_t)flag);
+
       for (WidgetFlag flag : a_flags)
-        m_flags |= (1ul << (uint32_t)flag);
+        SetFlag(flag, true);
     }
 
     Widget::~Widget()
@@ -84,6 +89,20 @@ namespace Engine
     bool Widget::HasFlag(WidgetFlag a_flag) const
     {
       return (m_flags & (1ul << (uint32_t)a_flag)) != 0;
+    }
+
+    bool Widget::SetFlag(WidgetFlag a_flag, bool a_set)
+    {
+      if ((m_allowedFlags & (1ul << (uint32_t)a_flag)) != 0)
+      {
+        if (a_set)
+          m_flags |= (1ul << (uint32_t)a_flag);
+        else
+          m_flags &= ~(1ul << (uint32_t)a_flag);
+
+        return true;
+      }
+      return false;
     }
 
     vec2 Widget::GetLocalPosition()

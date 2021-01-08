@@ -535,7 +535,9 @@ namespace Engine
     }
 
     Text::Text(Widget * pParent, std::string const & text, vec2 const & position, vec2 const & size, TextAttributes const * pAttrs, std::initializer_list<WidgetFlag> flags)
-      : Widget(flags)
+      : Widget({WidgetFlag::NotResponsive,
+                WidgetFlag::StretchHeight,
+                WidgetFlag::StretchWidth}, flags)
       , m_pParent(pParent)
       , m_text(text)
       , m_attributes{}

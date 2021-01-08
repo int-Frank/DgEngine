@@ -14,7 +14,7 @@ namespace Engine
   namespace GUI
   {
     CheckBox::CheckBox(Widget * a_pParent, vec2 const & a_position, std::initializer_list<WidgetFlag> flags)
-      : Widget(flags)
+      : Widget({WidgetFlag::NotResponsive}, flags)
       , m_isSelected(false)
       , m_pTextTick(nullptr)
       , m_clrBox(GetStyle().colours[col_Checkbox])

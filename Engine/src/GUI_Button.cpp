@@ -13,7 +13,9 @@ namespace Engine
   {
 
     Button::Button(Widget * a_pParent, std::string const & a_text, vec2 const & a_position, vec2 const & a_size, std::initializer_list<WidgetFlag> flags)
-      : Widget(flags)
+      : Widget({WidgetFlag::NotResponsive,
+                WidgetFlag::StretchWidth,
+                WidgetFlag::StretchHeight}, flags)
       , m_pText(nullptr)
       , m_clrDefault(GetStyle().colours[col_Button])
       , m_clrHover(GetStyle().colours[col_ButtonHover])
