@@ -23,8 +23,6 @@ namespace Engine
       col_ContainerFace,
       col_ContainerOutline,
       col_ContainerGrab,
-      col_ContainerFaceHover,
-      col_ContainerOutlineHover,
       col_ContainerGrabHover,
 
       col_ButtonFace,

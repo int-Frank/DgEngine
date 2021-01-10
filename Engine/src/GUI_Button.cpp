@@ -210,5 +210,10 @@ namespace Engine
     {
       m_contentMargin = a_val;
     }
+
+    void Button::SetText(std::string const & a_str)
+    {
+      m_pText->SetText(a_str);
+    }
   }
 }

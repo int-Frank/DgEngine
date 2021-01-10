@@ -3,10 +3,9 @@
 #include "GUI.h"
 #include "GUI_Internal.h"
 
-#define CLR_NORMAL 0xFFD27619
+#define CLR_NORMAL 0xFF94592E
 #define CLR_HOVER 0xFFF39621
-//#define CLR_OUTLINE 0xFFA1470D
-#define CLR_OUTLINE 0xFFFF5544
+#define CLR_OUTLINE 0xFF683A0E
 #define CLR_TEXT 0xFFF9F0E5
 
 namespace Engine
@@ -27,8 +26,6 @@ namespace Engine
       s_pStyle->colours[col_ContainerFace]          = 0xCC333333;
       s_pStyle->colours[col_ContainerOutline]       = 0xCC404040;
       s_pStyle->colours[col_ContainerGrab]          = 0xFF909090;
-      s_pStyle->colours[col_ContainerFaceHover]     = 0xCC333333;
-      s_pStyle->colours[col_ContainerOutlineHover]  = 0xCC404040;
       s_pStyle->colours[col_ContainerGrabHover]     = 0xFFC0C0C0;
 
       s_pStyle->colours[col_ButtonFace]             = CLR_NORMAL;
@@ -38,10 +35,10 @@ namespace Engine
       s_pStyle->colours[col_ButtonTextHover]        = CLR_TEXT;
       s_pStyle->colours[col_ButtonOutlineHover]     = CLR_OUTLINE;
 
-      s_pStyle->colours[col_Checkbox]               = CLR_OUTLINE;
-      s_pStyle->colours[col_CheckboxHover]          = CLR_OUTLINE;
-      s_pStyle->colours[col_CheckboxTick]           = 0xFF49AA19;
-      s_pStyle->colours[col_CheckboxTickHover]      = 0xFF49AA19;
+      s_pStyle->colours[col_Checkbox]               = 0xFFCBEEFF;
+      s_pStyle->colours[col_CheckboxHover]          = 0xFFCBEEFF;
+      s_pStyle->colours[col_CheckboxTick]           = 0xFF69CA39;
+      s_pStyle->colours[col_CheckboxTickHover]      = 0xFF69CA39;
     }
 
     Dg::ErrorCode Init()

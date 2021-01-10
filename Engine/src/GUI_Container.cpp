@@ -25,8 +25,7 @@ namespace Engine
         Container * pContainer;
         Widget * pParent;
         Button * pGrab;
-        Colour clr[(int)ContainerState::COUNT][(int)ContainerElement::COUNT];
-        ContainerState state;
+        Colour clr[(int)ContainerElement::COUNT];
         UIAABB aabb;
         float contentMargin;
         float outlineWidth;
@@ -45,7 +44,7 @@ namespace Engine
 
       void Clear();
 
-      void SetColour(ContainerState, ContainerElement, Colour);
+      void SetColour(ContainerElement, Colour);
       void SetContentMargin(float);
 
       void Add(Widget * a_pWgt);
@@ -205,10 +204,9 @@ namespace Engine
           size.y() = 0.0f;
 
         vec2 pos = m_pData->pContainer->GetGlobalPosition() + vec2(m_pData->outlineWidth, m_pData->outlineWidth);
-        int s = (int)m_pData->state;
 
         ::Engine::Renderer::SetSissorBox((int)viewableWindow.position.x(), (int)viewableWindow.position.y(), (int)viewableWindow.size.x(), (int)viewableWindow.size.y());
-        Renderer::DrawBoxWithOutline({pos, size}, m_pData->outlineWidth, m_pData->clr[s][(int)ContainerElement::Face], m_pData->clr[s][(int)ContainerElement::Outline]);
+        Renderer::DrawBoxWithOutline({pos, size}, m_pData->outlineWidth, m_pData->clr[(int)ContainerElement::Face], m_pData->clr[(int)ContainerElement::Outline]);
       }
 
       for (auto it = m_pData->children.end();;)
@@ -238,11 +236,16 @@ namespace Engine
       m_pData->aabb.size = a_size;
     }
 
-    void Container::InternalState::SetColour(ContainerState a_state, ContainerElement a_ele, Colour a_clr)
+    void Container::InternalState::SetColour(ContainerElement a_ele, Colour a_clr)
     {
-      BSR_ASSERT(a_state != ContainerState::COUNT);
       BSR_ASSERT(a_ele != ContainerElement::COUNT);
-      m_pData->clr[(int)a_state][(int)a_ele] = a_clr;
+
+      if ((a_ele == ContainerElement::Grab) && (m_pData->pGrab != nullptr))
+        m_pData->pGrab->SetColour(ButtonState::Normal, ButtonElement::Face, a_clr);
+      else if ((a_ele == ContainerElement::GrabHover) && (m_pData->pGrab != nullptr))
+        m_pData->pGrab->SetColour(ButtonState::Hover, ButtonElement::Face, a_clr);
+
+      m_pData->clr[(int)a_ele] = a_clr;
     }
 
     vec2 Container::InternalState::GetContentDivPosition()
@@ -583,12 +586,11 @@ namespace Engine
         pData->pGrab->SetColour(ButtonState::Hover, ButtonElement::Text, GetStyle().colours[col_ContainerGrabHover]);
       }
 
-      pData->clr[(int)ContainerState::Normal][(int)ContainerElement::Face] = GetStyle().colours[col_ContainerFace];
-      pData->clr[(int)ContainerState::Normal][(int)ContainerElement::Outline] = GetStyle().colours[col_ContainerOutline];
-      pData->clr[(int)ContainerState::Hover][(int)ContainerElement::Face] = GetStyle().colours[col_ContainerFaceHover];
-      pData->clr[(int)ContainerState::Hover][(int)ContainerElement::Outline] = GetStyle().colours[col_ContainerOutlineHover];
+      pData->clr[(int)ContainerElement::Face] = GetStyle().colours[col_ContainerFace];
+      pData->clr[(int)ContainerElement::Outline] = GetStyle().colours[col_ContainerOutline];
+      pData->clr[(int)ContainerElement::Grab] = GetStyle().colours[col_ContainerGrab];
+      pData->clr[(int)ContainerElement::GrabHover] = GetStyle().colours[col_ContainerGrabHover];
 
-      pData->state = ContainerState::Normal;
       pData->aabb ={a_position, a_size};
       pData->contentMargin = GetStyle().contentMargin;
       pData->outlineWidth = GetStyle().outlineWidth;
@@ -677,9 +679,9 @@ namespace Engine
       return m_pState->_GetSize();
     }
 
-    void Container::SetColour(ContainerState a_state, ContainerElement a_ele, Colour a_clr)
+    void Container::SetColour(ContainerElement a_ele, Colour a_clr)
     {
-      m_pState->SetColour(a_state, a_ele, a_clr);
+      m_pState->SetColour(a_ele, a_clr);
     }
 
     bool Container::IsContainer() const

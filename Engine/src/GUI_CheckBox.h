@@ -37,11 +37,11 @@ namespace Engine
 
       ~CheckBox();
 
-      // TODO Set colours
-
-      void ClearBindings();
-
+      void SetColour(CheckboxState, CheckboxElement, Colour);
       void BindChangeSelected(std::function<void(bool)> a_fn);
+      void BindHoverOn(std::function<void()> a_fn);
+      void BindHoverOff(std::function<void()> a_fn);
+      void ClearBindings();
 
       void Draw() override;
       WidgetState QueryState() const override;
@@ -72,8 +72,9 @@ namespace Engine
       WidgetState m_state;
       Widget * m_pParent;
 
-      // TODO add hover on, hover off callbacks.
       std::function<void(bool)> m_clbk_ChangeSelected;
+      std::function<void()> m_clbk_HoverOn;
+      std::function<void()> m_clbk_HoverOff;
     };
   }
 }

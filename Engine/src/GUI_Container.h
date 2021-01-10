@@ -10,18 +10,12 @@ namespace Engine
 {
   namespace GUI
   {
-    enum class ContainerState
-    {
-      Normal,
-      Hover,
-
-      COUNT
-    };
-
     enum class ContainerElement
     {
       Face,
       Outline,
+      Grab,
+      GrabHover,
 
       COUNT
     };
@@ -37,7 +31,7 @@ namespace Engine
       ~Container();
 
       void SetContentMargin(float);
-      void SetColour(ContainerState, ContainerElement, Colour);
+      void SetColour(ContainerElement, Colour);
 
       void Clear();
       void Add(Widget *); // TODO Add check if widget already exists.

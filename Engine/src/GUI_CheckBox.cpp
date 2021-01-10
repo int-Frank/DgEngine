@@ -56,6 +56,16 @@ namespace Engine
       m_clbk_ChangeSelected = a_fn;
     }
 
+    void CheckBox::BindHoverOn(std::function<void()> a_fn)
+    {
+      m_clbk_HoverOn = a_fn;
+    }
+
+    void CheckBox::BindHoverOff(std::function<void()> a_fn)
+    {
+      m_clbk_HoverOff = a_fn;
+    }
+
     void CheckBox::_HandleMessage(Message * a_pMsg)
     {
       if (a_pMsg->GetCategory() != MC_GUI)
@@ -90,9 +100,17 @@ namespace Engine
         a_pMsg->ConsumeHover();
 
       if (isInside && m_state == WidgetState::None)
+      {
         m_state = WidgetState::HoverOn;
+        if (m_clbk_HoverOn != nullptr)
+          m_clbk_HoverOn();
+      }
       if (!isInside && m_state == WidgetState::HoverOn)
+      {
         m_state = WidgetState::None;
+        if (m_clbk_HoverOff != nullptr)
+          m_clbk_HoverOff();
+      }
     }
 
     void CheckBox::ClearBindings()
@@ -162,6 +180,13 @@ namespace Engine
     vec2 CheckBox::GetContentDivSize()
     {
       return CHECKBOX_SIZE;
+    }
+
+    void CheckBox::SetColour(CheckboxState a_state, CheckboxElement a_ele, Colour a_clr)
+    {
+      BSR_ASSERT(a_state != CheckboxState::COUNT);
+      BSR_ASSERT(a_ele != CheckboxElement::COUNT);
+      m_clr[(int)a_state][(int)a_ele] = a_clr;
     }
   }
 }

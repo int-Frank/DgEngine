@@ -39,7 +39,7 @@ namespace Engine
       ~Button();
 
       //void SetFont(uint32_t fontID);
-      //void SetText(std::string const &);
+      void SetText(std::string const &);
       void SetContentMargin(float);
       void SetColour(ButtonState, ButtonElement, Colour);
 
@@ -54,7 +54,6 @@ namespace Engine
       Widget * GetParent() const override;
       void SetParent(Widget *) override;
 
-      // TODO Content? Div? Border? Margin? Standardise language!
       vec2 GetContentDivPosition() override;
       vec2 GetContentDivSize() override;
 
