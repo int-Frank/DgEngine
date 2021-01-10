@@ -8,6 +8,7 @@
 #include "Renderer.h"
 
 #define CHECKBOX_SIZE vec2(25.0f, 25.0f)
+#define CHECKBOX_THICKNESS 3.0f
 
 namespace Engine
 {
@@ -17,16 +18,15 @@ namespace Engine
       : Widget({WidgetFlag::NotResponsive}, flags)
       , m_isSelected(false)
       , m_pTextTick(nullptr)
-      , m_clrBox(GetStyle().colours[col_Checkbox])
-      , m_clrTick(GetStyle().colours[col_CheckboxTick])
+      , m_clr{}
       , m_aabb{a_position, CHECKBOX_SIZE}
-      , m_pParent(a_pParent)
       , m_state(WidgetState::None)
+      , m_pParent(a_pParent)
       , m_clbk_ChangeSelected(nullptr)
     {
       TextAttributes attr = {};
       attr.size = GUI_FONT_SIZE_TICK;
-      attr.colourText = m_clrTick;
+      attr.colourText = GetStyle().colours[col_CheckboxTick];
       attr.horizontalAlign = HorizontalAlignment::Centre;
       attr.verticalAlign = VerticalAlignment::Centre;
       attr.lineSpacing = GetStyle().textLineSpacing;
@@ -34,6 +34,11 @@ namespace Engine
 
       m_pTextTick = Text::Create(this, "\xE2\x9C\x94", {0.f, 0.f}, CHECKBOX_SIZE, &attr,
         {WidgetFlag::NotResponsive, WidgetFlag::StretchHeight, WidgetFlag::StretchWidth});
+
+      m_clr[(int)CheckboxState::Normal][(int)CheckboxElement::Outline] = GetStyle().colours[col_Checkbox];
+      m_clr[(int)CheckboxState::Normal][(int)CheckboxElement::Tick] = GetStyle().colours[col_CheckboxTick];
+      m_clr[(int)CheckboxState::Hover][(int)CheckboxElement::Outline] = GetStyle().colours[col_CheckboxHover];
+      m_clr[(int)CheckboxState::Hover][(int)CheckboxElement::Tick] = GetStyle().colours[col_CheckboxTickHover];
     }
 
     CheckBox::~CheckBox()
@@ -103,10 +108,12 @@ namespace Engine
 
       ::Engine::Renderer::SetSissorBox((int)viewableWindow.position.x(), (int)viewableWindow.position.y(), (int)viewableWindow.size.x(), (int)viewableWindow.size.y());
 
-      float th = GetStyle().checkboxThickness;
-      vec2 pos = GetGlobalPosition() + vec2(th, th);
-      vec2 size = GetSize() - 2.0f * vec2(th, th);
-      Renderer::DrawBoxBorder({pos, size}, th, m_clrBox);
+      vec2 pos = GetGlobalPosition() + vec2(CHECKBOX_THICKNESS, CHECKBOX_THICKNESS);
+      vec2 size = GetSize() - 2.0f * vec2(CHECKBOX_THICKNESS, CHECKBOX_THICKNESS);
+
+      // TODO implement hover-on colours
+      int s = m_state == WidgetState::HoverOn ? (int)CheckboxState::Hover : (int)CheckboxState::Normal;
+      Renderer::DrawBoxOutline({pos, size}, CHECKBOX_THICKNESS, m_clr[s][(int)CheckboxElement::Outline]);
 
       if (m_isSelected)
         m_pTextTick->Draw();

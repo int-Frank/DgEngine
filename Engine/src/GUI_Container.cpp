@@ -7,6 +7,8 @@
 #include "GUI_Button.h"
 #include "Renderer.h"
 
+#define CONTAINER_GRAB_SIZE 16.0f
+
 namespace Engine
 {
   namespace GUI
@@ -14,25 +16,26 @@ namespace Engine
     //------------------------------------------------------------------------------------
     // State class declarations
     //------------------------------------------------------------------------------------
-    class Container::ContainerState
+    class Container::InternalState
     {
     public:
 
       struct Data
       {
-        Colour clrBackground;
-
         Container * pContainer;
         Widget * pParent;
-        UIAABB aabb;
-        float contentBorder[4]; // left, top, right, botom
         Button * pGrab;
+        Colour clr[(int)ContainerState::COUNT][(int)ContainerElement::COUNT];
+        ContainerState state;
+        UIAABB aabb;
+        float contentMargin;
+        float outlineWidth;
         bool grabPressed;
         Dg::DoublyLinkedList<Widget *> children;
       };
 
-      ContainerState(Data * a_pData);
-      virtual ~ContainerState();
+      InternalState(Data * a_pData);
+      virtual ~InternalState();
 
       void Destroy();
 
@@ -42,8 +45,8 @@ namespace Engine
 
       void Clear();
 
-      void SetBackgroundColour(Colour);
-      void SetDivBorder(float left, float top, float right, float bottom);
+      void SetColour(ContainerState, ContainerElement, Colour);
+      void SetContentMargin(float);
 
       void Add(Widget * a_pWgt);
       void Remove(Widget * a_pWgt);
@@ -52,7 +55,7 @@ namespace Engine
       vec2 GetContentDivPosition();
       vec2 GetContentDivSize();
 
-      virtual ContainerState * HandleMessage(Message *) = 0;
+      virtual InternalState * HandleMessage(Message *) = 0;
 
       void _SetLocalPosition(vec2 const &);
       void _SetSize(vec2 const &);
@@ -64,7 +67,7 @@ namespace Engine
       Data * m_pData;
     };
 
-    class StaticState : public Container::ContainerState
+    class StaticState : public Container::InternalState
     {
     public:
 
@@ -73,10 +76,10 @@ namespace Engine
 
       WidgetState QueryState() const override;
 
-      ContainerState * HandleMessage(Message * a_pMsg) override;
-      ContainerState * HandleMessage(Message_GUI_PointerDown * a_pMsg);
-      ContainerState * HandleMessage(Message_GUI_PointerUp * a_pMsg);
-      ContainerState * HandleMessage(Message_GUI_PointerMove * a_pMsg);
+      InternalState * HandleMessage(Message * a_pMsg) override;
+      InternalState * HandleMessage(Message_GUI_PointerDown * a_pMsg);
+      InternalState * HandleMessage(Message_GUI_PointerUp * a_pMsg);
+      InternalState * HandleMessage(Message_GUI_PointerMove * a_pMsg);
 
     private:
 
@@ -84,7 +87,7 @@ namespace Engine
       WidgetState m_state;
     };
 
-    class MoveState : public Container::ContainerState
+    class MoveState : public Container::InternalState
     {
     public:
 
@@ -93,8 +96,8 @@ namespace Engine
 
       WidgetState QueryState() const override;
 
-      ContainerState * HandleMessage(Message * a_pMsg) override;
-      ContainerState * HandleMessage(Message_GUI_PointerMove * a_pMsg);
+      InternalState * HandleMessage(Message * a_pMsg) override;
+      InternalState * HandleMessage(Message_GUI_PointerMove * a_pMsg);
 
     private:
 
@@ -102,7 +105,7 @@ namespace Engine
       vec2 m_positionAnchor;
     };
 
-    class ResizeState : public Container::ContainerState
+    class ResizeState : public Container::InternalState
     {
     public:
 
@@ -111,8 +114,8 @@ namespace Engine
 
       WidgetState QueryState() const override;
 
-      ContainerState * HandleMessage(Message *) override;
-      ContainerState * HandleMessage(Message_GUI_PointerMove *);
+      InternalState * HandleMessage(Message *) override;
+      InternalState * HandleMessage(Message_GUI_PointerMove *);
 
     private:
 
@@ -121,21 +124,21 @@ namespace Engine
     };
 
     //------------------------------------------------------------------------------------
-    // ContainerState
+    // InternalState
     //------------------------------------------------------------------------------------
 
-    Container::ContainerState::ContainerState(Data * a_pData)
+    Container::InternalState::InternalState(InternalState::Data * a_pData)
       : m_pData(a_pData)
     {
 
     }
 
-    Container::ContainerState::~ContainerState()
+    Container::InternalState::~InternalState()
     {
 
     }
 
-    void Container::ContainerState::Destroy()
+    void Container::InternalState::Destroy()
     {
       Clear();
 
@@ -144,29 +147,29 @@ namespace Engine
       m_pData = nullptr;
     }
 
-    Widget * Container::ContainerState::GetParent() const
+    Widget * Container::InternalState::GetParent() const
     {
       return m_pData->pParent;
     }
 
-    void Container::ContainerState::SetParent(Widget * a_pParent)
+    void Container::InternalState::SetParent(Widget * a_pParent)
     {
       m_pData->pParent = a_pParent;
     }
 
-    vec2 Container::ContainerState::_GetSize()
+    vec2 Container::InternalState::_GetSize()
     {
       return m_pData->aabb.size;
     }
 
-    void Container::ContainerState::Clear()
+    void Container::InternalState::Clear()
     {
       for (auto pWgt : m_pData->children)
         delete pWgt;
       m_pData->children.clear();
     }
 
-    void Container::ContainerState::Add(Widget * a_pWgt)
+    void Container::InternalState::Add(Widget * a_pWgt)
     {
       if (a_pWgt->IsContainer())
         m_pData->children.push_front(a_pWgt);
@@ -174,7 +177,7 @@ namespace Engine
         m_pData->children.push_back(a_pWgt);
     }
 
-    void Container::ContainerState::Remove(Widget * a_pWgt)
+    void Container::InternalState::Remove(Widget * a_pWgt)
     {
       for (auto it = m_pData->children.begin(); it != m_pData->children.end(); it++)
       {
@@ -187,16 +190,25 @@ namespace Engine
       }
     }
 
-    void Container::ContainerState::Draw()
+    void Container::InternalState::Draw()
     {
+      UIAABB viewableWindow;
+      if (!m_pData->pContainer->GetGlobalAABB(viewableWindow))
+        return;
+
       if (!m_pData->pContainer->HasFlag(WidgetFlag::NoBackground))
       {
-        UIAABB viewableWindow;
-        if (!m_pData->pContainer->GetGlobalAABB(viewableWindow))
-          return;
+        vec2 size = m_pData->pContainer->GetSize() - 2.0f * vec2(m_pData->outlineWidth, m_pData->outlineWidth);
+        if (size.x() < 0.0f)
+          size.x() = 0.0f;
+        if (size.y() < 0.0f)
+          size.y() = 0.0f;
+
+        vec2 pos = m_pData->pContainer->GetGlobalPosition() + vec2(m_pData->outlineWidth, m_pData->outlineWidth);
+        int s = (int)m_pData->state;
 
         ::Engine::Renderer::SetSissorBox((int)viewableWindow.position.x(), (int)viewableWindow.position.y(), (int)viewableWindow.size.x(), (int)viewableWindow.size.y());
-        Renderer::DrawBox({m_pData->pContainer->GetGlobalPosition(), m_pData->pContainer->GetSize()}, m_pData->clrBackground);
+        Renderer::DrawBoxWithOutline({pos, size}, m_pData->outlineWidth, m_pData->clr[s][(int)ContainerElement::Face], m_pData->clr[s][(int)ContainerElement::Outline]);
       }
 
       for (auto it = m_pData->children.end();;)
@@ -211,35 +223,37 @@ namespace Engine
         m_pData->pGrab->Draw();
     }
 
-    vec2 Container::ContainerState::_GetLocalPosition()
+    vec2 Container::InternalState::_GetLocalPosition()
     {
       return m_pData->aabb.position;
     }
 
-    void Container::ContainerState::_SetLocalPosition(vec2 const & a_position)
+    void Container::InternalState::_SetLocalPosition(vec2 const & a_position)
     {
       m_pData->aabb.position = a_position;
     }
 
-    void Container::ContainerState::_SetSize(vec2 const & a_size)
+    void Container::InternalState::_SetSize(vec2 const & a_size)
     {
       m_pData->aabb.size = a_size;
     }
 
-    void Container::ContainerState::SetBackgroundColour(Colour a_clr)
+    void Container::InternalState::SetColour(ContainerState a_state, ContainerElement a_ele, Colour a_clr)
     {
-      m_pData->clrBackground = a_clr;
+      BSR_ASSERT(a_state != ContainerState::COUNT);
+      BSR_ASSERT(a_ele != ContainerElement::COUNT);
+      m_pData->clr[(int)a_state][(int)a_ele] = a_clr;
     }
 
-    vec2 Container::ContainerState::GetContentDivPosition()
+    vec2 Container::InternalState::GetContentDivPosition()
     {
-      return vec2(m_pData->contentBorder[0], m_pData->contentBorder[1]);
+      return vec2(m_pData->contentMargin, m_pData->contentMargin);
     }
 
-    vec2 Container::ContainerState::GetContentDivSize()
+    vec2 Container::InternalState::GetContentDivSize()
     {
-      vec2 size = m_pData->pContainer->GetSize() - vec2(m_pData->contentBorder[0] + m_pData->contentBorder[2],
-                                                     m_pData->contentBorder[1] + m_pData->contentBorder[3]);
+      vec2 size = m_pData->pContainer->GetSize() - vec2(m_pData->contentMargin * 2.0f,
+                                                        m_pData->contentMargin * 2.0f);
 
       if ((size[0] <= 0.0f) || (size[1] <= 0.0f))
         size.Zero();
@@ -247,12 +261,9 @@ namespace Engine
       return size;
     }
 
-    void Container::ContainerState::SetDivBorder(float left, float top, float right, float bottom)
+    void Container::InternalState::SetContentMargin(float a_size)
     {
-      m_pData->contentBorder[0] = left;
-      m_pData->contentBorder[1] = top;
-      m_pData->contentBorder[2] = right;
-      m_pData->contentBorder[3] = bottom;
+      m_pData->contentMargin = a_size;
     }
 
     //------------------------------------------------------------------------------------
@@ -260,7 +271,7 @@ namespace Engine
     //------------------------------------------------------------------------------------
 
     StaticState::StaticState(Data * a_pData)
-      : ContainerState(a_pData)
+      : InternalState(a_pData)
       , m_pFocus(nullptr)
       , m_state(WidgetState::None)
     {
@@ -277,12 +288,12 @@ namespace Engine
       return m_state;
     }
 
-    Container::ContainerState * StaticState::HandleMessage(Message * a_pMsg)
+    Container::InternalState * StaticState::HandleMessage(Message * a_pMsg)
     {
       if (a_pMsg->GetCategory() != MC_GUI)
         return nullptr;
 
-      ContainerState * pResult = nullptr;
+      InternalState * pResult = nullptr;
 
       if (m_pFocus != nullptr)
       {
@@ -310,7 +321,7 @@ namespace Engine
       return pResult;
     }
 
-    Container::ContainerState * StaticState::HandleMessage(Message_GUI_PointerDown * a_pMsg)
+    Container::InternalState * StaticState::HandleMessage(Message_GUI_PointerDown * a_pMsg)
     {
       UIAABB aabb;
       if (!m_pData->pContainer->GetGlobalAABB(aabb))
@@ -363,7 +374,7 @@ namespace Engine
       return nullptr;
     }
 
-    Container::ContainerState * StaticState::HandleMessage(Message_GUI_PointerUp * a_pMsg)
+    Container::InternalState * StaticState::HandleMessage(Message_GUI_PointerUp * a_pMsg)
     {
       for (Widget * pWidget : m_pData->children)
       {
@@ -381,7 +392,7 @@ namespace Engine
       return nullptr;
     }
 
-    Container::ContainerState * StaticState::HandleMessage(Message_GUI_PointerMove * a_pMsg)
+    Container::InternalState * StaticState::HandleMessage(Message_GUI_PointerMove * a_pMsg)
     {
       vec2 point((float)a_pMsg->x, (float)a_pMsg->y);
 
@@ -421,7 +432,7 @@ namespace Engine
     //------------------------------------------------------------------------------------
 
     MoveState::MoveState(Data * a_pData, vec2 const & a_controlAnchor)
-      : ContainerState(a_pData)
+      : InternalState(a_pData)
       , m_controlAnchor(a_controlAnchor)
       , m_positionAnchor(a_pData->aabb.position)
     {
@@ -438,7 +449,7 @@ namespace Engine
       return WidgetState::HasFocus;
     }
 
-    Container::ContainerState * MoveState::HandleMessage(Message * a_pMsg)
+    Container::InternalState * MoveState::HandleMessage(Message * a_pMsg)
     {
       if (a_pMsg->GetCategory() != MC_GUI)
         return nullptr;
@@ -455,7 +466,7 @@ namespace Engine
       return nullptr;
     }
 
-    Container::ContainerState * MoveState::HandleMessage(Message_GUI_PointerMove * a_pMsg)
+    Container::InternalState * MoveState::HandleMessage(Message_GUI_PointerMove * a_pMsg)
     {
       vec2 point((float)a_pMsg->x, (float)a_pMsg->y);
 
@@ -482,7 +493,7 @@ namespace Engine
     //------------------------------------------------------------------------------------
 
     ResizeState::ResizeState(Data * a_pData, vec2 const & a_controlAnchor)
-      : ContainerState(a_pData)
+      : InternalState(a_pData)
       , m_controlAnchor(a_controlAnchor)
       , m_sizeAnchor(a_pData->aabb.size)
     {
@@ -499,7 +510,7 @@ namespace Engine
       return WidgetState::HasFocus;
     }
 
-    Container::ContainerState * ResizeState::HandleMessage(Message * a_pMsg)
+    Container::InternalState * ResizeState::HandleMessage(Message * a_pMsg)
     {
       if (a_pMsg->GetCategory() != MC_GUI)
         return nullptr;
@@ -516,7 +527,7 @@ namespace Engine
       return nullptr;
     }
 
-    Container::ContainerState * ResizeState::HandleMessage(Message_GUI_PointerMove * a_pMsg)
+    Container::InternalState * ResizeState::HandleMessage(Message_GUI_PointerMove * a_pMsg)
     {
       vec2 point((float)a_pMsg->x, (float)a_pMsg->y);
       vec2 newSize = m_sizeAnchor + (point - m_controlAnchor);
@@ -552,31 +563,37 @@ namespace Engine
                }, a_flags)
       , m_pState(nullptr)
     {
-      ContainerState::Data * pData = new ContainerState::Data();
-      pData->clrBackground = GetStyle().colours[col_ContainerBackground];
-      pData->pParent = a_pParent;
+      InternalState::Data * pData = new InternalState::Data();
       pData->pContainer = this;
-      pData->aabb ={a_position, a_size};
-
-      for (int i = 0; i < 4; i++)
-        pData->contentBorder[i] = 4.0f;
-
-      vec2 grabSize(16.f, 16.f);
+      pData->pParent = a_pParent;
       pData->grabPressed = false;
       pData->pGrab = nullptr;
 
       if (HasFlag(WidgetFlag::Resizable))
       {
+        vec2 grabSize(CONTAINER_GRAB_SIZE, CONTAINER_GRAB_SIZE);
         pData->pGrab = Button::Create(this, "\xEE\x80\x80", a_size - grabSize, grabSize);
+        pData->pGrab->SetContentMargin(-4.0f);
         pData->pGrab->BindSelect([pBool = &pData->grabPressed](){*pBool = true; });
-        pData->pGrab->SetBackgroundColour(0);
-        pData->pGrab->SetHoverOnBackgroundColour(0);
-        pData->pGrab->SetTextColour(GetStyle().colours[col_ContainerGrab]);
-        pData->pGrab->SetHoverOnTextColour(GetStyle().colours[col_ContainerGrabHover]);
+        pData->pGrab->SetColour(ButtonState::Normal, ButtonElement::Face, 0);
+        pData->pGrab->SetColour(ButtonState::Normal, ButtonElement::Outline, 0);
+        pData->pGrab->SetColour(ButtonState::Normal, ButtonElement::Text, GetStyle().colours[col_ContainerGrab]);
+        pData->pGrab->SetColour(ButtonState::Hover, ButtonElement::Face, 0);
+        pData->pGrab->SetColour(ButtonState::Hover, ButtonElement::Outline, 0);
+        pData->pGrab->SetColour(ButtonState::Hover, ButtonElement::Text, GetStyle().colours[col_ContainerGrabHover]);
       }
 
+      pData->clr[(int)ContainerState::Normal][(int)ContainerElement::Face] = GetStyle().colours[col_ContainerFace];
+      pData->clr[(int)ContainerState::Normal][(int)ContainerElement::Outline] = GetStyle().colours[col_ContainerOutline];
+      pData->clr[(int)ContainerState::Hover][(int)ContainerElement::Face] = GetStyle().colours[col_ContainerFaceHover];
+      pData->clr[(int)ContainerState::Hover][(int)ContainerElement::Outline] = GetStyle().colours[col_ContainerOutlineHover];
+
+      pData->state = ContainerState::Normal;
+      pData->aabb ={a_position, a_size};
+      pData->contentMargin = GetStyle().contentMargin;
+      pData->outlineWidth = GetStyle().outlineWidth;
+
       m_pState = new StaticState(pData);
-      char t = 0;
     }
 
     Container::~Container()
@@ -631,7 +648,7 @@ namespace Engine
       m_pState->SetParent(a_pParent);
     }
 
-    void Container::UpdateState(ContainerState * a_pState)
+    void Container::UpdateState(InternalState * a_pState)
     {
       if (a_pState != nullptr)
       {
@@ -660,9 +677,9 @@ namespace Engine
       return m_pState->_GetSize();
     }
 
-    void Container::SetBackgroundColour(Colour a_clr)
+    void Container::SetColour(ContainerState a_state, ContainerElement a_ele, Colour a_clr)
     {
-      m_pState->SetBackgroundColour(a_clr);
+      m_pState->SetColour(a_state, a_ele, a_clr);
     }
 
     bool Container::IsContainer() const
@@ -680,9 +697,9 @@ namespace Engine
       return m_pState->GetContentDivSize();
     }
 
-    void Container::SetDivBorder(float left, float top, float right, float bottom)
+    void Container::SetContentMargin(float a_size)
     {
-      m_pState->SetDivBorder(left, top, right, bottom);
+      m_pState->SetContentMargin(a_size);
     }
   }
 }

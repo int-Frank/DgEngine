@@ -19,15 +19,25 @@ namespace Engine
     enum StyleColour
     {
       col_Text,
-      col_ContainerBackground,
+
+      col_ContainerFace,
+      col_ContainerOutline,
       col_ContainerGrab,
+      col_ContainerFaceHover,
+      col_ContainerOutlineHover,
       col_ContainerGrabHover,
-      col_Button,
-      col_ButtonHover,
+
+      col_ButtonFace,
       col_ButtonText,
+      col_ButtonOutline,
+      col_ButtonFaceHover,
       col_ButtonTextHover,
+      col_ButtonOutlineHover,
+
       col_Checkbox,
+      col_CheckboxHover,
       col_CheckboxTick,
+      col_CheckboxTickHover,
 
       col_COUNT
     };
@@ -35,11 +45,10 @@ namespace Engine
     struct Style
     {
       Colour colours[col_COUNT];
-
-      float contentBorder;
+      float contentMargin;
+      float outlineWidth;
       float textLineSpacing;
       bool textWrap;
-      float checkboxThickness = 3.0f;
     };
 
     Dg::ErrorCode Init();

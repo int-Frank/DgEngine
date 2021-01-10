@@ -39,7 +39,6 @@ namespace Engine
       HasFocus // Eg text inputs in focus and waiting for input
     };
 
-    // TODO not all flags a relevant to all widgets. In fact some flags may actually break the widget.
     enum class WidgetFlag
     {
       NotResponsive,

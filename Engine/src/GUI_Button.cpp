@@ -17,14 +17,12 @@ namespace Engine
                 WidgetFlag::StretchWidth,
                 WidgetFlag::StretchHeight}, flags)
       , m_pText(nullptr)
-      , m_clrDefault(GetStyle().colours[col_Button])
-      , m_clrHover(GetStyle().colours[col_ButtonHover])
-      , m_clrTextDefault(GetStyle().colours[col_ButtonText])
-      , m_clrTextHover(GetStyle().colours[col_ButtonTextHover])
       , m_aabb{a_position, a_size}
       , m_state(WidgetState::None)
-      , m_contentBoarder(-4.f)
       , m_pParent(a_pParent)
+      , m_clr{}
+      , m_contentMargin(0.0f)
+      , m_outlineWidth(0.0f)
       , m_clbk_HoverOn(nullptr)
       , m_clbk_HoverOff(nullptr)
       , m_clbk_Select(nullptr)
@@ -36,6 +34,16 @@ namespace Engine
       attr.verticalAlign = VerticalAlignment::Centre;
       attr.lineSpacing = GetStyle().textLineSpacing;
       attr.wrapText = true;
+
+      m_clr[(int)ButtonState::Normal][(int)ButtonElement::Face] = GetStyle().colours[col_ButtonFace];
+      m_clr[(int)ButtonState::Normal][(int)ButtonElement::Outline] = GetStyle().colours[col_ButtonOutline];
+      m_clr[(int)ButtonState::Normal][(int)ButtonElement::Text] = GetStyle().colours[col_ButtonText];
+      m_clr[(int)ButtonState::Hover][(int)ButtonElement::Face] = GetStyle().colours[col_ButtonFaceHover];
+      m_clr[(int)ButtonState::Hover][(int)ButtonElement::Outline] = GetStyle().colours[col_ButtonOutlineHover];
+      m_clr[(int)ButtonState::Hover][(int)ButtonElement::Text] = GetStyle().colours[col_ButtonTextHover];
+
+      m_contentMargin = GetStyle().contentMargin;
+      m_outlineWidth = GetStyle().outlineWidth;
 
       m_pText = Text::Create(this, a_text, {0.f, 0.f}, a_size, &attr, 
         {WidgetFlag::NotResponsive, WidgetFlag::StretchHeight, WidgetFlag::StretchWidth});
@@ -125,10 +133,19 @@ namespace Engine
       if (!GetGlobalAABB(viewableWindow))
         return;
 
-      ::Engine::Renderer::SetSissorBox((int)viewableWindow.position.x(), (int)viewableWindow.position.y(), (int)viewableWindow.size.x(), (int)viewableWindow.size.y());
-      Renderer::DrawBox({GetGlobalPosition(), GetSize()}, m_state == WidgetState::None ? m_clrDefault : m_clrHover);
+      vec2 size = GetSize() - 2.0f * vec2(m_outlineWidth, m_outlineWidth);
+      if (size.x() < 0.0f)
+        size.x() = 0.0f;
+      if (size.y() < 0.0f)
+        size.y() = 0.0f;
 
-      m_pText->SetColour(m_state == WidgetState::None ? m_clrTextDefault : m_clrTextHover);
+      vec2 pos = GetGlobalPosition() + vec2(m_outlineWidth, m_outlineWidth);
+      int s = m_state == WidgetState::HoverOn ? (int)ButtonState::Hover : (int)ButtonState::Normal;
+
+      ::Engine::Renderer::SetSissorBox((int)viewableWindow.position.x(), (int)viewableWindow.position.y(), (int)viewableWindow.size.x(), (int)viewableWindow.size.y());
+      Renderer::DrawBoxWithOutline({pos, size}, m_outlineWidth, m_clr[s][(int)ButtonElement::Face], m_clr[s][(int)ButtonElement::Outline]);
+
+      m_pText->SetColour(m_clr[s][(int)ButtonElement::Text]);
       m_pText->Draw();
     }
 
@@ -169,12 +186,12 @@ namespace Engine
 
     vec2 Button::GetContentDivPosition()
     {
-      return vec2(m_contentBoarder, m_contentBoarder);
+      return vec2(m_contentMargin, m_contentMargin);
     }
 
     vec2 Button::GetContentDivSize()
     {
-      vec2 size = GetSize() - vec2(m_contentBoarder * 2.0f, m_contentBoarder * 2.0f);
+      vec2 size = GetSize() - vec2(m_contentMargin * 2.0f, m_contentMargin * 2.0f);
 
       if ((size[0] <= 0.0f) || (size[1] <= 0.0f))
         size.Zero();
@@ -182,24 +199,16 @@ namespace Engine
       return size;
     }
 
-    void Button::SetBackgroundColour(Colour a_clr)
+    void Button::SetColour(ButtonState a_state, ButtonElement a_ele, Colour a_clr)
     {
-      m_clrDefault = a_clr;
+      BSR_ASSERT(a_state != ButtonState::COUNT);
+      BSR_ASSERT(a_ele != ButtonElement::COUNT);
+      m_clr[(int)a_state][(int)a_ele] = a_clr;
     }
 
-    void Button::SetHoverOnBackgroundColour(Colour a_clr)
+    void Button::SetContentMargin(float a_val)
     {
-      m_clrHover = a_clr;
-    }
-
-    void Button::SetTextColour(Colour a_clr)
-    {
-      m_clrTextDefault = a_clr;
-    }
-
-    void Button::SetHoverOnTextColour(Colour a_clr)
-    {
-      m_clrTextHover = a_clr;
+      m_contentMargin = a_val;
     }
   }
 }

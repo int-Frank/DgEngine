@@ -10,6 +10,22 @@ namespace Engine
 {
   namespace GUI
   {
+    enum class CheckboxState
+    {
+      Normal,
+      Hover,
+
+      COUNT
+    };
+
+    enum class CheckboxElement
+    {
+      Outline,
+      Tick,
+
+      COUNT
+    };
+
     class Text;
 
     class CheckBox : public Widget
@@ -51,12 +67,12 @@ namespace Engine
 
       bool m_isSelected;
       Text * m_pTextTick;
-      Colour m_clrBox;
-      Colour m_clrTick;
+      Colour m_clr[(int)CheckboxState::COUNT][(int)CheckboxElement::COUNT];
       UIAABB m_aabb;
       WidgetState m_state;
       Widget * m_pParent;
 
+      // TODO add hover on, hover off callbacks.
       std::function<void(bool)> m_clbk_ChangeSelected;
     };
   }

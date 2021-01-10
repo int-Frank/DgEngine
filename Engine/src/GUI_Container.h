@@ -10,6 +10,22 @@ namespace Engine
 {
   namespace GUI
   {
+    enum class ContainerState
+    {
+      Normal,
+      Hover,
+
+      COUNT
+    };
+
+    enum class ContainerElement
+    {
+      Face,
+      Outline,
+
+      COUNT
+    };
+
     class Container : public Widget
     {
       Container(Widget * pParent, vec2 const position, vec2 const & size, std::initializer_list<WidgetFlag> flags);
@@ -20,9 +36,8 @@ namespace Engine
       static Container * Create(Widget * pParent, vec2 const position, vec2 const & size, std::initializer_list<WidgetFlag> flags = {WidgetFlag::Movable, WidgetFlag::Resizable});
       ~Container();
 
-      void SetBackgroundColour(Colour);
-      void SetDivBorder(float left, float top, float right, float bottom);
-      //void SetHoverOnBackgroundColour(Colour);
+      void SetContentMargin(float);
+      void SetColour(ContainerState, ContainerElement, Colour);
 
       void Clear();
       void Add(Widget *); // TODO Add check if widget already exists.
@@ -38,13 +53,13 @@ namespace Engine
 
       bool IsContainer() const override;
 
-      class ContainerState;
+      class InternalState;
 
     private:
 
       void _HandleMessage(Message *) override;
 
-      void UpdateState(ContainerState *);
+      void UpdateState(InternalState *);
 
       void _SetLocalPosition(vec2 const &) override;
       void _SetSize(vec2 const &) override;
@@ -53,7 +68,7 @@ namespace Engine
 
     private:
 
-      ContainerState * m_pState;
+      InternalState * m_pState;
     };
   }
 }

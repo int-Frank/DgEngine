@@ -3,6 +3,12 @@
 #include "GUI.h"
 #include "GUI_Internal.h"
 
+#define CLR_NORMAL 0xFFD27619
+#define CLR_HOVER 0xFFF39621
+//#define CLR_OUTLINE 0xFFA1470D
+#define CLR_OUTLINE 0xFFFF5544
+#define CLR_TEXT 0xFFF9F0E5
+
 namespace Engine
 {
   namespace GUI
@@ -11,20 +17,31 @@ namespace Engine
 
     void ResetStyle()
     {
-      s_pStyle->contentBorder = 4.0f;
+      s_pStyle->contentMargin = 4.0f;
+      s_pStyle->outlineWidth = 2.0f;
       s_pStyle->textLineSpacing = 1.0f;
       s_pStyle->textWrap = true;
 
-      s_pStyle->colours[col_Text]                 = 0xFFFFFFFF;
-      s_pStyle->colours[col_ContainerBackground]  = 0x33FFFFFF;
-      s_pStyle->colours[col_ContainerGrab]        = 0xFF00FFFF;
-      s_pStyle->colours[col_ContainerGrabHover]   = 0xFF00FF00;
-      s_pStyle->colours[col_Button]               = 0xFFFFFF00;
-      s_pStyle->colours[col_ButtonHover]          = 0xFFFF0000;
-      s_pStyle->colours[col_ButtonText]           = 0xFF888888;
-      s_pStyle->colours[col_ButtonTextHover]      = 0xFF888888;
-      s_pStyle->colours[col_Checkbox]             = 0xFF444444;
-      s_pStyle->colours[col_CheckboxTick]         = 0xFF00FF00;
+      s_pStyle->colours[col_Text]                   = CLR_TEXT;
+
+      s_pStyle->colours[col_ContainerFace]          = 0xCC333333;
+      s_pStyle->colours[col_ContainerOutline]       = 0xCC404040;
+      s_pStyle->colours[col_ContainerGrab]          = 0xFF909090;
+      s_pStyle->colours[col_ContainerFaceHover]     = 0xCC333333;
+      s_pStyle->colours[col_ContainerOutlineHover]  = 0xCC404040;
+      s_pStyle->colours[col_ContainerGrabHover]     = 0xFFC0C0C0;
+
+      s_pStyle->colours[col_ButtonFace]             = CLR_NORMAL;
+      s_pStyle->colours[col_ButtonText]             = CLR_TEXT;
+      s_pStyle->colours[col_ButtonOutline]          = CLR_OUTLINE;
+      s_pStyle->colours[col_ButtonFaceHover]        = CLR_HOVER;
+      s_pStyle->colours[col_ButtonTextHover]        = CLR_TEXT;
+      s_pStyle->colours[col_ButtonOutlineHover]     = CLR_OUTLINE;
+
+      s_pStyle->colours[col_Checkbox]               = CLR_OUTLINE;
+      s_pStyle->colours[col_CheckboxHover]          = CLR_OUTLINE;
+      s_pStyle->colours[col_CheckboxTick]           = 0xFF49AA19;
+      s_pStyle->colours[col_CheckboxTickHover]      = 0xFF49AA19;
     }
 
     Dg::ErrorCode Init()

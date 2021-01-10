@@ -263,7 +263,7 @@ namespace Engine
         ::Engine::Renderer::DrawIndexed(s_pRenderContext->va_unitBox, RenderMode::Triangles, 1);
       }
 
-      void DrawBoxBorder(UIAABB const & a_inner, float a_thickness, Colour a_colour)
+      void DrawBoxOutline(UIAABB const & a_inner, float a_thickness, Colour a_colour)
       {
         float verts[16] = 
         {
@@ -288,6 +288,12 @@ namespace Engine
         s_pRenderContext->va_boxBorder->Bind();
 
         ::Engine::Renderer::DrawIndexed(s_pRenderContext->va_boxBorder, RenderMode::Triangles, 1);
+      }
+
+      void DrawBoxWithOutline(UIAABB const & inner, float thickness, Colour clrInner, Colour clrOutline)
+      {
+        DrawBox(inner, clrInner);
+        DrawBoxOutline(inner, thickness, clrOutline);
       }
 
       void DrawText(uint16_t a_textureID, Colour a_colour, uint32_t a_count, void * a_pVerts)
