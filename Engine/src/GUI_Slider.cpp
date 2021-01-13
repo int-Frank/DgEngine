@@ -16,7 +16,7 @@ namespace Engine
     //------------------------------------------------------------------------------------
     // State class declarations
     //------------------------------------------------------------------------------------
-    class Slider::InternalState
+    class SliderBase::InternalState
     {
     public:
 
@@ -30,7 +30,7 @@ namespace Engine
         float outlineWidth;
         vec2 position;
         Colour clr[(int)SliderState::COUNT][(int)SliderElement::COUNT];
-        Slider * pSlider;
+        SliderBase * pSlider;
         Widget * pParent;
 
         std::function<void()> m_clbk_HoverOn;
@@ -72,7 +72,7 @@ namespace Engine
       Data * m_pData;
     };
 
-    class SliderStaticState : public Slider::InternalState
+    class SliderStaticState : public SliderBase::InternalState
     {
     public:
 
@@ -91,7 +91,7 @@ namespace Engine
       WidgetState m_state;
     };
 
-    class SliderActiveState : public Slider::InternalState
+    class SliderActiveState : public SliderBase::InternalState
     {
     public:
 
@@ -113,44 +113,44 @@ namespace Engine
     // InternalState
     //------------------------------------------------------------------------------------
 
-    Slider::InternalState::InternalState(Data * a_pData)
+    SliderBase::InternalState::InternalState(Data * a_pData)
       : m_pData(a_pData)
     {
 
     }
 
-    Slider::InternalState::~InternalState()
+    SliderBase::InternalState::~InternalState()
     {
 
     }
 
-    void Slider::InternalState::Destroy()
+    void SliderBase::InternalState::Destroy()
     {
       delete m_pData;
       m_pData = nullptr;
     }
 
-    void Slider::InternalState::BindHoverOn(std::function<void()> a_fn)
+    void SliderBase::InternalState::BindHoverOn(std::function<void()> a_fn)
     {
       m_pData->m_clbk_HoverOn = a_fn;
     }
 
-    void Slider::InternalState::BindHoverOff(std::function<void()> a_fn)
+    void SliderBase::InternalState::BindHoverOff(std::function<void()> a_fn)
     {
       m_pData->m_clbk_HoverOff = a_fn;
     }
 
-    Widget * Slider::InternalState::GetParent() const
+    Widget * SliderBase::InternalState::GetParent() const
     {
       return m_pData->pParent;
     }
 
-    void Slider::InternalState::SetParent(Widget * a_pParent)
+    void SliderBase::InternalState::SetParent(Widget * a_pParent)
     {
       m_pData->pParent = a_pParent;
     }
 
-    void Slider::InternalState::SetVal(float a_val)
+    void SliderBase::InternalState::SetVal(float a_val)
     {
       if (a_val < 0.0f)
         a_val = 0.0f;
@@ -160,20 +160,20 @@ namespace Engine
       m_pData->value = a_val;
     }
 
-    vec2 Slider::InternalState::_GetSize()
+    vec2 SliderBase::InternalState::_GetSize()
     {
       float h = m_pData->caretHeight > m_pData->barHeight ? m_pData->caretHeight : m_pData->barHeight;
       return vec2(m_pData->width, h);
     }
 
-    void Slider::InternalState::SetColour(SliderState a_state, SliderElement a_ele, Colour a_clr)
+    void SliderBase::InternalState::SetColour(SliderState a_state, SliderElement a_ele, Colour a_clr)
     {
       BSR_ASSERT(a_state != SliderState::COUNT);
       BSR_ASSERT(a_ele != SliderElement::COUNT);
       m_pData->clr[(int)a_state][(int)a_ele] = a_clr;
     }
 
-    void Slider::InternalState::_Draw(SliderState a_state)
+    void SliderBase::InternalState::_Draw(SliderState a_state)
     {
       UIAABB viewableWindow;
       if (!m_pData->pSlider->GetGlobalAABB(viewableWindow))
@@ -191,12 +191,12 @@ namespace Engine
       Renderer::DrawBoxWithOutline(caret, m_pData->outlineWidth, m_pData->clr[s][(int)SliderElement::Caret], m_pData->clr[s][(int)SliderElement::Outline]);
     }
 
-    float Slider::InternalState::GetGlobalBarCentre()
+    float SliderBase::InternalState::GetGlobalBarCentre()
     {
       return m_pData->pSlider->GetGlobalPosition().x() + m_pData->caretWidth / 2.0f + ((m_pData->width - m_pData->caretWidth) * m_pData->value);
     }
 
-    void Slider::InternalState::GetAABBs(UIAABB & a_lower, UIAABB & a_upper, UIAABB & a_caret)
+    void SliderBase::InternalState::GetAABBs(UIAABB & a_lower, UIAABB & a_upper, UIAABB & a_caret)
     {
       vec2 size = _GetSize();
       vec2 globalPos = m_pData->pSlider->GetGlobalPosition();
@@ -212,7 +212,7 @@ namespace Engine
       a_caret ={vec2(caretX, caretY), vec2(m_pData->caretWidth, m_pData->caretHeight)};
     }
 
-    void Slider::InternalState::GetAABBs(UIAABB & a_bar, UIAABB & a_caret)
+    void SliderBase::InternalState::GetAABBs(UIAABB & a_bar, UIAABB & a_caret)
     {
       vec2 size = _GetSize();
       vec2 globalPos = m_pData->pSlider->GetGlobalPosition();
@@ -225,7 +225,7 @@ namespace Engine
       a_caret = {vec2(caretX, caretY), vec2(m_pData->caretWidth, m_pData->caretHeight)};
     }
 
-    void Slider::InternalState::GetInnerAABBs(UIAABB & a_lower, UIAABB & a_upper, UIAABB & a_caret)
+    void SliderBase::InternalState::GetInnerAABBs(UIAABB & a_lower, UIAABB & a_upper, UIAABB & a_caret)
     {
       GetAABBs(a_lower, a_upper, a_caret);
 
@@ -239,7 +239,7 @@ namespace Engine
       a_caret.size -= 2.0f * posOffset;
     }
 
-    void Slider::InternalState::SetValFromScreenCoord(float a_x)
+    void SliderBase::InternalState::SetValFromScreenCoord(float a_x)
     {
       float xPos = m_pData->pSlider->GetGlobalPosition().x() + m_pData->caretWidth / 2.0f;
       m_pData->value = (a_x - xPos) / (m_pData->width - m_pData->caretWidth);
@@ -249,17 +249,17 @@ namespace Engine
         m_pData->value = 1.0f;
     }
 
-    vec2 Slider::InternalState::_GetLocalPosition()
+    vec2 SliderBase::InternalState::_GetLocalPosition()
     {
       return m_pData->position;
     }
 
-    void Slider::InternalState::_SetLocalPosition(vec2 const & a_position)
+    void SliderBase::InternalState::_SetLocalPosition(vec2 const & a_position)
     {
       m_pData->position;
     }
 
-    void Slider::InternalState::_SetSize(vec2 const & a_size)
+    void SliderBase::InternalState::_SetSize(vec2 const & a_size)
     {
       m_pData->width = a_size.x();
       if (m_pData->width < (m_pData->caretWidth + SLIDER_MIN_RUN_PIXELS))
@@ -292,7 +292,7 @@ namespace Engine
       _Draw(m_state == WidgetState::HoverOn ? SliderState::Hover : SliderState::Normal);
     }
 
-    Slider::InternalState * SliderStaticState::HandleMessage(Message * a_pMsg)
+    SliderBase::InternalState * SliderStaticState::HandleMessage(Message * a_pMsg)
     {
       if (a_pMsg->GetCategory() != MC_GUI)
         return nullptr;
@@ -306,7 +306,7 @@ namespace Engine
       return pResult;
     }
 
-    Slider::InternalState * SliderStaticState::HandleMessage(Message_GUI_PointerDown * a_pMsg)
+    SliderBase::InternalState * SliderStaticState::HandleMessage(Message_GUI_PointerDown * a_pMsg)
     {
       UIAABB aabb;
       if (!m_pData->pSlider->GetGlobalAABB(aabb))
@@ -335,7 +335,7 @@ namespace Engine
       return nullptr;
     }
 
-    Slider::InternalState * SliderStaticState::HandleMessage(Message_GUI_PointerMove * a_pMsg)
+    SliderBase::InternalState * SliderStaticState::HandleMessage(Message_GUI_PointerMove * a_pMsg)
     {
       vec2 point((float)a_pMsg->x, (float)a_pMsg->y);
 
@@ -386,7 +386,7 @@ namespace Engine
       _Draw(SliderState::Grab);
     }
 
-    Slider::InternalState * SliderActiveState::HandleMessage(Message * a_pMsg)
+    SliderBase::InternalState * SliderActiveState::HandleMessage(Message * a_pMsg)
     {
       if (a_pMsg->GetCategory() != MC_GUI)
         return nullptr;
@@ -403,7 +403,7 @@ namespace Engine
       return nullptr;
     }
 
-    Slider::InternalState * SliderActiveState::HandleMessage(Message_GUI_PointerMove * a_pMsg)
+    SliderBase::InternalState * SliderActiveState::HandleMessage(Message_GUI_PointerMove * a_pMsg)
     {
       vec2 point((float)a_pMsg->x, (float)a_pMsg->y);
       bool canMove = true;
@@ -426,10 +426,10 @@ namespace Engine
     }
 
     //------------------------------------------------------------------------------------
-    // Slider
+    // SliderBase
     //------------------------------------------------------------------------------------
 
-    Slider::Slider(Widget * a_pParent, vec2 const & a_position, float a_width, float a_value, std::initializer_list<WidgetFlag> a_flags)
+    SliderBase::SliderBase(Widget * a_pParent, vec2 const & a_position, float a_width, float a_value, std::initializer_list<WidgetFlag> a_flags)
       : Widget({WidgetFlag::NotResponsive,
                 WidgetFlag::StretchWidth
         }, a_flags)
@@ -475,53 +475,53 @@ namespace Engine
       m_pState = new SliderStaticState(pData, WidgetState::None);
     }
 
-    Slider::~Slider()
+    SliderBase::~SliderBase()
     {
       m_pState->Destroy();
       delete m_pState;
     }
 
-    void Slider::_HandleMessage(Message * a_pMsg)
+    void SliderBase::_HandleMessage(Message * a_pMsg)
     {
       UpdateState(m_pState->HandleMessage(a_pMsg));
     }
 
-    void Slider::Draw()
+    void SliderBase::Draw()
     {
       m_pState->Draw();
     }
 
-    void Slider::BindHoverOn(std::function<void()> a_fn)
+    void SliderBase::BindHoverOn(std::function<void()> a_fn)
     {
       m_pState->BindHoverOn(a_fn);
     }
 
-    void Slider::BindHoverOff(std::function<void()> a_fn)
+    void SliderBase::BindHoverOff(std::function<void()> a_fn)
     {
       m_pState->BindHoverOff(a_fn);
     }
 
-    WidgetState Slider::QueryState() const
+    WidgetState SliderBase::QueryState() const
     {
       return m_pState->QueryState();
     }
 
-    void Slider::SetVal(float a_val)
+    void SliderBase::SetVal(float a_val)
     {
       m_pState->SetVal(a_val);
     }
 
-    Widget * Slider::GetParent() const
+    Widget * SliderBase::GetParent() const
     {
       return m_pState->GetParent();
     }
 
-    void Slider::SetParent(Widget * a_pParent)
+    void SliderBase::SetParent(Widget * a_pParent)
     {
       m_pState->SetParent(a_pParent);
     }
 
-    void Slider::UpdateState(InternalState * a_pState)
+    void SliderBase::UpdateState(InternalState * a_pState)
     {
       if (a_pState != nullptr)
       {
@@ -530,78 +530,29 @@ namespace Engine
       }
     }
 
-    void Slider::_SetLocalPosition(vec2 const & a_pos)
+    void SliderBase::_SetLocalPosition(vec2 const & a_pos)
     {
       m_pState->_SetLocalPosition(a_pos);
     }
 
-    void Slider::_SetSize(vec2 const & a_size)
+    void SliderBase::_SetSize(vec2 const & a_size)
     {
       m_pState->_SetSize(a_size);
     }
 
-    vec2 Slider::_GetLocalPosition()
+    vec2 SliderBase::_GetLocalPosition()
     {
       return m_pState->_GetLocalPosition();
     }
 
-    vec2 Slider::_GetSize()
+    vec2 SliderBase::_GetSize()
     {
       return m_pState->_GetSize();
     }
 
-    void Slider::SetColour(SliderState a_state, SliderElement a_ele, Colour a_clr)
+    void SliderBase::SetColour(SliderState a_state, SliderElement a_ele, Colour a_clr)
     {
       m_pState->SetColour(a_state, a_ele, a_clr);
-    }
-
-    //------------------------------------------------------------------------------------
-    // SliderFloat
-    //------------------------------------------------------------------------------------
-
-    SliderFloat::SliderFloat(Widget * a_pParent, vec2 const & a_position, float a_width,
-                             float a_val, float a_minVal, float a_maxVal,
-                             std::initializer_list<WidgetFlag> a_flags)
-      : Slider(a_pParent, a_position, a_width, 0.0f, a_flags)
-      , m_minVal(a_minVal)
-      , m_maxVal(a_maxVal)
-      , m_lastValue(0.0f)
-    {
-      if (m_minVal > m_maxVal)
-        m_minVal = m_maxVal;
-
-      if (a_val < m_minVal)
-        a_val = m_minVal;
-      else if (a_val > m_maxVal)
-        a_val = m_maxVal;
-
-      SetVal((a_val - m_minVal) / (m_maxVal - m_minVal));
-      m_lastValue = a_val;
-    }
-
-    SliderFloat * SliderFloat::Create(Widget * a_pParent, vec2 const & a_position, float a_width,
-                                      float a_val, float a_minVal, float a_maxVal,
-                                      std::initializer_list<WidgetFlag> a_flags)
-    {
-      return new SliderFloat(a_pParent, a_position, a_width, a_val, a_minVal, a_maxVal, a_flags);
-    }
-
-    void SliderFloat::BindNewValue(std::function<void(float)> a_fn)
-    {
-      m_clbk_NewValue = a_fn;
-    }
-
-    void SliderFloat::NewValueClbk(float a_val)
-    {
-      if (m_clbk_NewValue != nullptr)
-      {
-        float val = m_minVal + a_val * (m_maxVal - m_minVal);
-        if (val != m_lastValue)
-        {
-          m_clbk_NewValue(m_minVal + a_val * (m_maxVal - m_minVal));
-          m_lastValue = val;
-        }
-      }
     }
   }
 }

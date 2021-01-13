@@ -29,11 +29,11 @@ namespace Engine
       COUNT
     };
 
-    class Slider : public Widget
+    class SliderBase : public Widget
     {
     public:
 
-      ~Slider();
+      ~SliderBase();
 
       void SetColour(SliderState, SliderElement, Colour);
 
@@ -50,7 +50,7 @@ namespace Engine
 
     protected:
 
-      Slider(Widget * pParent, vec2 const & position, float width, float value, std::initializer_list<WidgetFlag> flags);
+      SliderBase(Widget * pParent, vec2 const & position, float width, float value, std::initializer_list<WidgetFlag> flags);
       void SetVal(float);
 
     private:
@@ -68,24 +68,81 @@ namespace Engine
       InternalState * m_pState;
     };
 
-    class SliderFloat : public Slider
+    template<typename T>
+    class Slider : public SliderBase
     {
-      SliderFloat(Widget * pParent, vec2 const & position, float width, float val, float minVal, float maxVal, std::initializer_list<WidgetFlag> flags);
+      Slider(Widget * pParent, vec2 const & position, float width, T minVal, T maxVal, T initialVal, std::initializer_list<WidgetFlag> flags);
     public:
 
-      static SliderFloat * Create(Widget * pParent, vec2 const & position, float width, float val, float minVal, float maxVal, std::initializer_list<WidgetFlag> flags = {});
+      static Slider * Create(Widget * pParent, vec2 const & position, float width, T minVal, T maxVal, T initialVal, std::initializer_list<WidgetFlag> flags ={});
 
-      void BindNewValue(std::function<void(float)> a_fn);
+      void BindNewValue(std::function<void(T)> a_fn);
 
     private:
 
       void NewValueClbk(float) override;
 
-      float m_minVal;
-      float m_maxVal;
-      float m_lastValue;
-      std::function<void(float)> m_clbk_NewValue;
+      T m_minVal;
+      T m_maxVal;
+      T m_lastValue;
+      std::function<void(T)> m_clbk_NewValue;
     };
+
+    using SliderFloat = Slider<float>;
+    using SliderInt = Slider<int32_t>;
+
+    template<typename T>
+    Slider<T>::Slider(Widget * a_pParent, vec2 const & a_position, float a_width,
+                      T a_minVal, T a_maxVal, T a_initialVal,
+                      std::initializer_list<WidgetFlag> a_flags)
+      : SliderBase(a_pParent, a_position, a_width, 0.0f, a_flags)
+      , m_minVal(a_minVal)
+      , m_maxVal(a_maxVal)
+      , m_lastValue(T(0))
+    {
+      if (m_minVal > m_maxVal)
+        m_minVal = m_maxVal;
+
+      if (a_initialVal < m_minVal)
+        a_initialVal = m_minVal;
+      else if (a_initialVal > m_maxVal)
+        a_initialVal = m_maxVal;
+
+      float v = 0.0f;
+      if (m_maxVal != m_minVal)
+        v = float(a_initialVal - m_minVal) / float(m_maxVal - m_minVal);
+
+      SetVal(v);
+      m_lastValue = a_initialVal;
+    }
+
+    template<typename T>
+    Slider<T> * Slider<T>::Create(Widget * a_pParent, vec2 const & a_position, float a_width,
+                                  T a_minVal, T a_maxVal, T a_initialVal,
+                                  std::initializer_list<WidgetFlag> a_flags)
+    {
+      return new Slider(a_pParent, a_position, a_width, a_minVal, a_maxVal, a_initialVal, a_flags);
+    }
+
+    template<typename T>
+    void Slider<T>::BindNewValue(std::function<void(T)> a_fn)
+    {
+      m_clbk_NewValue = a_fn;
+    }
+
+    template<typename T>
+    void Slider<T>::NewValueClbk(float a_val)
+    {
+      if (m_clbk_NewValue != nullptr)
+      {
+        T val = T(a_val * (m_maxVal - m_minVal) + m_minVal);
+        if (val != m_lastValue)
+        {
+          m_clbk_NewValue(val);
+          m_lastValue = val;
+        }
+      }
+    }
   }
 }
 

@@ -64,8 +64,8 @@ void GUIDemo::BuildGUI()
     });
   pControlsWindow->Add(pChkboxWrap);
 
-  SliderFloat *pSlider = SliderFloat::Create(pControlsWindow, {20.0f, 150.0f}, 128.0f, 128.0f, 0.0f, 255.0f);
-  pSlider->BindNewValue([](float a_val)
+  SliderInt *pSlider = SliderInt::Create(pControlsWindow, {20.0f, 150.0f}, 128, 0, 255, 128);
+  pSlider->BindNewValue([](int32_t a_val)
     {
       LOG_DEBUG("Slider: {}", a_val);
     });
