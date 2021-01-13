@@ -20,6 +20,9 @@ namespace Engine
       s_pStyle->outlineWidth = 2.0f;
       s_pStyle->textLineSpacing = 1.0f;
       s_pStyle->textWrap = true;
+      s_pStyle->sliderCaretWidth = 16.0f;
+      s_pStyle->sliderCaretHeight = 20.0f;
+      s_pStyle->sliderBarHeight = 16.0f;
 
       s_pStyle->colours[col_Text]                   = CLR_TEXT;
 
@@ -39,6 +42,19 @@ namespace Engine
       s_pStyle->colours[col_CheckboxHover]          = 0xFFCBEEFF;
       s_pStyle->colours[col_CheckboxTick]           = 0xFF69CA39;
       s_pStyle->colours[col_CheckboxTickHover]      = 0xFF69CA39;
+
+      s_pStyle->colours[col_SliderLower]             = CLR_NORMAL;
+      s_pStyle->colours[col_SliderLowerHover]        = CLR_NORMAL;
+      s_pStyle->colours[col_SliderLowerGrab]         = CLR_NORMAL;
+      s_pStyle->colours[col_SliderUpper]             = 0xFF909090;
+      s_pStyle->colours[col_SliderUpperHover]        = 0xFF909090;
+      s_pStyle->colours[col_SliderUpperGrab]         = 0xFF909090;
+      s_pStyle->colours[col_SliderCaret]             = CLR_NORMAL;
+      s_pStyle->colours[col_SliderCaretHover]        = CLR_HOVER;
+      s_pStyle->colours[col_SliderCaretGrab]         = 0xFFF3AA33;
+      s_pStyle->colours[col_SliderOutline]           = CLR_OUTLINE;
+      s_pStyle->colours[col_SliderOutlineHover]      = CLR_OUTLINE;
+      s_pStyle->colours[col_SliderOutlineGrab]       = CLR_OUTLINE;
     }
 
     Dg::ErrorCode Init()

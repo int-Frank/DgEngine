@@ -37,6 +37,19 @@ namespace Engine
       col_CheckboxTick,
       col_CheckboxTickHover,
 
+      col_SliderLower,
+      col_SliderLowerHover,
+      col_SliderLowerGrab,
+      col_SliderUpper,
+      col_SliderUpperHover,
+      col_SliderUpperGrab,
+      col_SliderCaret,
+      col_SliderCaretHover,
+      col_SliderCaretGrab,
+      col_SliderOutline,
+      col_SliderOutlineHover,
+      col_SliderOutlineGrab,
+
       col_COUNT
     };
 
@@ -47,6 +60,9 @@ namespace Engine
       float outlineWidth;
       float textLineSpacing;
       bool textWrap;
+      float sliderCaretWidth;
+      float sliderCaretHeight;
+      float sliderBarHeight;
     };
 
     Dg::ErrorCode Init();

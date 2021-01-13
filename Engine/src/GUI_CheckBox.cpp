@@ -8,7 +8,7 @@
 #include "Renderer.h"
 
 #define CHECKBOX_SIZE vec2(25.0f, 25.0f)
-#define CHECKBOX_THICKNESS 3.0f
+#define CHECKBOX_THICKNESS 2.0f
 
 namespace Engine
 {
