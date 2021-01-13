@@ -30,15 +30,16 @@ namespace Engine
 
     class CheckBox : public Widget
     {
-      CheckBox(Widget * pParent, vec2 const & position, std::initializer_list<WidgetFlag> flags);
+      CheckBox(Widget * pParent, vec2 const & position, bool checked, std::initializer_list<WidgetFlag> flags);
     public:
 
-      static CheckBox * Create(Widget * pParent, vec2 const & position, std::initializer_list<WidgetFlag> flags ={});
+      static CheckBox * Create(Widget * pParent, vec2 const & position, bool checked, std::initializer_list<WidgetFlag> flags ={});
 
       ~CheckBox();
 
+      void SetChecked(bool);
       void SetColour(CheckboxState, CheckboxElement, Colour);
-      void BindChangeSelected(std::function<void(bool)> a_fn);
+      void BindCheckedChanged(std::function<void(bool)> a_fn);
       void BindHoverOn(std::function<void()> a_fn);
       void BindHoverOff(std::function<void()> a_fn);
       void ClearBindings();
@@ -65,14 +66,14 @@ namespace Engine
 
     private:
 
-      bool m_isSelected;
+      bool m_isChecked;
       Text * m_pTextTick;
       Colour m_clr[(int)CheckboxState::COUNT][(int)CheckboxElement::COUNT];
       UIAABB m_aabb;
       WidgetState m_state;
       Widget * m_pParent;
 
-      std::function<void(bool)> m_clbk_ChangeSelected;
+      std::function<void(bool)> m_clbk_CheckChanged;
       std::function<void()> m_clbk_HoverOn;
       std::function<void()> m_clbk_HoverOff;
     };

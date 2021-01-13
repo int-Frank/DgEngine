@@ -43,6 +43,7 @@ namespace Engine
 
       ~Text();
 
+      void SetWrap(bool);
       void SetText(std::string const &);
       void SetColour(Colour);
 

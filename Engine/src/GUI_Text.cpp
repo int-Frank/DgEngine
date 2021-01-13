@@ -549,10 +549,9 @@ namespace Engine
       }
       else
       {
-        // TODO UI defaults should be defined in one place
         m_attributes.size = GUI_FONT_SIZE;
-        m_attributes.colourText = 0xFFFFFFFF;
-        m_attributes.lineSpacing = 1.0f;
+        m_attributes.colourText = GetStyle().colours[col_Text];
+        m_attributes.lineSpacing = GetStyle().textLineSpacing;
         m_attributes.horizontalAlign = HorizontalAlignment::Left;
         m_attributes.verticalAlign = VerticalAlignment::Top;
         m_attributes.wrapText = true;
@@ -630,6 +629,11 @@ namespace Engine
     void Text::SetParent(Widget * a_pParent)
     {
       m_pParent = a_pParent;
+    }
+
+    void Text::SetWrap(bool a_val)
+    {
+      m_attributes.wrapText = a_val;
     }
 
     void Text::_HandleMessage(Message * a_pMsg)

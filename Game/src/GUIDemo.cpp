@@ -19,6 +19,8 @@ MAKE_SYSTEM_DEFINITION(GUIDemo)
 
 void GUIDemo::OnAttach()
 {
+  m_textColour = 0xFFFFFFFF;
+
   BuildGUI();
   BindInput();
 }
@@ -32,44 +34,102 @@ void GUIDemo::BuildGUI()
     return;
   }
 
-
   // Main window
-  Container * pMainWindow = Container::Create(nullptr, {20.f, 20.f}, {768.f, 512.f});
-
-  // Controls
-  Container * pControlsWindow = Container::Create(nullptr, {20.f, 20.f}, {250.f, 200.f});
-  Button * pBtnReset = Button::Create(nullptr, "Reset", {10.f, 20.f}, {70.f, 30.f});
-  pBtnReset->BindSelect([](){LOG_WARN("PRESSED");});
-  pControlsWindow->Add(pBtnReset);
+  Container * pMainWindow = Container::Create(nullptr, {70.f, 40.f}, {735.f, 450.f});
 
   // Text window
-  const char * pStr = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum";
-  Container * pTextWindow = Container::Create(nullptr, {400.f, 20.f}, {300.f, 200.f});
+  const char * pStr = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.\nUt enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.\nDuis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.\nExcepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum";
+  Container * pTextWindow = Container::Create(nullptr, {200.f, 10.f}, {480.f, 280.f});
   TextAttributes attr ={};
   attr.size = GUI_FONT_SIZE; // TODO This should not be exposed
   attr.colourText = GetStyle().colours[col_Text];
   attr.lineSpacing = GetStyle().textLineSpacing;
-  attr.horizontalAlign = Engine::GUI::HorizontalAlignment::Centre;
-  attr.verticalAlign = Engine::GUI::VerticalAlignment::Centre;
+  attr.horizontalAlign = Engine::GUI::HorizontalAlignment::Left;
+  attr.verticalAlign = Engine::GUI::VerticalAlignment::Top;
   attr.wrapText = true;
-  Text *pText = Text::Create(pTextWindow, pStr, {0.0, 0.0}, {0.0, 0.0}, &attr, {WidgetFlag::StretchHeight, WidgetFlag::StretchWidth, WidgetFlag::NotResponsive});
+  Text * pText = Text::Create(pTextWindow, pStr, {0.0, 0.0}, {0.0, 0.0}, &attr, {WidgetFlag::StretchHeight, WidgetFlag::StretchWidth, WidgetFlag::NotResponsive});
 
-  CheckBox *pChkboxWrap = CheckBox::Create(pControlsWindow, {20.0f, 100.0f});
-  pChkboxWrap->BindChangeSelected([](bool a_selected)
+  // Control Window
+  Container * pControlsWindow = Container::Create(nullptr, {10.f, 10.f}, {150.f, 280.f});
+
+  // Text wrapping options
+  CheckBox *pChkboxWrap = CheckBox::Create(pControlsWindow, {12.0f, 60.0f}, true);
+  pChkboxWrap->BindCheckedChanged([pText](bool a_selected)
     {
-      if (a_selected)
-        LOG_DEBUG("ON");
-      else
-        LOG_DEBUG("OFF");
+      pText->SetWrap(a_selected);
     });
+
+  Text *pWrapLabel = Text::Create(pControlsWindow, "Wrap text", {50.0f, 60.0f}, {200.0f, 40.0f});
   pControlsWindow->Add(pChkboxWrap);
+  pControlsWindow->Add(pWrapLabel);
 
-  SliderInt *pSlider = SliderInt::Create(pControlsWindow, {20.0f, 150.0f}, 128, 0, 255, 128);
-  pSlider->BindNewValue([](int32_t a_val)
+  // Colour sliders
+  Text * pColourLabel = Text::Create(pControlsWindow, "Text colour", {25.0f, 110.0f}, {200.0f, 40.0f});
+  pControlsWindow->Add(pColourLabel);
+
+  Colour *pClr = &m_textColour;
+  SliderInt * pRedSlider = SliderInt::Create(pControlsWindow, {10.0f, 150.0f}, 128.0f, 0, 255, 255);
+  pRedSlider->SetColour(SliderState::Normal, SliderElement::Caret, 0xFF0000DD);
+  pRedSlider->SetColour(SliderState::Hover, SliderElement::Caret, 0xFF0000EE);
+  pRedSlider->SetColour(SliderState::Grab, SliderElement::Caret, 0xFF0000FF);
+  pRedSlider->SetColour(SliderState::Normal, SliderElement::Lower, 0xFF0000EE);
+  pRedSlider->SetColour(SliderState::Hover, SliderElement::Lower, 0xFF0000EE);
+  pRedSlider->SetColour(SliderState::Grab, SliderElement::Lower, 0xFF0000EE);
+  pRedSlider->BindNewValue([pText, pClr = &m_textColour] (int32_t a_val)
     {
-      LOG_DEBUG("Slider: {}", a_val);
+      pClr->r(a_val);
+      pText->SetColour(*pClr);
     });
-  pControlsWindow->Add(pSlider);
+
+  SliderInt * pBlueSlider = SliderInt::Create(pControlsWindow, {10.0f, 180.0f}, 128.0f, 0, 255, 255);
+  pBlueSlider->SetColour(SliderState::Normal, SliderElement::Caret, 0xFFDD0000);
+  pBlueSlider->SetColour(SliderState::Hover, SliderElement::Caret, 0xFFEE0000);
+  pBlueSlider->SetColour(SliderState::Grab, SliderElement::Caret, 0xFFFF0000);
+  pBlueSlider->SetColour(SliderState::Normal, SliderElement::Lower, 0xFFEE0000);
+  pBlueSlider->SetColour(SliderState::Hover, SliderElement::Lower, 0xFFEE0000);
+  pBlueSlider->SetColour(SliderState::Grab, SliderElement::Lower, 0xFFEE0000);
+  pBlueSlider->BindNewValue([pText, pClr = &m_textColour](int32_t a_val)
+    {
+      pClr->b(a_val);
+      pText->SetColour(*pClr);
+    });
+
+  SliderInt * pGreenSlider = SliderInt::Create(pControlsWindow, {10.0f, 210.0f}, 128.0f, 0, 255, 255);
+  pGreenSlider->SetColour(SliderState::Normal, SliderElement::Caret, 0xFF00DD00);
+  pGreenSlider->SetColour(SliderState::Hover, SliderElement::Caret, 0xFF00EE00);
+  pGreenSlider->SetColour(SliderState::Grab, SliderElement::Caret, 0xFF00FF00);
+  pGreenSlider->SetColour(SliderState::Normal, SliderElement::Lower, 0xFF00EE00);
+  pGreenSlider->SetColour(SliderState::Hover, SliderElement::Lower, 0xFF00EE00);
+  pGreenSlider->SetColour(SliderState::Grab, SliderElement::Lower, 0xFF00EE00);
+  pGreenSlider->BindNewValue([pText, pClr = &m_textColour](int32_t a_val)
+    {
+      pClr->g(a_val);
+      pText->SetColour(*pClr);
+    });
+
+  SliderInt * pAlphaSlider = SliderInt::Create(pControlsWindow, {10.0f, 240.0f}, 128.0f, 0, 255, 255);
+  pAlphaSlider->BindNewValue([pText, pClr = &m_textColour](int32_t a_val)
+    {
+      pClr->a(a_val);
+      pText->SetColour(*pClr);
+    });
+
+  pControlsWindow->Add(pRedSlider);
+  pControlsWindow->Add(pGreenSlider);
+  pControlsWindow->Add(pBlueSlider);
+  pControlsWindow->Add(pAlphaSlider);
+
+  // Reset button
+  Button * pBtnReset = Button::Create(nullptr, "Reset", {10.f, 10.f}, {70.f, 30.f});
+  pBtnReset->BindSelect([pChkboxWrap, pRedSlider, pGreenSlider, pBlueSlider, pAlphaSlider]()
+    {
+      pChkboxWrap->SetChecked(true);
+      pRedSlider->SetValue(255);
+      pGreenSlider->SetValue(255);
+      pBlueSlider->SetValue(255);
+      pAlphaSlider->SetValue(255);
+    });
+  pControlsWindow->Add(pBtnReset);
 
   // Hooking it all up
   pTextWindow->Add(pText);

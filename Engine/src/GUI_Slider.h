@@ -51,7 +51,7 @@ namespace Engine
     protected:
 
       SliderBase(Widget * pParent, vec2 const & position, float width, float value, std::initializer_list<WidgetFlag> flags);
-      void SetVal(float);
+      float SetNormalisedValue(float); // Set value between 0 and 1
 
     private:
 
@@ -77,6 +77,7 @@ namespace Engine
       static Slider * Create(Widget * pParent, vec2 const & position, float width, T minVal, T maxVal, T initialVal, std::initializer_list<WidgetFlag> flags ={});
 
       void BindNewValue(std::function<void(T)> a_fn);
+      void SetValue(T);
 
     private:
 
@@ -108,11 +109,8 @@ namespace Engine
       else if (a_initialVal > m_maxVal)
         a_initialVal = m_maxVal;
 
-      float v = 0.0f;
-      if (m_maxVal != m_minVal)
-        v = float(a_initialVal - m_minVal) / float(m_maxVal - m_minVal);
+      SetValue(a_initialVal);
 
-      SetVal(v);
       m_lastValue = a_initialVal;
     }
 
@@ -128,6 +126,16 @@ namespace Engine
     void Slider<T>::BindNewValue(std::function<void(T)> a_fn)
     {
       m_clbk_NewValue = a_fn;
+    }
+
+    template<typename T>
+    void Slider<T>::SetValue(T a_val)
+    {
+      float v = 0.0f;
+      if (m_maxVal != m_minVal)
+        v = float(a_val - m_minVal) / float(m_maxVal - m_minVal);
+
+      NewValueClbk(SetNormalisedValue(v));
     }
 
     template<typename T>

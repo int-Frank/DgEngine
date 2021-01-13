@@ -51,7 +51,7 @@ namespace Engine
       Widget * GetParent() const;
       void SetParent(Widget * a_pParent);
 
-      void SetVal(float);
+      float SetNormalisedValue(float);
 
       virtual InternalState * HandleMessage(Message *) = 0;
 
@@ -150,7 +150,7 @@ namespace Engine
       m_pData->pParent = a_pParent;
     }
 
-    void SliderBase::InternalState::SetVal(float a_val)
+    float SliderBase::InternalState::SetNormalisedValue(float a_val)
     {
       if (a_val < 0.0f)
         a_val = 0.0f;
@@ -158,6 +158,7 @@ namespace Engine
         a_val = 1.0f;
 
       m_pData->value = a_val;
+      return m_pData->value;
     }
 
     vec2 SliderBase::InternalState::_GetSize()
@@ -329,6 +330,7 @@ namespace Engine
       {
         a_pMsg->SetFlag(Message::Flag::Handled, true);
         SetValFromScreenCoord(point.x());
+        m_pData->pSlider->NewValueClbk(m_pData->value);
         return new SliderActiveState(m_pData, 0.0f);
       }
 
@@ -506,9 +508,9 @@ namespace Engine
       return m_pState->QueryState();
     }
 
-    void SliderBase::SetVal(float a_val)
+    float SliderBase::SetNormalisedValue(float a_val)
     {
-      m_pState->SetVal(a_val);
+      return m_pState->SetNormalisedValue(a_val);
     }
 
     Widget * SliderBase::GetParent() const

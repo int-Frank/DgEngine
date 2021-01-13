@@ -14,15 +14,15 @@ namespace Engine
 {
   namespace GUI
   {
-    CheckBox::CheckBox(Widget * a_pParent, vec2 const & a_position, std::initializer_list<WidgetFlag> flags)
+    CheckBox::CheckBox(Widget * a_pParent, vec2 const & a_position, bool a_checked, std::initializer_list<WidgetFlag> flags)
       : Widget({WidgetFlag::NotResponsive}, flags)
-      , m_isSelected(false)
+      , m_isChecked(a_checked)
       , m_pTextTick(nullptr)
       , m_clr{}
       , m_aabb{a_position, CHECKBOX_SIZE}
       , m_state(WidgetState::None)
       , m_pParent(a_pParent)
-      , m_clbk_ChangeSelected(nullptr)
+      , m_clbk_CheckChanged(nullptr)
     {
       TextAttributes attr = {};
       attr.size = GUI_FONT_SIZE_TICK;
@@ -46,14 +46,14 @@ namespace Engine
       delete m_pTextTick;
     }
 
-    CheckBox * CheckBox::Create(Widget * pParent, vec2 const & position, std::initializer_list<WidgetFlag> flags)
+    CheckBox * CheckBox::Create(Widget * pParent, vec2 const & position, bool a_checked, std::initializer_list<WidgetFlag> flags)
     {
-      return new CheckBox(pParent, position, flags);
+      return new CheckBox(pParent, position, a_checked, flags);
     }
 
-    void CheckBox::BindChangeSelected(std::function<void(bool)> a_fn)
+    void CheckBox::BindCheckedChanged(std::function<void(bool)> a_fn)
     {
-      m_clbk_ChangeSelected = a_fn;
+      m_clbk_CheckChanged = a_fn;
     }
 
     void CheckBox::BindHoverOn(std::function<void()> a_fn)
@@ -81,10 +81,10 @@ namespace Engine
       if (!GetGlobalAABB(aabb))
         return;
 
-      if (PointInBox(vec2((float)a_pMsg->x, (float)a_pMsg->y), aabb) && m_clbk_ChangeSelected != nullptr)
+      if (PointInBox(vec2((float)a_pMsg->x, (float)a_pMsg->y), aabb) && m_clbk_CheckChanged != nullptr)
       {
-        m_isSelected = !m_isSelected;
-        m_clbk_ChangeSelected(m_isSelected);
+        m_isChecked = !m_isChecked;
+        m_clbk_CheckChanged(m_isChecked);
         a_pMsg->SetFlag(Engine::Message::Flag::Handled, true);
       }
     }
@@ -115,7 +115,7 @@ namespace Engine
 
     void CheckBox::ClearBindings()
     {
-      m_clbk_ChangeSelected = nullptr;
+      m_clbk_CheckChanged = nullptr;
     }
 
     void CheckBox::Draw()
@@ -129,11 +129,10 @@ namespace Engine
       vec2 pos = GetGlobalPosition() + vec2(CHECKBOX_THICKNESS, CHECKBOX_THICKNESS);
       vec2 size = GetSize() - 2.0f * vec2(CHECKBOX_THICKNESS, CHECKBOX_THICKNESS);
 
-      // TODO implement hover-on colours
       int s = m_state == WidgetState::HoverOn ? (int)CheckboxState::Hover : (int)CheckboxState::Normal;
       Renderer::DrawBoxOutline({pos, size}, CHECKBOX_THICKNESS, m_clr[s][(int)CheckboxElement::Outline]);
 
-      if (m_isSelected)
+      if (m_isChecked)
         m_pTextTick->Draw();
     }
 
@@ -187,6 +186,16 @@ namespace Engine
       BSR_ASSERT(a_state != CheckboxState::COUNT);
       BSR_ASSERT(a_ele != CheckboxElement::COUNT);
       m_clr[(int)a_state][(int)a_ele] = a_clr;
+    }
+    
+    void CheckBox::SetChecked(bool a_val)
+    {
+      if (a_val == m_isChecked)
+        return;
+
+      m_isChecked = a_val;
+      if (m_clbk_CheckChanged != nullptr)
+        m_clbk_CheckChanged(m_isChecked);
     }
   }
 }

@@ -2,6 +2,7 @@
 #define GUIDEMO_H
 
 #include "System.h"
+#include "Utils.h"
 
 // We just use this system to generate the GUI
 class GUIDemo : public Engine::System
@@ -20,6 +21,8 @@ private:
 
   void BuildGUI();
   void BindInput();
+
+  Engine::Colour m_textColour;
 };
 
 #endif
