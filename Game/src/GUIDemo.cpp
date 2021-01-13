@@ -59,12 +59,12 @@ void GUIDemo::BuildGUI()
       pText->SetWrap(a_selected);
     });
 
-  Text *pWrapLabel = Text::Create(pControlsWindow, "Wrap text", {50.0f, 60.0f}, {200.0f, 40.0f});
+  Text *pWrapLabel = Text::Create(pControlsWindow, "Wrap text", {50.0f, 60.0f}, {200.0f, 40.0f}, nullptr, {WidgetFlag::NotResponsive});
   pControlsWindow->Add(pChkboxWrap);
   pControlsWindow->Add(pWrapLabel);
 
   // Colour sliders
-  Text * pColourLabel = Text::Create(pControlsWindow, "Text colour", {25.0f, 110.0f}, {200.0f, 40.0f});
+  Text * pColourLabel = Text::Create(pControlsWindow, "Text colour", {25.0f, 110.0f}, {200.0f, 40.0f}, nullptr, {WidgetFlag::NotResponsive});
   pControlsWindow->Add(pColourLabel);
 
   Colour *pClr = &m_textColour;
