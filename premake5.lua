@@ -138,8 +138,8 @@ project "Engine"
 		runtime "Release"
 		optimize "on"
 
-  project "Game"
-    location "Game"
+  project "Demo"
+    location "Demo"
     kind "ConsoleApp"
     targetdir (projOutput)
     objdir (projOutputInt)
@@ -149,8 +149,8 @@ project "Engine"
     
     files 
     {
-      "Game/src/**.h",
-      "Game/src/**.cpp",
+      "Demo/src/**.h",
+      "Demo/src/**.cpp",
     }
     
     includedirs
