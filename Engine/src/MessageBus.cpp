@@ -63,22 +63,14 @@ namespace Engine
     if (a_cycles == 0)
       a_cycles = 0xFFFFFFFF;
 
-    int noMessages = 0;
     for (uint32_t c = 0; c < a_cycles; c++)
     {
-      if (noMessages == 2)
-        break;
-
       int readBuffer = m_writeBuffer;
-      m_writeBuffer = (m_writeBuffer + 1) % 2;
+      m_writeBuffer = (m_writeBuffer + 1) & 1;
 
       if (m_messageQueue[readBuffer].size() == 0)
-      {
-        noMessages++;
-        continue;
-      }
+        break;
 
-      noMessages = 0;
       for (size_t i = 0; i < m_messageQueue[readBuffer].size(); i++)
       {
         Message * pMsg = m_messageQueue[readBuffer][i];
@@ -90,6 +82,7 @@ namespace Engine
             break;
         }
       }
+
       m_messageQueue[readBuffer].clear();
       m_buf[readBuffer].clear();
     }

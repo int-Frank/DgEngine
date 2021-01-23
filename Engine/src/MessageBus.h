@@ -55,8 +55,8 @@ namespace Engine
     // Can be used from any thread.
     void Register(TRef<Message> const &);
 
-    // Since dispatching messages will create more messages, we add the upper limit of how 
-    // many 'cycles' of messaging before we exit. 0 == no limit.
+    // Since dispatching messages may generate more messages, we add an upper limit of how 
+    // many times we want to cycle through the message buffers. 0 == no limit.
     void DispatchMessages(uint32_t cycles = 0);
 
     size_t MessageCount();
