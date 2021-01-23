@@ -146,7 +146,6 @@ namespace Engine
       });
 
     Renderer::Instance()->SwapBuffers();
-    MessageBus::Instance()->SwapBuffers();
     Engine::TBUFClear();
     RenderThread::Instance()->Continue();
   }

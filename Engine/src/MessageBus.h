@@ -55,17 +55,16 @@ namespace Engine
     // Can be used from any thread.
     void Register(TRef<Message> const &);
 
-    // SwapBuffers needs to be called before DispatchMessages, at a time no
-    // Messages are being registered.
-    void SwapBuffers();
-    void DispatchMessages();
+    // Since dispatching messages will create more messages, we add the upper limit of how 
+    // many 'cycles' of messaging before we exit. 0 == no limit.
+    void DispatchMessages(uint32_t cycles = 0);
 
     size_t MessageCount();
 
   private:
 
     std::mutex              m_mutex;
-    int                     m_producerIndex;
+    int                     m_writeBuffer;
     PODArray<Message*>      m_messageQueue[2];
     MemBuffer               m_buf[2];
     SystemStack &           m_systemStack;
