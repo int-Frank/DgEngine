@@ -159,10 +159,11 @@ namespace Engine
     {
       float dt = 1.0f / 60.0f;
 
-      MessageBus::Instance()->DispatchMessages();
-
       for (auto it = m_pimpl->systemStack.begin(); it != m_pimpl->systemStack.end(); it++)
+      {
         it->second->Update(dt);
+        MessageBus::Instance()->DispatchMessages();
+      }
 
       Renderer::Clear();
 

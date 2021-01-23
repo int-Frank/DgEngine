@@ -28,8 +28,6 @@
 #define FONTATLAS_DEFAULT_TEXTURE_DIMENSION 1024
 #define MAX_TEXT_CHARACTERS 65536
 
-// GUI defaults have their own file
-
 //----------------------------------------------------------------------------
 // Logging
 //----------------------------------------------------------------------------
