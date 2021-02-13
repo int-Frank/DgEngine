@@ -1,5 +1,6 @@
 #include "Log.h"
 
+#include "Serialize.h"
 #include "Buffer.h"
 #include "unicode.h"
 
@@ -45,6 +46,29 @@ void TEST_BufferLayout()
   delete[] buf;
 }
 
+void TEST_Serialize()
+{
+  std::string strList[6] = {std::string("A,B,C"),
+                            std::string("The quick brown fox jumps over the lazy dog."),
+                            std::string(""),
+                            std::string("1"),
+                            std::string(""),
+                            std::string("Final string")};
+
+  uint8_t buf[128] = {};
+
+  Engine::Serialize(buf, strList, 6);
+  std::string outList[6] = {};
+  Engine::Deserialize(buf, outList, 6);
+
+  CHECK(strList[0] == outList[0]);
+  CHECK(strList[1] == outList[1]);
+  CHECK(strList[2] == outList[2]);
+  CHECK(strList[3] == outList[3]);
+  CHECK(strList[4] == outList[4]);
+  CHECK(strList[5] == outList[5]);
+}
+
 void TEST_UTF8()
 {
   uint8_t const utf8Str[] = {0x61, 0x73, 0x64, 0x66, 0xF3, 0x9A, 0x8D, 0xA0, 0x00};
@@ -62,6 +86,7 @@ void TEST_UTF8()
 void RunTests()
 {
   TEST_BufferLayout();
+  TEST_Serialize();
   TEST_UTF8();
 
   LOG_INFO("Finished running tests.");
