@@ -10,9 +10,9 @@ namespace Engine
 {
   MessageBus * MessageBus::s_instance = nullptr;
 
-  void MessageBus::Init(SystemStack& a_ls)
+  void MessageBus::Init()
   {
-    s_instance = new MessageBus(a_ls);
+    s_instance = new MessageBus();
   }
 
   void MessageBus::ShutDown()
@@ -26,9 +26,8 @@ namespace Engine
     return s_instance;
   }
 
-  MessageBus::MessageBus(SystemStack & a_ss)
-    : m_systemStack(a_ss)
-    , m_writeBuffer(0)
+  MessageBus::MessageBus()
+    : m_writeBuffer(0)
   {
 
   }
@@ -58,7 +57,7 @@ namespace Engine
     a_message->Clone(buf);
   }
 
-  void MessageBus::DispatchMessages(uint32_t a_cycles)
+  void MessageBus::DispatchMessages(SystemStack & a_systemStack, uint32_t a_cycles)
   {
     if (a_cycles == 0)
       a_cycles = 0xFFFFFFFF;
@@ -74,8 +73,8 @@ namespace Engine
       for (size_t i = 0; i < m_messageQueue[readBuffer].size(); i++)
       {
         Message * pMsg = m_messageQueue[readBuffer][i];
-        auto it = m_systemStack.begin();
-        for (; it != m_systemStack.end(); it++)
+        auto it = a_systemStack.begin();
+        for (; it != a_systemStack.end(); it++)
         {
           it->second->HandleMessage(pMsg);
           if (pMsg->QueryFlag(Message::Flag::Handled))

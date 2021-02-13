@@ -47,7 +47,7 @@ void GUIDemo::BuildGUI()
   attr.horizontalAlign = Engine::GUI::HorizontalAlignment::Left;
   attr.verticalAlign = Engine::GUI::VerticalAlignment::Top;
   attr.wrapText = true;
-  Text * pText = Text::Create(pTextWindow, pStr, {0.0, 0.0}, {0.0, 0.0}, &attr, {WidgetFlag::StretchHeight, WidgetFlag::StretchWidth, WidgetFlag::NotResponsive});
+  Text * pText = Text::Create(pTextWindow, pStr, {0.0f, 0.0f}, {0.0f, 0.0f}, &attr, {WidgetFlag::StretchHeight, WidgetFlag::StretchWidth, WidgetFlag::NotResponsive});
 
   // Control Window
   Container * pControlsWindow = Container::Create(nullptr, {10.f, 10.f}, {150.f, 280.f});

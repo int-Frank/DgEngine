@@ -30,21 +30,19 @@
 
 #define CALL_OVERLOAD(name, ...) GLUE(OVERLOAD_MACRO(name, COUNT_ARGS_MAX5(__VA_ARGS__)), (__VA_ARGS__))
 
-
 namespace Engine
 {
-  class System;
   class SystemStack;
 
   class MessageBus
   {
     static MessageBus * s_instance;
 
-    MessageBus(SystemStack&);
+    MessageBus();
 
   public:
 
-    static void Init(SystemStack&);
+    static void Init();
     static void ShutDown();
     static MessageBus * Instance();
 
@@ -57,7 +55,7 @@ namespace Engine
 
     // Since dispatching messages may generate more messages, we add an upper limit of how 
     // many times we want to cycle through the message buffers. 0 == no limit.
-    void DispatchMessages(uint32_t cycles = 0);
+    void DispatchMessages(SystemStack &, uint32_t cycles = 0);
 
     size_t MessageCount();
 
@@ -67,7 +65,6 @@ namespace Engine
     int                     m_writeBuffer;
     PODArray<Message*>      m_messageQueue[2];
     MemBuffer               m_buf[2];
-    SystemStack &           m_systemStack;
   };
 }
 

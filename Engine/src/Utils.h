@@ -6,10 +6,9 @@
 #include <stdint.h>
 #include <string>
 
-#include "DgR2Vector.h"
-#include "DgR3Vector.h"
-#include "DgR3Matrix.h"
-#include "DgR2Matrix.h"
+#include "DgVector.h"
+#include "DgMatrix44.h"
+#include "DgMatrix33.h"
 #include "DgBit.h"
 
 #define BIT(x) (1 << x)
@@ -20,11 +19,11 @@ namespace Engine
 {
   typedef unsigned char byte;
 
-  typedef Dg::R2::Vector<float>           vec3;
-  typedef Dg::R2::Vector_cartesian<float> vec2;
-  typedef Dg::R3::Vector<float>           vec4;
-  typedef Dg::R2::Matrix<float>           mat3;
-  typedef Dg::R3::Matrix<float>           mat4;
+  typedef Dg::Vector2<float>    vec2;
+  typedef Dg::Vector3<float>    vec3;
+  typedef Dg::Vector4<float>    vec4;
+  typedef Dg::Matrix33<float>   mat33;
+  typedef Dg::Matrix44<float>   mat44;
 
   struct UIAABB
   {

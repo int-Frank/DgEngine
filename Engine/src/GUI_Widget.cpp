@@ -73,12 +73,12 @@ namespace Engine
 
     vec2 Widget::GetContentDivPosition()
     {
-      return vec2::ZeroVector();
+      return Zeros2f();
     }
 
     vec2 Widget::GetContentDivSize()
     {
-      return vec2::ZeroVector();
+      return Zeros2f();
     }
 
     bool Widget::IsContainer() const

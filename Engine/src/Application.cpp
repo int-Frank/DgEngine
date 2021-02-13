@@ -81,7 +81,7 @@ namespace Engine
     s_instance = this;
 
     ResourceManager::Init();
-    MessageBus::Init(m_pimpl->systemStack);
+    MessageBus::Init();
 
     if (a_opts.loggerType == E_UseFileLogger)
       impl::Logger::Init_file(a_opts.loggerName.c_str(), a_opts.logFile.c_str());
@@ -162,7 +162,7 @@ namespace Engine
       for (auto it = m_pimpl->systemStack.begin(); it != m_pimpl->systemStack.end(); it++)
       {
         it->second->Update(dt);
-        MessageBus::Instance()->DispatchMessages();
+        MessageBus::Instance()->DispatchMessages(m_pimpl->systemStack);
       }
 
       Renderer::Clear();
