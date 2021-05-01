@@ -20,14 +20,15 @@
 #define SHADERUNIFORM_H
 
 #include <string>
+#include <vector>
 #include <stdint.h>
 
-#include "DgDynamicArray.h"
 #include "BSR_Assert.h"
 #include "Memory.h"
 #include "RenderResource.h"
 #include "ShaderUtils.h"
 #include "ShaderSource.h"
+#include "DgMap_AVL.h"
 
 #define BIT(x) (1 << x)
 #define INVALID_INDEX -1
@@ -66,76 +67,6 @@ namespace Engine
     uint32_t m_data;
   };
 
-  //A data type of STRUCT will just be padding. This can be used 
-  //to pad out the front and back of a struct.
-  class std140ItemDeclaration
-  {
-  public:
-
-    std140ItemDeclaration(ShaderDataType, uint32_t count, MatrixLayout layout = MatrixLayout::ColumnMajor);
-    void * CopyToBuffer(void * buffer, void const * data) const;
-
-    friend bool operator==(std140ItemDeclaration const&, std140ItemDeclaration const&);
-    friend bool operator!=(std140ItemDeclaration const&, std140ItemDeclaration const&);
-
-    void SetBaseAlignment(uint32_t offset);
-    void SetFrontPadding(uint32_t padding);
-
-    ShaderDataType Type() const;
-
-    uint32_t Stride() const;
-    uint32_t Count() const;
-    uint32_t FrontPadding() const;
-
-  private:
-
-    ShaderDataType  const m_type;  //Cannot be struct
-    uint32_t        const m_count;
-    MatrixLayout    const m_matLayout;
-
-    uint32_t              m_frontPadding;
-  };
-
-  typedef Dg::DynamicArray<std140ItemDeclaration> std140UniformBlockList;
-
-  //Matrices will be column-major
-  class std140UniformBlock
-  {
-  public:
-
-    std140UniformBlock(MatrixLayout);
-    ~std140UniformBlock();
-
-    friend bool operator==(std140UniformBlock const &, std140UniformBlock const&);
-
-    void Push(std140ItemDeclaration const&);
-    void * OutputNext(void *);
-
-    uint32_t Size() const;
-    uint32_t ItemCount() const;
-
-  private:
-    std::string m_name;
-    MatrixLayout m_matrixLayout;
-    std140UniformBlockList m_items;
-  };
-
-  class std140UniformBlockBuffer
-  {
-  public:
-
-    std140UniformBlockBuffer();
-    ~std140UniformBlockBuffer();
-
-    void Push(std140UniformBlock const&);
-    std140UniformBlock * Get(std::string const & name);
-
-    uint32_t Size();
-
-  private:
-    Dg::DynamicArray<std140UniformBlock *> m_blocks;
-  };
-
   class ShaderUniformDeclaration
   {
   public:
@@ -168,7 +99,7 @@ namespace Engine
     ShaderDataType m_type;
   };
 
-  typedef Dg::DynamicArray<ShaderUniformDeclaration> ShaderUniformList;
+  typedef std::vector<ShaderUniformDeclaration> ShaderUniformList;
 
   class ShaderData : public RenderResource
   {
@@ -215,8 +146,7 @@ namespace Engine
 
   class BindingPoint : public RenderResource
   {
-    void Init(StorageBlockType, ShaderDomain);
-    BindingPoint();
+    BindingPoint(StorageBlockType, ShaderDomain);
   public:
 
     static Ref<BindingPoint> Create(StorageBlockType, ShaderDomain);

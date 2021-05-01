@@ -48,12 +48,6 @@ namespace Engine
     Texture
   };
 
-  enum class MatrixLayout : uint32_t
-  {
-    RowMajor,
-    ColumnMajor
-  };
-
   enum class ShaderDataBaseType : uint32_t
   {
     None,
@@ -103,12 +97,7 @@ namespace Engine
 
   ShaderDataType GetRowVectorFromMatrix(ShaderDataType);
   ShaderDataType GetColumnVectorFromMatrix(ShaderDataType);
-
-  uint32_t std140BaseAlignmentSingle(ShaderDataType);
-  uint32_t std140BaseAlignmentArray(ShaderDataType);
-  uint32_t std140StrideSingle(ShaderDataType, MatrixLayout layout = MatrixLayout::ColumnMajor);
-  uint32_t std140StrideArray(ShaderDataType, MatrixLayout layout = MatrixLayout::ColumnMajor);
-
+  
   ShaderDataClass GetShaderDataClass(ShaderDataType);
   ShaderDataBaseType GetShaderDataBaseType(ShaderDataType);
 

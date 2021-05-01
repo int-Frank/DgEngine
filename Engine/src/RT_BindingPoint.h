@@ -8,15 +8,20 @@
 
 namespace Engine
 {
-  //Domain is included in the ID
-  class BindingPointID
+  class RT_BindingPoint
   {
-    friend class RT_BindingPoint;
   public:
 
-    BindingPointID();
+    RT_BindingPoint();
+    ~RT_BindingPoint();
 
-    bool IsValid() const;
+    static void Init();
+
+    bool Capture(StorageBlockType, ShaderDomain);  //Finds the next binding point if one exists
+    void Release();                                //Equivilant of Destroy()
+    bool IsBound() const;
+    void Unbind();
+
     uint32_t Address() const;
     ShaderDomain Domain() const;
     StorageBlockType Type() const;
@@ -24,44 +29,18 @@ namespace Engine
   private:
 
     void Set(StorageBlockType, ShaderDomain, uint32_t index);
-    void SetInvalid();
 
-  private:
-    static uint32_t const INVALID_ID = 0xFFFFFFFF;
-    uint32_t m_data;
-  };
-
-  class RT_BindingPoint
-  {
-  public:
-
-    static void Init();
-
-    bool Capture(StorageBlockType, ShaderDomain);  //Finds the next binding point if it exists
-    void Release();                                //Equivilant of Destroy()
-    bool IsBound() const;
-    BindingPointID GetID() const;
-
-  private:
-
-    struct Domain
+    struct BindingPointData
     {
-      Domain()
-        : bindingPoints(0)
-        , begin(0)
-        , count(0)
-      {
-      }
-
       uint32_t bindingPoints;
       uint16_t begin;
       uint16_t count;
     };
 
-    static Domain s_addresses[ShaderDomain_COUNT][ShaderDomain_COUNT];
+    static BindingPointData s_addresses[SBT32(COUNT)][ShaderDomain_COUNT];
 
   private:
-    BindingPointID  m_bindingIndex;
+    uint32_t  m_bindingData;
   };
 }
 

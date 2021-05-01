@@ -20,6 +20,7 @@
 #define RT_RENDERERPROGRAM_H
 
 #include <stdint.h>
+#include <vector>
 #include "MemBuffer.h"
 #include "Utils.h"
 #include "ShaderUniform.h"
@@ -74,7 +75,7 @@ namespace Engine
 
     std::string m_name;
     ShaderData const * m_pShaderData;
-    Dg::DynamicArray<int32_t> m_uniformLocations;
+    std::vector<int32_t> m_uniformLocations;
   };
 }
 

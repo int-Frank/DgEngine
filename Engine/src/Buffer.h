@@ -125,35 +125,29 @@ namespace Engine
   class UniformBuffer : public RenderResource
   {
   private:
-    UniformBuffer(void const * data, uint32_t size, BufferUsage a_usage = BufferUsage::Static);
-    UniformBuffer(uint32_t size, BufferUsage a_usage = BufferUsage::Static);
+    UniformBuffer(uint32_t size, BufferUsage);
+    UniformBuffer(void const * a_pData, uint32_t size, BufferUsage);
 
     UniformBuffer(UniformBuffer const&) = delete;
     UniformBuffer& operator=(UniformBuffer const&) = delete;
 
   public:
-    
-    static Ref<UniformBuffer> Create(void const * a_pData,
-                                     uint32_t a_size,
-                                     BufferUsage a_usage = BufferUsage::Static);
 
-    static Ref<UniformBuffer> Create(uint32_t a_size,
-                                     BufferUsage a_usage = BufferUsage::Static);
+    static Ref<UniformBuffer> Create(void const * a_pData, uint32_t size, BufferUsage = BufferUsage::Static);
+    static Ref<UniformBuffer> Create(uint32_t size, BufferUsage = BufferUsage::Static);
 
     ~UniformBuffer();
 
-    void SetData(void const * data, uint32_t size, uint32_t offset = 0);
-    void Bind() const;
-    void Bind(Ref<BindingPoint> const&);
+    void Bind(Ref<BindingPoint> const &);
 
-    void SetLayout(BufferLayout const &);
+    void SetData(void const * a_pData, uint32_t a_size, uint32_t a_offset);
   };
 
   //------------------------------------------------------------------------------------------------
   // ShaderStorageBuffer
   //------------------------------------------------------------------------------------------------
 
-  class ShaderStorageBuffer : public RenderResource
+  /*class ShaderStorageBuffer : public RenderResource
   {
   private:
     ShaderStorageBuffer(void const * data, uint32_t size, BufferUsage a_usage = BufferUsage::Static);
@@ -178,7 +172,7 @@ namespace Engine
     void Bind(Ref<BindingPoint> const&);
 
     void SetLayout(BufferLayout const &);
-  };
+  };*/
 
 
   //------------------------------------------------------------------------------------------------

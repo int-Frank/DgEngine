@@ -92,7 +92,7 @@ namespace Engine
   // Indexed Buffer
   //------------------------------------------------------------------------------------------------
 
-  class RT_IndexedBuffer : public RT_BufferBase
+  /*class RT_IndexedBuffer : public RT_BufferBase
   {
     friend class RT_UniformBuffer;
     friend class RT_ShaderStorageBuffer;
@@ -108,21 +108,22 @@ namespace Engine
     void BindToPoint(RT_BindingPoint const&);
 
   private:
-  };
+  };*/
 
   //------------------------------------------------------------------------------------------------
   // Uniform Buffer
   //------------------------------------------------------------------------------------------------
 
-  class RT_UniformBuffer : public RT_IndexedBuffer
+  class RT_UniformBuffer : public RT_BufferBase
   {
-    BufferType GetType() const;
-    bool CanBind(RT_BindingPoint const&) const;
+    BufferType GetType() const override;
 
     RT_UniformBuffer(void * data, uint32_t size, BufferUsage usage);
     RT_UniformBuffer(uint32_t size, BufferUsage usage);
 
   public:
+
+    void Bind(RT_BindingPoint const & a_bp);
 
     static RT_UniformBuffer * Create(void * data, uint32_t size, BufferUsage usage = BufferUsage::Dynamic);
     static RT_UniformBuffer * Create(uint32_t size, BufferUsage usage = BufferUsage::Dynamic);
@@ -132,7 +133,7 @@ namespace Engine
   // Shader Storage Buffer
   //------------------------------------------------------------------------------------------------
 
-  class RT_ShaderStorageBuffer : public RT_IndexedBuffer
+  /*class RT_ShaderStorageBuffer : public RT_IndexedBuffer
   {
     BufferType GetType() const;
     bool CanBind(RT_BindingPoint const&) const;
@@ -144,7 +145,7 @@ namespace Engine
 
     static RT_ShaderStorageBuffer * Create(void * data, uint32_t size, BufferUsage usage = BufferUsage::Dynamic);
     static RT_ShaderStorageBuffer * Create(uint32_t size, BufferUsage usage = BufferUsage::Dynamic);
-  };
+  };*/
 
   //------------------------------------------------------------------------------------------------
   // IndexBuffer

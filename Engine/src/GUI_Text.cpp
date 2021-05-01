@@ -60,7 +60,7 @@ namespace Engine
     // Global buffers to avoid excessive memory allocating to render text
     // TODO This still requires copying to render memory. Perhaps we can write directly to a chunk of Render memory.
     // [x, y, tx, ty, sizex, sizey], ...
-    static float s_textVertexBuffer[MAX_TEXT_CHARACTERS * 4 * 4] = {};
+    static float s_textVertexBuffer[MAX_TEXT_CHARACTERS * 6] = {};
     static CPData s_glyphData[MAX_TEXT_CHARACTERS] = {};
     static uint16_t s_textureIDs[MAX_TEXTURES] = {};
 

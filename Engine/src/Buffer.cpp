@@ -319,29 +319,6 @@ namespace Engine
   // UniformBuffer
   //------------------------------------------------------------------------------------------------
 
-  UniformBuffer::UniformBuffer(void const * a_pData, uint32_t a_size, BufferUsage a_usage)
-  {
-    BSR_ASSERT(a_pData != nullptr);
-
-    uint8_t* data = (uint8_t*)RENDER_ALLOCATE(a_size);
-    memcpy(data, a_pData, a_size);
-
-    RenderState state = RenderState::Create();
-    state.Set<RenderState::Attr::Type>(RenderState::Type::Command);
-    state.Set<RenderState::Attr::Command>(RenderState::Command::BufferCreate);
-
-    RENDER_SUBMIT(state, [resID = m_id, size = a_size, usage = a_usage, data]()
-    {
-      ::Engine::RT_UniformBuffer * pUB = ::Engine::RT_UniformBuffer::Create(data, size, usage);
-      if (pUB == nullptr)
-      {
-        LOG_WARN("UniformBuffer::UniformBuffer(): Failed to create uniform buffer!");
-        return;
-      }
-      ::Engine::RenderThreadData::Instance()->UBOs.insert(resID, pUB);
-    });
-  }
-
   UniformBuffer::UniformBuffer(uint32_t a_size, BufferUsage a_usage)
   {
     RenderState state = RenderState::Create();
@@ -358,6 +335,29 @@ namespace Engine
       }
       RenderThreadData::Instance()->UBOs.insert(resID, pUB);
     });
+  }
+
+  UniformBuffer::UniformBuffer(void const * a_pData, uint32_t a_size, BufferUsage a_usage)
+  {
+    BSR_ASSERT(a_pData != nullptr);
+
+    uint8_t * data = (uint8_t *)RENDER_ALLOCATE(a_size);
+    memcpy(data, a_pData, a_size);
+
+    RenderState state = RenderState::Create();
+    state.Set<RenderState::Attr::Type>(RenderState::Type::Command);
+    state.Set<RenderState::Attr::Command>(RenderState::Command::BufferCreate);
+
+    RENDER_SUBMIT(state, [resID = m_id, size = a_size, usage = a_usage, data]()
+      {
+        ::Engine::RT_UniformBuffer * pUB = ::Engine::RT_UniformBuffer::Create(data, size, usage);
+        if (pUB == nullptr)
+        {
+          LOG_WARN("UniformBuffer::UniformBuffer(): Failed to create uniform buffer!");
+          return;
+        }
+        ::Engine::RenderThreadData::Instance()->UBOs.insert(resID, pUB);
+      });
   }
 
   UniformBuffer::~UniformBuffer()
@@ -382,7 +382,7 @@ namespace Engine
 
   void UniformBuffer::SetData(void const * a_pData, uint32_t a_size, uint32_t a_offset)
   {
-    uint8_t* data = (uint8_t*)RENDER_ALLOCATE(a_size);
+    uint8_t * data = (uint8_t *)RENDER_ALLOCATE(a_size);
     memcpy(data, a_pData, a_size);
 
     RenderState state = RenderState::Create();
@@ -390,58 +390,16 @@ namespace Engine
     state.Set<RenderState::Attr::Command>(RenderState::Command::BufferSetData);
 
     RENDER_SUBMIT(state, [resID = m_id, offset = a_offset, size = a_size, data]()
-    {
-      ::Engine::RT_UniformBuffer ** ppUB = ::Engine::RenderThreadData::Instance()->UBOs.at(resID);
-      if (ppUB == nullptr)
       {
-        LOG_WARN("UniformBuffer::SetData(): RefID '{}' does not exist!", resID);
-        return;
-      }
+        ::Engine::RT_UniformBuffer ** ppUBO = ::Engine::RenderThreadData::Instance()->UBOs.at(resID);
+        if (ppUBO == nullptr)
+        {
+          LOG_WARN("UniformBuffer::SetData(): RefID '{}' does not exist!", resID);
+          return;
+        }
 
-      (*ppUB)->SetData(data, size, offset);
-    });
-  }
-
-  void UniformBuffer::Bind() const
-  {
-    RenderState state = RenderState::Create();
-    state.Set<RenderState::Attr::Type>(RenderState::Type::Command);
-    state.Set<RenderState::Attr::Command>(RenderState::Command::BufferBind);
-
-    RENDER_SUBMIT(state, [resID = m_id]()
-    {
-      ::Engine::RT_UniformBuffer ** ppUB = ::Engine::RenderThreadData::Instance()->UBOs.at(resID);
-      if (ppUB == nullptr)
-      {
-        LOG_WARN("UniformBuffer::Bind(): RefID '{}' does not exist!", resID);
-        return;
-      }
-
-      (*ppUB)->Bind();
-    });
-  }
-
-  void UniformBuffer::SetLayout(BufferLayout const& a_layout)
-  {
-    void* pBuf = RENDER_ALLOCATE(static_cast<uint32_t>(a_layout.Size()));
-    a_layout.Serialize(pBuf);
-
-    RenderState state = RenderState::Create();
-    state.Set<RenderState::Attr::Type>(RenderState::Type::Command);
-    state.Set<RenderState::Attr::Command>(RenderState::Command::BufferSetLayout);
-
-    RENDER_SUBMIT(state, [resID = m_id, pBuf = pBuf]()
-    {
-      ::Engine::RT_UniformBuffer ** ppUB = ::Engine::RenderThreadData::Instance()->UBOs.at(resID);
-      if (ppUB == nullptr)
-      {
-        LOG_WARN("UniformBuffer::SetLayout(): RefID '{}' does not exist!", resID);
-        return;
-      }
-      BufferLayout layout;
-      layout.Deserialize(pBuf);
-      (*ppUB)->SetLayout(layout);
-    });
+        (*ppUBO)->SetData(data, size, offset);
+      });
   }
 
   Ref<UniformBuffer> UniformBuffer::Create(void const * a_pData,
@@ -481,7 +439,7 @@ namespace Engine
         return;
       }
       
-      (*ppUB)->BindToPoint(**ppBP);
+      (*ppUB)->Bind(**ppBP);
     });
   }
   
@@ -489,7 +447,7 @@ namespace Engine
   // ShaderStorageBuffer
   //------------------------------------------------------------------------------------------------
   
-  ShaderStorageBuffer::ShaderStorageBuffer(void const * a_pData, uint32_t a_size, BufferUsage a_usage)
+  /*ShaderStorageBuffer::ShaderStorageBuffer(void const * a_pData, uint32_t a_size, BufferUsage a_usage)
   {
     BSR_ASSERT(a_pData != nullptr);
 
@@ -653,7 +611,7 @@ namespace Engine
       
       (*ppSSB)->BindToPoint(**ppBP);
     });
-  }
+  }*/
 
   //------------------------------------------------------------------------------------------------
   // IndexBuffer

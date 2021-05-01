@@ -3,8 +3,14 @@
 #include "Serialize.h"
 #include "Buffer.h"
 #include "unicode.h"
+#include "ShaderUniform.h"
 
 #define CHECK(val) do { if (!(val)) LOG_ERROR("TEST FAILED! Line: {}", __LINE__); } while(false)
+
+void TEST_UniformBuffer()
+{
+
+}
 
 void TEST_BufferLayout()
 {

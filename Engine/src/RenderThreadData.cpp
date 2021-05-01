@@ -13,7 +13,7 @@ namespace Engine
     for (auto kv : IBOs)  delete kv.second;
     for (auto kv : VBOs)  delete kv.second;
     for (auto kv : UBOs)  delete kv.second;
-    for (auto kv : SSBOs)  delete kv.second;
+    //for (auto kv : SSBOs)  delete kv.second;
     for (auto kv : bindingPoints)  delete kv.second;
     for (auto kv : textures)  delete kv.second;
     for (auto kv : rendererPrograms)  delete kv.second;

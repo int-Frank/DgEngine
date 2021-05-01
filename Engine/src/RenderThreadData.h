@@ -32,7 +32,7 @@ namespace Engine
     Dg::OpenHashMap<RenderResourceID, RT_IndexBuffer*>          IBOs;
     Dg::OpenHashMap<RenderResourceID, RT_VertexBuffer*>         VBOs;
     Dg::OpenHashMap<RenderResourceID, RT_UniformBuffer*>        UBOs;
-    Dg::OpenHashMap<RenderResourceID, RT_ShaderStorageBuffer*>  SSBOs;
+    //Dg::OpenHashMap<RenderResourceID, RT_ShaderStorageBuffer*>  SSBOs;
     Dg::OpenHashMap<RenderResourceID, RT_BindingPoint*>         bindingPoints;
     Dg::OpenHashMap<RenderResourceID, RT_Texture2D*>            textures;
     Dg::OpenHashMap<RenderResourceID, RT_RendererProgram*>      rendererPrograms;

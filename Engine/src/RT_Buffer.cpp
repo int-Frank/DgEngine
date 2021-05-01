@@ -110,22 +110,6 @@ namespace Engine
   }
 
   //------------------------------------------------------------------------------------------------
-  // Indexed Buffer
-  //------------------------------------------------------------------------------------------------
-
-  RT_IndexedBuffer::RT_IndexedBuffer(void * a_data, uint32_t a_size, BufferUsage a_usage)
-    : RT_BufferBase(a_data, a_size, a_usage)
-  {
-  
-  }
-
-  RT_IndexedBuffer::RT_IndexedBuffer(uint32_t a_size, BufferUsage a_usage)
-    : RT_BufferBase(a_size, a_usage)
-  {
-
-  }
-
-  //------------------------------------------------------------------------------------------------
   // Vertex Buffer
   //------------------------------------------------------------------------------------------------
 
@@ -157,39 +141,28 @@ namespace Engine
   }
 
   //------------------------------------------------------------------------------------------------
-  // Bindable Buffer
-  //------------------------------------------------------------------------------------------------
-  
-  void RT_IndexedBuffer::BindToPoint(RT_BindingPoint const & a_bp)
-  {
-    BSR_ASSERT(!CanBind(a_bp), "Incorrect buffer type / binding point matchup!");
-
-    //TODO do we need to bind the buffer first?
-    glBindBufferBase(OpenGLBufferType(GetType()), a_bp.GetID().Address(), m_rendererID);
-  }
-
-  //------------------------------------------------------------------------------------------------
   // Uniform Buffer
   //------------------------------------------------------------------------------------------------
-  
+
+  void RT_UniformBuffer::Bind(RT_BindingPoint const & a_bp)
+  {
+    //TODO do we need to bind the buffer first?
+    glBindBufferBase(OpenGLBufferType(GetType()), a_bp.Address(), m_rendererID);
+  }
+
   BufferType RT_UniformBuffer::GetType() const
   {
     return BufferType::Uniform;
   }
 
-  bool RT_UniformBuffer::CanBind(RT_BindingPoint const& a_bp) const
-  {
-    return a_bp.GetID().Type() == StorageBlockType::Uniform;
-  }
-
   RT_UniformBuffer::RT_UniformBuffer(void * a_data, uint32_t a_size, BufferUsage a_usage)
-    : RT_IndexedBuffer(a_data, a_size, a_usage)
+    : RT_BufferBase(a_data, a_size, a_usage)
   {
 
   }
 
   RT_UniformBuffer::RT_UniformBuffer(uint32_t a_size, BufferUsage a_usage)
-    : RT_IndexedBuffer(a_size, a_usage)
+    : RT_BufferBase(a_size, a_usage)
   {
 
   }
@@ -208,7 +181,7 @@ namespace Engine
   // Shader storage Buffer
   //------------------------------------------------------------------------------------------------
 
-  BufferType RT_ShaderStorageBuffer::GetType() const
+  /*BufferType RT_ShaderStorageBuffer::GetType() const
   {
     return BufferType::ShaderStorage;
   }
@@ -238,7 +211,7 @@ namespace Engine
   RT_ShaderStorageBuffer * RT_ShaderStorageBuffer::Create(uint32_t a_size, BufferUsage a_usage)
   {
     return new RT_ShaderStorageBuffer(a_size, a_usage);
-  }
+  }*/
 
   //------------------------------------------------------------------------------------------------
   // RT_IndexBuffer

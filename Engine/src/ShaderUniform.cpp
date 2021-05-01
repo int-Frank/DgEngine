@@ -175,164 +175,6 @@ namespace Engine
   }
 
   //---------------------------------------------------------------------------------------------------
-  // std140ItemDeclaration
-  //---------------------------------------------------------------------------------------------------
-
-  std140ItemDeclaration::std140ItemDeclaration(ShaderDataType a_type,
-                                               uint32_t a_count,
-                                               MatrixLayout a_layout)
-    : m_type(a_type)
-    , m_count(a_count)
-    , m_matLayout(a_layout)
-    , m_frontPadding(0)
-  {
-    BSR_ASSERT(a_type != ShaderDataType::NONE, "");
-  }
-
-  void * std140ItemDeclaration::CopyToBuffer(void * a_buffer, void const * a_data) const
-  {
-    BSR_ASSERT(m_type != ShaderDataType::NONE, "");
-
-    if (m_count == 0)
-      return a_buffer;
-
-    //align first
-    void * buf = AdvancePtr(a_buffer, m_frontPadding);
-
-    //copy data
-    if (m_type == ShaderDataType::STRUCT)
-      return buf; //It's just padding
-
-    uint32_t dataSize = 0;
-    uint32_t padding = 0;
-    uint32_t count = 0;
-
-    ShaderDataBaseType baseType = GetShaderDataBaseType(m_type);
-    uint32_t baseTypeSize = SizeOfShaderDataBaseType(baseType);
-
-    if (GetShaderDataClass(m_type) == ShaderDataClass::Matrix)
-    {
-      ShaderDataType rowType = GetRowVectorFromMatrix(m_type);
-      ShaderDataType columnType = GetColumnVectorFromMatrix(m_type);
-      uint32_t nRowElements = GetComponentCount(rowType);
-      uint32_t nColumnElements = GetComponentCount(columnType);
-
-      if (m_matLayout == MatrixLayout::RowMajor)
-      {
-        count = m_count * nColumnElements; 
-        dataSize = nRowElements * baseTypeSize;
-        uint32_t stride = std140StrideArray(rowType);
-        padding = stride - dataSize;
-      }
-      else
-      {
-        count = m_count * nRowElements;
-        dataSize = nColumnElements * baseTypeSize;
-        uint32_t stride = std140StrideArray(columnType);
-        padding = stride - dataSize;
-      }
-    }
-    else
-    {
-      uint32_t nElements = GetComponentCount(m_type);
-      dataSize = nElements * baseTypeSize;
-      uint32_t stride(0);
-      if (m_count == 1)
-        stride = std140StrideSingle(m_type);
-      else
-        stride = std140StrideArray(m_type);
-      padding = stride - dataSize;
-    }
-
-    byte const * pSrc = static_cast<byte const *>(a_data);
-    for (uint32_t c = 0; c < count; c++)
-    {
-      buf = Serialize<byte>(buf, pSrc, dataSize);
-      buf = AdvancePtr(buf, padding);
-    }
-
-    return buf;
-  }
-
-  uint32_t std140ItemDeclaration::Count() const
-  {
-    return m_count;
-  }
-
-  ShaderDataType std140ItemDeclaration::Type() const
-  {
-    return m_type;
-  }
-
-  void std140ItemDeclaration::SetBaseAlignment(uint32_t a_beginOffset)
-  {
-    BSR_ASSERT(m_type != ShaderDataType::STRUCT, "Cannot set the base alignment of a struct! Use 'SetPadding()' instead");
-
-    uint32_t alignment(0);
-    if (m_count == 1)
-      alignment = std140BaseAlignmentSingle(m_type);
-    else
-      alignment = std140BaseAlignmentSingle(m_type);
-    uint32_t offset = ALIGN(a_beginOffset, alignment);
-    m_frontPadding = offset - a_beginOffset;
-  }
-
-  void std140ItemDeclaration::SetFrontPadding(uint32_t a_padding)
-  {
-    BSR_ASSERT(m_type == ShaderDataType::STRUCT, "Can only set padding of a STRUCT type!");
-    m_frontPadding = a_padding;
-  }
-
-  uint32_t std140ItemDeclaration::Stride() const
-  {
-    if (m_count == 1)
-      return std140StrideSingle(m_type);
-    return std140StrideArray(m_type);
-  }
-
-  uint32_t std140ItemDeclaration::FrontPadding() const
-  {
-    return m_frontPadding;
-  }
-
-  bool operator==(std140ItemDeclaration const& a_item_0, std140ItemDeclaration const& a_item_1)
-  {
-    bool result = a_item_0.m_type == a_item_1.m_type;
-    result &= (a_item_0.m_count == a_item_1.m_count);
-    result &= (a_item_0.m_matLayout == a_item_1.m_matLayout);
-    return result;
-  }
-
-  bool operator!=(std140ItemDeclaration const& a_item_0, std140ItemDeclaration const& a_item_1)
-  {
-    bool result = a_item_0.m_type == a_item_1.m_type;
-    result &= (a_item_0.m_count == a_item_1.m_count);
-    result &= (a_item_0.m_matLayout == a_item_1.m_matLayout);
-    return !result;
-  }
-
-  //---------------------------------------------------------------------------------------------------
-  // std140UniformBlock
-  //---------------------------------------------------------------------------------------------------
-
-  bool operator==(std140UniformBlock const & a_block_0, std140UniformBlock const & a_block_1)
-  {
-    if (a_block_0.m_items.size() != a_block_1.m_items.size())
-      return false;
-
-    for (uint32_t i = 0; i < uint32_t(a_block_0.m_items.size()); i++)
-    {
-      if (a_block_0.m_items[i] != a_block_1.m_items[i])
-        return false;
-    }
-    return true;
-  }
-
-  //---------------------------------------------------------------------------------------------------
-  // std140UniformBlockBuffer
-  //---------------------------------------------------------------------------------------------------
-
-  //---------------------------------------------------------------------------------------------------
   // ShaderUniformDeclaration
   //---------------------------------------------------------------------------------------------------
   ShaderUniformDeclaration::ShaderUniformDeclaration(ShaderDataType a_type, 
@@ -408,32 +250,27 @@ namespace Engine
   //---------------------------------------------------------------------------------------------------
   // Binding point
   //---------------------------------------------------------------------------------------------------
-  BindingPoint::BindingPoint()
-  {
-  
-  }
 
   Ref<BindingPoint> BindingPoint::Create(StorageBlockType a_type, ShaderDomain a_domain)
   {
-    BindingPoint * pBP = new BindingPoint();
-    Ref<BindingPoint> ref(pBP);
-    pBP->Init(a_type, a_domain);
-    return ref;
+    BindingPoint * pBP = new BindingPoint(a_type, a_domain);
+    return Ref<BindingPoint>(pBP);
   }
 
-  void BindingPoint::Init(StorageBlockType a_type, ShaderDomain a_domain)
+  BindingPoint::BindingPoint(StorageBlockType a_type, ShaderDomain a_domain)
   {
     RenderState state = RenderState::Create();
     state.Set<RenderState::Attr::Type>(RenderState::Type::Command);
     state.Set<RenderState::Attr::Command>(RenderState::Command::BindingPointCreate);
 
-    //RENDER_SUBMIT(state, [resID = m_id, sbtype = a_type, domain = a_domain]()
-    //{
-    //  ::Engine::RT_BindingPoint bp;
-    //  if (!bp.Capture(sbtype, domain))
-    //    LOG_WARN("BindingPoint::Init(): Failed to capture binding index!");
-    //  ::Engine::RenderThreadData::Instance()->bindingPoints.insert(resID, bp);
-    //});
+    RENDER_SUBMIT(state, [resID = m_id, sbtype = a_type, domain = a_domain]()
+    {
+      RT_BindingPoint * pBP = new RT_BindingPoint;
+      if (!pBP->Capture(sbtype, domain))
+        LOG_WARN("BindingPoint::Capture(): Failed to capture binding index!");
+      else
+        RenderThreadData::Instance()->bindingPoints.insert(resID, pBP);
+    });
   }
 
   BindingPoint::~BindingPoint()
@@ -442,18 +279,19 @@ namespace Engine
     state.Set<RenderState::Attr::Type>(RenderState::Type::Command);
     state.Set<RenderState::Attr::Command>(RenderState::Command::BindingPointDelete);
 
-    //RENDER_SUBMIT(state, [resID = m_id]()
-    //{
-    //  ::Engine::RT_BindingPoint * pbp = ::Engine::RenderThreadData::Instance()->bindingPoints.at(resID);
-    //  if (pbp == nullptr)
-    //  {
-    //    LOG_WARN("BindingPoint::~BindingPoint(): RefID '{}' does not exist!", resID);
-    //    return;
-    //  }
-    //
-    //  pbp->Release();
-    //  ::Engine::RenderThreadData::Instance()->bindingPoints.erase(resID);
-    //});
+    RENDER_SUBMIT(state, [resID = m_id]()
+    {
+      RT_BindingPoint ** ppBP = RenderThreadData::Instance()->bindingPoints.at(resID);
+      if (ppBP == nullptr)
+      {
+        LOG_WARN("BindingPoint::~BindingPoint(): RefID '{}' does not exist!", resID);
+        return;
+      }
+    
+      delete *ppBP;
+      *ppBP = nullptr;
+      RenderThreadData::Instance()->bindingPoints.erase(resID);
+    });
   }
 
   //--------------------------------------------------------------------------------------------------

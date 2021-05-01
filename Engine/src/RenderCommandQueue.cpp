@@ -74,7 +74,7 @@ namespace Engine
   {
     Sort();
 
-    int readInd = (m_writeIndex + 1) % 2;
+    int readInd = (m_writeIndex + 1) & 1;
     for (size_t i = 0; i < m_sortedCommands.size(); i++)
     {
       uint32_t ind = m_sortedCommands[i];
@@ -91,7 +91,7 @@ namespace Engine
 
   void RenderCommandQueue::Swap()
   {
-    m_writeIndex = (m_writeIndex + 1) % 2;
+    m_writeIndex = (m_writeIndex + 1) & 1;
     m_commandBuffer[m_writeIndex].Clear();
     m_mem[m_writeIndex].clear();
   }
@@ -110,7 +110,7 @@ namespace Engine
   {
     //No sort for now...
     m_sortedCommands.clear();
-    int readInd = (m_writeIndex + 1) % 2;
+    int readInd = (m_writeIndex + 1) & 1;
     for (uint32_t i = 0; i < (uint32_t)m_commandBuffer[readInd].allocs.size(); i++)
     {
       m_sortedCommands.push_back(i);

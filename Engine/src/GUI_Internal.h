@@ -23,7 +23,7 @@ namespace Engine
       void DrawBox(UIAABB const &, Colour colour);
       void DrawBoxOutline(UIAABB const & inner, float thickness, Colour colour);
       void DrawBoxWithOutline(UIAABB const & inner, float thickness, Colour clrInner, Colour clrOutline);
-      void DrawText(uint16_t textureID, Colour colour, uint32_t count, void * pData);
+      void DrawText(uint16_t textureID, Colour colour, uint32_t count, void * pVerts);
     }
 
     bool Intersection(UIAABB const & A, UIAABB const & B,  UIAABB & out);
