@@ -3,13 +3,14 @@
 
 #include "System.h"
 #include "Utils.h"
+#include "common.h"
 
 // We just use this system to generate the GUI
 class GUIDemo : public Engine::System
 {
 public:
 
-  MAKE_SYSTEM_DECL
+  MAKE_SYSTEM_DECL(SID_GUIDemo)
 
   void OnAttach() override;
   void HandleMessage(Engine::Message * a_pMsg) override {}

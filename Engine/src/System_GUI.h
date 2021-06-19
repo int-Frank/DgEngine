@@ -13,7 +13,7 @@ namespace Engine
   {
   public:
 
-    MAKE_SYSTEM_DECL
+    MAKE_SYSTEM_DECL(RSID_GUI)
     
     System_GUI(int windowW, int windowH);
     ~System_GUI();

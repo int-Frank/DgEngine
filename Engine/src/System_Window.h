@@ -18,7 +18,7 @@ namespace Engine
 
   public:
 
-    MAKE_SYSTEM_DECL
+    MAKE_SYSTEM_DECL(RSID_Window)
 
     System_Window(IWindow *);
     ~System_Window();

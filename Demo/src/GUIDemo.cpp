@@ -15,8 +15,6 @@
 using namespace Engine;
 using namespace Engine::GUI;
 
-MAKE_SYSTEM_DEFINITION(GUIDemo)
-
 void GUIDemo::OnAttach()
 {
   m_textColour = 0xFFFFFFFF;

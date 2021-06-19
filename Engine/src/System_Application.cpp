@@ -5,8 +5,6 @@
 
 namespace Engine
 {
-  MAKE_SYSTEM_DEFINITION(System_Application)
-
   System_Application::System_Application()
   {
 

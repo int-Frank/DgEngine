@@ -8,8 +8,6 @@
 
 namespace Engine
 {
-  MAKE_SYSTEM_DEFINITION(System_Console)
-
   System_Console::System_Console()
   {
 

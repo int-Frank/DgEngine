@@ -24,7 +24,7 @@ namespace Engine
   {
   public:
 
-    MAKE_SYSTEM_DECL
+    MAKE_SYSTEM_DECL(RSID_Input)
 
     System_Input();
     ~System_Input();

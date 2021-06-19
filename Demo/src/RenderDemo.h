@@ -1,6 +1,7 @@
 #ifndef RENDERTEXTUREDEMO_H
 #define RENDERTEXTUREDEMO_H
 
+#include "common.h"
 #include "System.h"
 #include "Buffer.h"
 #include "VertexArray.h"
@@ -12,7 +13,7 @@ class RenderDemo : public Engine::System
 {
 public:
 
-  MAKE_SYSTEM_DECL
+  MAKE_SYSTEM_DECL(SID_RenderDemo)
 
   void OnAttach() override;
   void HandleMessage(Engine::Message * a_pMsg) override {}

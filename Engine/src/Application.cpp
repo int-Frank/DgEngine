@@ -69,7 +69,7 @@ namespace Engine
     m_pimpl->systemStack.PushSystem(a_pLayer, a_pLayer->GetID());
   }
 
-  System * Application::GetSystem(System::ID a_id)
+  System * Application::GetSystem(SystemID a_id)
   {
     return m_pimpl->systemStack.GetSystem(a_id);
   }

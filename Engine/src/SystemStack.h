@@ -30,14 +30,14 @@ namespace Engine
   class SystemStack
   {
   public:
-    typedef Dg::DoublyLinkedList<std::pair<System::ID, System *>> List;
+    typedef Dg::DoublyLinkedList<std::pair<SystemID, System *>> List;
 
     SystemStack();
     ~SystemStack();
 
-    bool PushSystem(System *, System::ID);
-    void PopSystem(System::ID);
-    System * GetSystem(System::ID);
+    bool PushSystem(System *, SystemID);
+    void PopSystem(SystemID);
+    System * GetSystem(SystemID);
     void Clear();
 
     List::iterator begin();
@@ -45,7 +45,7 @@ namespace Engine
 
   private:
 
-    List::iterator Find(System::ID);
+    List::iterator Find(SystemID);
 
   private:
 

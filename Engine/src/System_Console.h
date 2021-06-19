@@ -13,7 +13,7 @@ namespace Engine
   {
   public:
 
-    MAKE_SYSTEM_DECL
+    MAKE_SYSTEM_DECL(RSID_Console)
 
     System_Console();
     ~System_Console();

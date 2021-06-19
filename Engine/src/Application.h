@@ -42,7 +42,7 @@ namespace Engine
     static Application * Instance();
 
     void PushSystem(System*);
-    System * GetSystem(System::ID);
+    System * GetSystem(SystemID);
 
     void Run();
     void RequestQuit();

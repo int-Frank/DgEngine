@@ -29,8 +29,6 @@ static char const * g_fs = R"(
         FragColor = texture(tex, texCoord);
       })";
 
-MAKE_SYSTEM_DEFINITION(RenderDemo)
-
 Colour * GenerateTexture(uint32_t dim)
 {
   Colour * pPixels = new Colour[dim * dim];

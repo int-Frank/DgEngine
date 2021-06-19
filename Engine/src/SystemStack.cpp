@@ -31,7 +31,7 @@ namespace Engine
     Clear();
   }
 
-  bool SystemStack::PushSystem(System * a_pLayer, System::ID a_ID)
+  bool SystemStack::PushSystem(System * a_pLayer, SystemID a_ID)
   {
     BSR_ASSERT(a_pLayer != nullptr);
 
@@ -43,7 +43,7 @@ namespace Engine
     return true;
   }
 
-  void SystemStack::PopSystem(System::ID a_ID)
+  void SystemStack::PopSystem(SystemID a_ID)
   {
     auto it = Find(a_ID);
     if (it != m_systemStack.end())
@@ -61,7 +61,7 @@ namespace Engine
     m_systemStack.clear();
   }
 
-  System * SystemStack::GetSystem(System::ID a_ID)
+  System * SystemStack::GetSystem(SystemID a_ID)
   {
     System * result(nullptr);
     auto it = Find(a_ID);
@@ -70,7 +70,7 @@ namespace Engine
     return result;
   }
 
-  SystemStack::List::iterator SystemStack::Find(System::ID a_id)
+  SystemStack::List::iterator SystemStack::Find(SystemID a_id)
   {
     List::iterator it = m_systemStack.begin();
     for (; it != m_systemStack.end(); it++)

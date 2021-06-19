@@ -7,34 +7,32 @@
 #include "MessageHandler.h"
 #include "Memory.h"
 
-#define MAKE_SYSTEM_DECL static ::Engine::System::ID GetStaticID();\
-::Engine::System::ID GetID() const override;
-
-#define MAKE_SYSTEM_DEFINITION(CLASS) ::Engine::System::ID CLASS::GetStaticID()\
-{\
-  static ID s_ID = 0;\
-  if (s_ID == 0)\
-    s_ID = _GetNewID();\
-  return s_ID;\
-}\
-::Engine::System::ID CLASS::GetID() const\
-{\
-  return GetStaticID();\
-}
+#define MAKE_SYSTEM_DECL(id) inline static ::Engine::SystemID GetStaticID() {return id;}\
+inline ::Engine::SystemID GetID() const override {return id;};
 
 namespace Engine
 {
+  typedef uint32_t SystemID;
+
+  enum ReservedSystemID : SystemID
+  {
+    RSID_Application,
+    RSID_Console,
+    RSID_GUI,
+    RSID_Input,
+    RSID_Window,
+    RSID_BEGIN // Your System IDs must not be less than this value
+  };
+
   class MessageBus;
 
   class System : public MessageHandler
   {
   public: 
 
-    typedef uint32_t ID;
-
     virtual ~System(){}
 
-    virtual ID GetID() const = 0;
+    virtual SystemID GetID() const = 0;
 
     virtual void OnAttach(){}
     virtual void OnDetach(){}
@@ -44,8 +42,6 @@ namespace Engine
     virtual void DoImGui(){}
 
   protected:
-
-    static ID _GetNewID();
 
     //System(System const &);
     //System & operator=(System const &);
