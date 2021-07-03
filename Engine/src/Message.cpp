@@ -8,33 +8,8 @@
 
 #define ID_SHIFT 20
 
-// This marco needs to be somehwere the client can access
 #undef ITEM
-#define ITEM(TYPE, CLASS) uint32_t Message_##TYPE::s_ID(0);\
-static_assert(std::is_trivially_destructible<Message_##TYPE>::value, #TYPE " must be trivially destructible");\
-uint32_t Message_##TYPE::GetStaticID()\
-{\
-  if (s_ID == 0)\
-    s_ID = GetNewID(MC_##CLASS);\
-  return s_ID;\
-}\
-uint32_t Message_##TYPE::GetID() const\
-{\
-  return GetStaticID();\
-}\
-size_t Message_##TYPE::Size() const\
-{\
-  return sizeof(*this);\
-}\
-TRef<Message> Message_##TYPE::CloneAsTRef() const\
-{\
-  TRef<Message_##TYPE> cpy = TRef<Message_##TYPE>::MakeCopy(this); \
-  return StaticPointerCast<Message>(cpy); \
-}\
-void Message_##TYPE::Clone(void * a_buf) const\
-{\
-  new (a_buf) Message_##TYPE(*this);\
-}
+#define ITEM(TYPE, CLASS) MESSAGE_DEFINITIONS(Message_ ## TYPE, MC_ ## CLASS)
 
 #define MESSAGE_TO_STRING(TYPE) std::string Message_##TYPE::ToString() const\
 {\

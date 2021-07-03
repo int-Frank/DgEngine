@@ -48,8 +48,8 @@ namespace Engine
     friend class RT_ShaderStorageBuffer;
 
     virtual BufferType GetType() const = 0;
-    RT_BufferBase(void * data, uint32_t size, BufferUsage usage);
-    RT_BufferBase(uint32_t size, BufferUsage usage);
+    RT_BufferBase(void * data, uint32_t size, BufferUsage usage, uint32_t flags = 0);
+    RT_BufferBase(uint32_t size, BufferUsage usage, uint32_t flags = 0);
 
   public:
 
@@ -62,10 +62,12 @@ namespace Engine
     void SetLayout(BufferLayout const&);
     uint32_t GetSize() const;
     RendererID GetRendererID() const;
+    void * GetMappedPointer();
 
   protected:
     RendererID m_rendererID;
   private:
+    void * m_pMappedPointer;
     uint32_t m_size;
     BufferUsage m_usage;
     BufferLayout m_layout;
@@ -79,13 +81,13 @@ namespace Engine
   {
     BufferType GetType() const;
 
-    RT_VertexBuffer(void * data, uint32_t size, BufferUsage usage);
-    RT_VertexBuffer(uint32_t size, BufferUsage usage);
+    RT_VertexBuffer(void * data, uint32_t size, uint32_t flags, BufferUsage usage);
+    RT_VertexBuffer(uint32_t size, uint32_t flags, BufferUsage usage);
 
   public:
 
-    static RT_VertexBuffer * Create(void * data, uint32_t size, BufferUsage usage = BufferUsage::Dynamic);
-    static RT_VertexBuffer * Create(uint32_t size, BufferUsage usage = BufferUsage::Dynamic);
+    static RT_VertexBuffer * Create(void * data, uint32_t size, uint32_t flags, BufferUsage usage = BufferUsage::Dynamic);
+    static RT_VertexBuffer * Create(uint32_t size, uint32_t flags, BufferUsage usage = BufferUsage::Dynamic);
   };
 
   //------------------------------------------------------------------------------------------------

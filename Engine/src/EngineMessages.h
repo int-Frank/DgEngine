@@ -4,6 +4,7 @@
 #define ENGINEMESSAGES_H
 
 #include "Message.h"
+#include "InputCodes.h"
 
 #define TEXT_INPUT_TEXT_SIZE 32
 
@@ -51,95 +52,103 @@ namespace Engine
   // Message Classes
   //-----------------------------------------------------------------------------------
 
-  MESSAGE_CLASS_HEADER(None) };
-
-  MESSAGE_CLASS_HEADER(GUI_GoBack) }; // eg Esc...
-  MESSAGE_CLASS_HEADER(GUI_Up) };     // eg arrow keys, numpad arrows, joystick controls...
-  MESSAGE_CLASS_HEADER(GUI_Down) };
-  MESSAGE_CLASS_HEADER(GUI_Left) };
-  MESSAGE_CLASS_HEADER(GUI_Right) };
-  MESSAGE_CLASS_HEADER(GUI_Select) }; // eg Enter, xBox controller 'A'
+  class Message_None : public Message { MESSAGE_HEADER }; // eg Esc...
+  class Message_GUI_GoBack : public Message { MESSAGE_HEADER };
+  class Message_GUI_Up : public Message { MESSAGE_HEADER };     // eg arrow keys, numpad arrows, joystick controls...
+  class Message_GUI_Down : public Message { MESSAGE_HEADER };
+  class Message_GUI_Left : public Message { MESSAGE_HEADER };
+  class Message_GUI_Right : public Message { MESSAGE_HEADER };
+  class Message_GUI_Select : public Message { MESSAGE_HEADER }; // eg Enter, xBox controller 'A'
 
   // eg mouse click, joystick pointer...
-  MESSAGE_CLASS_HEADER(GUI_PointerDown)
+  class Message_GUI_PointerDown : public Message
+  {
+    MESSAGE_HEADER
     uint32_t context; // eg main select, secondary select (left click, right click)
     int32_t x;
     int32_t y;
   };
 
   // eg mouse click, joystick pointer...
-  MESSAGE_CLASS_HEADER(GUI_PointerUp)
+  class Message_GUI_PointerUp : public Message
+  {
+    MESSAGE_HEADER
     uint32_t context; // eg main select, secondary select (left click, right click)
     int32_t x;
     int32_t y;
   };
 
-  MESSAGE_CLASS_HEADER(GUI_PointerMove)
+  class Message_GUI_PointerMove : public Message
+  {
+    MESSAGE_HEADER
     void ConsumeHover(); // Call this instead of setting the message flag to 'Handled'
     int32_t x;
     int32_t y;
   };
 
-  MESSAGE_CLASS_HEADER(GUI_Text)
+  class Message_GUI_Text : public Message
+  {
+    MESSAGE_HEADER
     char text[TEXT_INPUT_TEXT_SIZE];
   };
 
-  MESSAGE_CLASS_HEADER(Window_Shown) };
-  MESSAGE_CLASS_HEADER(Window_Hidden) };
-  MESSAGE_CLASS_HEADER(Window_Exposed) };
+  class Message_Window_Shown : public Message { MESSAGE_HEADER };
+  class Message_Window_Hidden : public Message { MESSAGE_HEADER };
+  class Message_Window_Exposed : public Message { MESSAGE_HEADER };
 
-  MESSAGE_CLASS_HEADER(Window_Moved)
+  class Message_Window_Moved : public Message
+  {
+    MESSAGE_HEADER
     int32_t   x;
     int32_t   y;
   };
 
-  MESSAGE_CLASS_HEADER(Window_Resized)
+  class Message_Window_Resized : public Message
+  {
+    MESSAGE_HEADER
     int32_t   w;
     int32_t   h;
   };
+  
+  class Message_Window_Minimized : public Message { MESSAGE_HEADER };
+  class Message_Window_Maximized : public Message { MESSAGE_HEADER };
+  class Message_Window_Restored : public Message { MESSAGE_HEADER };
+  class Message_Window_Enter : public Message { MESSAGE_HEADER };
+  class Message_Window_Leave : public Message { MESSAGE_HEADER };
+  class Message_Window_Focus_Gained : public Message { MESSAGE_HEADER };
+  class Message_Window_Focus_Lost : public Message { MESSAGE_HEADER };
+  class Message_Quit : public Message { MESSAGE_HEADER };
+  class Message_Window_Take_Focus : public Message { MESSAGE_HEADER };
 
-  MESSAGE_CLASS_HEADER(Window_Minimized) };
-  MESSAGE_CLASS_HEADER(Window_Maximized) };
-  MESSAGE_CLASS_HEADER(Window_Restored) };
-  MESSAGE_CLASS_HEADER(Window_Enter) };
-  MESSAGE_CLASS_HEADER(Window_Leave) };
-  MESSAGE_CLASS_HEADER(Window_Focus_Gained) };
-  MESSAGE_CLASS_HEADER(Window_Focus_Lost) };
-  MESSAGE_CLASS_HEADER(Quit) };
-  MESSAGE_CLASS_HEADER(Window_Take_Focus) };
+  // TODO these shouldn't be messages, as they are only used by the System_Input.
+  class Message_Input : public Message
+  {
+    MESSAGE_HEADER
 
-  MESSAGE_CLASS_HEADER(Input_Text)
+    InputCode code;
+    InputEvent event;
+    uint16_t   modState;
+  };
+
+  class Message_Input_Text : public Message
+  {
+    MESSAGE_HEADER
+
+    InputCode code;
+    InputEvent event;
+    uint16_t   modState;
     char text[TEXT_INPUT_TEXT_SIZE];
   };
 
-  MESSAGE_CLASS_HEADER(Input_KeyUp)
-    uint32_t  keyCode;
-    uint16_t   modState;
-  };
+  class Message_Input_MouseEvent : public Message
+  {
+    MESSAGE_HEADER
 
-  MESSAGE_CLASS_HEADER(Input_KeyDown)
-    uint32_t  keyCode;
+    InputCode code;
+    InputEvent event;
     uint16_t   modState;
-  };
-
-  MESSAGE_CLASS_HEADER(Input_MouseButtonUp)
-    uint32_t  button;
     int32_t    x;
     int32_t    y;
-  };
-
-  MESSAGE_CLASS_HEADER(Input_MouseButtonDown)
-    uint32_t  button;
-    int32_t    x;
-    int32_t    y;
-  };
-
-  MESSAGE_CLASS_HEADER(Input_MouseWheelUp) };
-  MESSAGE_CLASS_HEADER(Input_MouseWheelDown) };
-
-  MESSAGE_CLASS_HEADER(Input_MouseMove)
-    int32_t x;
-    int32_t y;
   };
 }
 #endif

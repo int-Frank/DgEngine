@@ -44,6 +44,8 @@ namespace Engine
     void HandleMessage(Message_Quit *);
     void HandleMessage(Message_Window_Take_Focus *);
 
+    void GetDimensions(int & w, int & h);
+
   private:
 
     IWindow * m_pWindow;

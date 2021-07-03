@@ -14,10 +14,6 @@
 
 namespace Engine
 {
-  //------------------------------------------------------------------------------------
-  // System_Input
-  //------------------------------------------------------------------------------------
-
   System_Input::System_Input()
     : m_pEventPoller(Framework::Instance()->GetEventPoller())
   {
@@ -39,9 +35,9 @@ namespace Engine
     m_bindings.clear();
   }
 
-  void System_Input::AddBinding(uint32_t a_inputMessageID, InputMessageTranslator a_callback)
+  void System_Input::AddBinding(InputCode a_code, InputEvent a_event, InputMessageTranslator a_callback)
   {
-    m_bindings[a_inputMessageID] = a_callback;
+    m_bindings[((uint32_t(a_code) << 16) | uint32_t(a_event)] = a_callback;
   }
 
   void System_Input::Update(float a_dt)
@@ -52,11 +48,18 @@ namespace Engine
       if (pMsg.Get() == nullptr)
         break;
 
-      auto it = m_bindings.find(pMsg->GetID());
-      if (it != m_bindings.end())
-        it->second(pMsg.Get());
+      if (pMsg->GetID() == Message_Input::GetStaticID())
+      {
+        TRef<Message_Input> pTemp = StaticPointerCast<Message_Input, Message>(pMsg);
+        uint32_t code = GET_FULL_INPUT_CODE(pTemp->code, pTemp->event);
+        auto it = m_bindings.find(code);
+        if (it != m_bindings.end())
+          it->second(pTemp.Get());
+      }
       else if (pMsg->GetCategory() != MC_Input) // Pass on everything but raw input
+      {
         POST(pMsg);
+      }
     }
   }
 }

@@ -56,22 +56,30 @@ namespace Engine
   // BufferBase
   //------------------------------------------------------------------------------------------------
 
-  RT_BufferBase::RT_BufferBase(void * a_data, uint32_t a_size, BufferUsage a_usage)
-    : m_size(a_size)
+  RT_BufferBase::RT_BufferBase(void * a_data, uint32_t a_size, BufferUsage a_usage, uint32_t a_flags)
+    : m_rendererID(0)
+    , m_pMappedPointer(nullptr)
+    , m_size(a_size)
     , m_usage(a_usage)
-    , m_rendererID(0)
   {
     glCreateBuffers(1, &m_rendererID);
     glNamedBufferData(m_rendererID, m_size, a_data, OpenGLUsage(m_usage));
+
+    if ((a_flags & BF_Mapped) != 0)
+      m_pMappedPointer = glMapNamedBuffer(m_rendererID, GL_WRITE_ONLY);
   }
 
-  RT_BufferBase::RT_BufferBase(uint32_t a_size, BufferUsage a_usage)
-    : m_size(a_size)
+  RT_BufferBase::RT_BufferBase(uint32_t a_size, BufferUsage a_usage, uint32_t a_flags)
+    : m_rendererID(0)
+    , m_pMappedPointer(nullptr)
+    , m_size(a_size)
     , m_usage(a_usage)
-    , m_rendererID(0)
   {
     glCreateBuffers(1, &m_rendererID);
     glNamedBufferData(m_rendererID, m_size, nullptr, OpenGLUsage(m_usage));
+
+    if ((a_flags & BF_Mapped) != 0)
+      m_pMappedPointer = glMapNamedBuffer(m_rendererID, GL_WRITE_ONLY);
   }
 
   RT_BufferBase::~RT_BufferBase()
@@ -87,6 +95,11 @@ namespace Engine
   void RT_BufferBase::Bind() const
   {
     glBindBuffer(OpenGLBufferType(GetType()), m_rendererID);
+  }
+
+  void * RT_BufferBase::GetMappedPointer()
+  {
+    return m_pMappedPointer;
   }
 
   BufferLayout const& RT_BufferBase::GetLayout() const
@@ -113,14 +126,14 @@ namespace Engine
   // Vertex Buffer
   //------------------------------------------------------------------------------------------------
 
-  RT_VertexBuffer::RT_VertexBuffer(void * a_data, uint32_t a_size, BufferUsage a_usage)
-    : RT_BufferBase(a_data, a_size, a_usage)
+  RT_VertexBuffer::RT_VertexBuffer(void * a_data, uint32_t a_size, uint32_t a_flags, BufferUsage a_usage)
+    : RT_BufferBase(a_data, a_size, a_usage, a_flags)
   {
   
   }
 
-  RT_VertexBuffer::RT_VertexBuffer(uint32_t a_size, BufferUsage a_usage)
-    : RT_BufferBase(a_size, a_usage)
+  RT_VertexBuffer::RT_VertexBuffer(uint32_t a_size, uint32_t a_flags, BufferUsage a_usage)
+    : RT_BufferBase(a_size, a_usage, a_flags)
   {
 
   }
@@ -130,14 +143,14 @@ namespace Engine
     return BufferType::Vertex;
   }
 
-  RT_VertexBuffer * RT_VertexBuffer::Create(void * a_data, uint32_t a_size, BufferUsage a_usage)
+  RT_VertexBuffer * RT_VertexBuffer::Create(void * a_data, uint32_t a_size, uint32_t a_flags, BufferUsage a_usage)
   {
-    return new RT_VertexBuffer(a_data, a_size, a_usage);
+    return new RT_VertexBuffer(a_data, a_size, a_flags, a_usage);
   }
 
-  RT_VertexBuffer * RT_VertexBuffer::Create(uint32_t a_size, BufferUsage a_usage)
+  RT_VertexBuffer * RT_VertexBuffer::Create(uint32_t a_size, uint32_t a_flags, BufferUsage a_usage)
   {
-    return new RT_VertexBuffer(a_size, a_usage);
+    return new RT_VertexBuffer(a_size, a_flags, a_usage);
   }
 
   //------------------------------------------------------------------------------------------------

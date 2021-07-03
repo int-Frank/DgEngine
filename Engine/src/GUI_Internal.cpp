@@ -124,7 +124,7 @@ namespace Engine
 
       static void InitBox()
       {
-        s_pRenderContext->vb_unitBox = VertexBuffer::Create(g_unitBoxVerts, SIZEOF32(g_unitBoxVerts));
+        s_pRenderContext->vb_unitBox = VertexBuffer::Create(g_unitBoxVerts, SIZEOF32(g_unitBoxVerts), BF_None);
         s_pRenderContext->vb_unitBox->SetLayout(
           {
             { Engine::ShaderDataType::VEC2 }
@@ -149,7 +149,7 @@ namespace Engine
 
       static void InitBoxBorder()
       {
-        s_pRenderContext->vb_boxBorder = VertexBuffer::Create(sizeof(float) * 2 * 8);
+        s_pRenderContext->vb_boxBorder = VertexBuffer::Create(sizeof(float) * 2 * 8, BF_None);
         s_pRenderContext->vb_boxBorder->SetLayout(
           {
             { Engine::ShaderDataType::VEC2 }
@@ -174,7 +174,7 @@ namespace Engine
 
       static void InitText()
       {
-        s_pRenderContext->vb_textInstance = VertexBuffer::Create(MAX_TEXT_CHARACTERS * sizeof(float) * 6);
+        s_pRenderContext->vb_textInstance = VertexBuffer::Create(MAX_TEXT_CHARACTERS * sizeof(float) * 6, BF_None);
         s_pRenderContext->vb_textInstance->SetLayout(
           {
             { Engine::ShaderDataType::VEC2 }, // inPosOffset

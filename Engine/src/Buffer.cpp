@@ -173,7 +173,7 @@ namespace Engine
   // VertexBuffer
   //------------------------------------------------------------------------------------------------
   
-  VertexBuffer::VertexBuffer(void const * a_pData, uint32_t a_size, BufferUsage a_usage)
+  VertexBuffer::VertexBuffer(void const * a_pData, uint32_t a_size, uint32_t a_flags, BufferUsage a_usage)
   {
     BSR_ASSERT(a_pData != nullptr);
 
@@ -184,9 +184,9 @@ namespace Engine
     state.Set<RenderState::Attr::Type>(RenderState::Type::Command);
     state.Set<RenderState::Attr::Command>(RenderState::Command::BufferCreate);
 
-    RENDER_SUBMIT(state, [resID = m_id, size = a_size, usage = a_usage, data]()
+    RENDER_SUBMIT(state, [resID = m_id, size = a_size, flags = a_flags, usage = a_usage, data]()
       {
-        ::Engine::RT_VertexBuffer * pVB = ::Engine::RT_VertexBuffer::Create(data, size, usage);
+        ::Engine::RT_VertexBuffer * pVB = ::Engine::RT_VertexBuffer::Create(data, size, flags, usage);
         if (pVB == nullptr)
         {
           LOG_WARN("VertexBuffer::VertexBuffer(): Failed to create vertex buffer!");
@@ -196,15 +196,15 @@ namespace Engine
       });
   }
 
-  VertexBuffer::VertexBuffer(uint32_t a_size, BufferUsage a_usage)
+  VertexBuffer::VertexBuffer(uint32_t a_size, uint32_t a_flags, BufferUsage a_usage)
   {
     RenderState state = RenderState::Create();
     state.Set<RenderState::Attr::Type>(RenderState::Type::Command);
     state.Set<RenderState::Attr::Command>(RenderState::Command::BufferCreate);
 
-    RENDER_SUBMIT(state, [resID = m_id, size = a_size, usage = a_usage]()
+    RENDER_SUBMIT(state, [resID = m_id, size = a_size, flags = a_flags, usage = a_usage]()
       {
-        ::Engine::RT_VertexBuffer * pVB = ::Engine::RT_VertexBuffer::Create(size, usage);
+        ::Engine::RT_VertexBuffer * pVB = ::Engine::RT_VertexBuffer::Create(size, flags, usage);
         if (pVB == nullptr)
         {
           LOG_WARN("VertexBuffer::VertexBuffer(): Failed to create vertex buffer!");
@@ -258,6 +258,32 @@ namespace Engine
       });
   }
 
+  void VertexBuffer::WriteToMapped(MyFunc a_func, void * a_pUserData)
+  {
+    RenderState state = RenderState::Create();
+    state.Set<RenderState::Attr::Type>(RenderState::Type::Command);
+    state.Set<RenderState::Attr::Command>(RenderState::Command::None);
+
+    RENDER_SUBMIT(state, [resID = m_id, func = a_func, pUserData = a_pUserData]()
+      {
+        ::Engine::RT_VertexBuffer ** ppVBO = ::Engine::RenderThreadData::Instance()->VBOs.at(resID);
+        if (ppVBO == nullptr)
+        {
+          LOG_WARN("VertexBuffer::WriteToMapped(): RefID '{}' does not exist!", resID);
+          return;
+        }
+
+        void * ptr = (*ppVBO)->GetMappedPointer();
+        if (ptr == nullptr)
+        {
+          LOG_WARN("VertexBuffer::WriteToMapped(): RefID '{}' No mapped pointer!", resID);
+          return;
+        }
+
+        func(ptr, pUserData);
+      });
+  }
+
   void VertexBuffer::Bind() const
   {
     RenderState state = RenderState::Create();
@@ -302,17 +328,19 @@ namespace Engine
 
   Ref<VertexBuffer> VertexBuffer::Create(void const * a_pData,
                                          uint32_t a_size,
+                                         uint32_t a_flags,
                                          BufferUsage a_usage)
   {
     BSR_ASSERT(a_pData != nullptr);
 
-    return Ref<VertexBuffer>(new VertexBuffer(a_pData, a_size, a_usage));
+    return Ref<VertexBuffer>(new VertexBuffer(a_pData, a_size, a_flags, a_usage));
   }
 
   Ref<VertexBuffer> VertexBuffer::Create(uint32_t a_size,
-                                  BufferUsage a_usage)
+                                         uint32_t a_flags,
+                                         BufferUsage a_usage)
   {
-    return Ref<VertexBuffer>(new VertexBuffer(a_size, a_usage));
+    return Ref<VertexBuffer>(new VertexBuffer(a_size, a_flags, a_usage));
   }
 
   //------------------------------------------------------------------------------------------------

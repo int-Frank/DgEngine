@@ -50,6 +50,7 @@ namespace Engine
       uint16_t begin = 0;
       for (int j = 0; j < ShaderDomain_COUNT; j++)
       {
+        // Limit the number of binding pionts to the size of BindingPointData::bindingPoints
         if (values[i][j] > (sizeof(BindingPointData::bindingPoints) * CHAR_BIT))
           values[i][j] = (sizeof(BindingPointData::bindingPoints) * CHAR_BIT);
 
