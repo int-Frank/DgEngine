@@ -9,6 +9,8 @@
 
 namespace Engine
 {
+  MAKE_SYSTEM_DEFINITION(System_GUI)
+
   System_GUI::System_GUI(int a_windowW, int a_windowH)
     : m_dt(1.0f / 60.0f)
     , m_pScreen(nullptr)

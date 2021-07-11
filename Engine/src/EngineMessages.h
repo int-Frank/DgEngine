@@ -8,44 +8,6 @@
 
 #define TEXT_INPUT_TEXT_SIZE 32
 
-// Smart list reduces the amount of code we have to write.
-// Input messages never make it out of System_Input. This is where you convert them.
-#undef ITEM
-#define MESSAGE_LIST \
-  ITEM(None, None) \
-  ITEM(GUI_GoBack, GUI) \
-  ITEM(GUI_Up, GUI) \
-  ITEM(GUI_Down, GUI) \
-  ITEM(GUI_Left, GUI) \
-  ITEM(GUI_Right, GUI) \
-  ITEM(GUI_Select, GUI) \
-  ITEM(GUI_PointerDown, GUI) \
-  ITEM(GUI_PointerUp, GUI) \
-  ITEM(GUI_PointerMove, GUI) \
-  ITEM(GUI_Text, GUI) \
-  ITEM(Window_Shown, Window) \
-  ITEM(Window_Hidden, Window) \
-  ITEM(Window_Exposed, Window) \
-  ITEM(Window_Moved, Window) \
-  ITEM(Window_Resized, Window) \
-  ITEM(Window_Minimized, Window) \
-  ITEM(Window_Maximized, Window) \
-  ITEM(Window_Restored, Window) \
-  ITEM(Window_Enter, Window) \
-  ITEM(Window_Leave, Window) \
-  ITEM(Window_Focus_Gained, Window) \
-  ITEM(Window_Focus_Lost, Window) \
-  ITEM(Quit, None) \
-  ITEM(Window_Take_Focus, Window) \
-  ITEM(Input_Text, Input) \
-  ITEM(Input_KeyUp, Input) \
-  ITEM(Input_KeyDown, Input) \
-  ITEM(Input_MouseButtonUp, Input) \
-  ITEM(Input_MouseButtonDown, Input) \
-  ITEM(Input_MouseWheelUp, Input) \
-  ITEM(Input_MouseWheelDown, Input) \
-  ITEM(Input_MouseMove, Input)
-
 namespace Engine
 {
   //-----------------------------------------------------------------------------------
@@ -120,7 +82,6 @@ namespace Engine
   class Message_Quit : public Message { MESSAGE_HEADER };
   class Message_Window_Take_Focus : public Message { MESSAGE_HEADER };
 
-  // TODO these shouldn't be messages, as they are only used by the System_Input.
   class Message_Input : public Message
   {
     MESSAGE_HEADER

@@ -14,6 +14,8 @@
 
 namespace Engine
 {
+  MAKE_SYSTEM_DEFINITION(System_Input)
+
   System_Input::System_Input()
     : m_pEventPoller(Framework::Instance()->GetEventPoller())
   {
@@ -37,7 +39,7 @@ namespace Engine
 
   void System_Input::AddBinding(InputCode a_code, InputEvent a_event, InputMessageTranslator a_callback)
   {
-    m_bindings[((uint32_t(a_code) << 16) | uint32_t(a_event)] = a_callback;
+    m_bindings[GET_FULL_INPUT_CODE(a_code, a_event)] = a_callback;
   }
 
   void System_Input::Update(float a_dt)
@@ -48,6 +50,7 @@ namespace Engine
       if (pMsg.Get() == nullptr)
         break;
 
+      // Document InputCodes mapping to message types
       if (pMsg->GetID() == Message_Input::GetStaticID())
       {
         TRef<Message_Input> pTemp = StaticPointerCast<Message_Input, Message>(pMsg);
@@ -56,9 +59,29 @@ namespace Engine
         if (it != m_bindings.end())
           it->second(pTemp.Get());
       }
+      else if (pMsg->GetID() == Message_Input_Text::GetStaticID())
+      {
+        TRef<Message_Input_Text> pTemp = StaticPointerCast<Message_Input_Text, Message>(pMsg);
+        uint32_t code = GET_FULL_INPUT_CODE(pTemp->code, pTemp->event);
+        auto it = m_bindings.find(code);
+        if (it != m_bindings.end())
+          it->second(pTemp.Get());
+      }
+      else if (pMsg->GetID() == Message_Input_MouseEvent::GetStaticID())
+      {
+        TRef<Message_Input_MouseEvent> pTemp = StaticPointerCast<Message_Input_MouseEvent, Message>(pMsg);
+        uint32_t code = GET_FULL_INPUT_CODE(pTemp->code, pTemp->event);
+        auto it = m_bindings.find(code);
+        if (it != m_bindings.end())
+          it->second(pTemp.Get());
+      }
       else if (pMsg->GetCategory() != MC_Input) // Pass on everything but raw input
       {
         POST(pMsg);
+      }
+      else
+      {
+        BSR_ASSERT("Unhandled Input Message!");
       }
     }
   }

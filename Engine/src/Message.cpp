@@ -8,6 +8,39 @@
 
 #define ID_SHIFT 20
 
+// Smart list reduces the amount of code we have to write.
+// Input messages never make it out of System_Input. This is where you convert them.
+#undef ITEM
+#define MESSAGE_LIST \
+  ITEM(None, None) \
+  ITEM(GUI_GoBack, GUI) \
+  ITEM(GUI_Up, GUI) \
+  ITEM(GUI_Down, GUI) \
+  ITEM(GUI_Left, GUI) \
+  ITEM(GUI_Right, GUI) \
+  ITEM(GUI_Select, GUI) \
+  ITEM(GUI_PointerDown, GUI) \
+  ITEM(GUI_PointerUp, GUI) \
+  ITEM(GUI_PointerMove, GUI) \
+  ITEM(GUI_Text, GUI) \
+  ITEM(Window_Shown, Window) \
+  ITEM(Window_Hidden, Window) \
+  ITEM(Window_Exposed, Window) \
+  ITEM(Window_Moved, Window) \
+  ITEM(Window_Resized, Window) \
+  ITEM(Window_Minimized, Window) \
+  ITEM(Window_Maximized, Window) \
+  ITEM(Window_Restored, Window) \
+  ITEM(Window_Enter, Window) \
+  ITEM(Window_Leave, Window) \
+  ITEM(Window_Focus_Gained, Window) \
+  ITEM(Window_Focus_Lost, Window) \
+  ITEM(Quit, None) \
+  ITEM(Window_Take_Focus, Window) \
+  ITEM(Input, Input) \
+  ITEM(Input_Text, Input) \
+  ITEM(Input_MouseEvent, Input)
+
 #undef ITEM
 #define ITEM(TYPE, CLASS) MESSAGE_DEFINITIONS(Message_ ## TYPE, MC_ ## CLASS)
 
@@ -71,8 +104,6 @@ namespace Engine
   MESSAGE_TO_STRING(Window_Focus_Lost)
   MESSAGE_TO_STRING(Quit)
   MESSAGE_TO_STRING(Window_Take_Focus)
-  MESSAGE_TO_STRING(Input_MouseWheelUp)
-  MESSAGE_TO_STRING(Input_MouseWheelDown)
 
   void Message_GUI_PointerMove::ConsumeHover()
   {
@@ -115,45 +146,25 @@ namespace Engine
     return ss.str();
   }
 
+  std::string Message_Input::ToString() const
+  {
+    std::stringstream ss;
+    ss << "Input_KeyUp [code: " << GetInputCodeString(code) << ", event: " << GetInputEventString(event) << ", mod state " << modState << "]";
+    return ss.str();
+  }
+
   std::string Message_Input_Text::ToString() const
   {
     std::stringstream ss;
-    ss << "Input_Text [text: PLACEHOLDER]";
+    ss << "Input_Text [text: " << text << "]";
     return ss.str();
   }
 
-  std::string Message_Input_KeyUp::ToString() const
+  std::string Message_Input_MouseEvent::ToString() const
   {
     std::stringstream ss;
-    ss << "Input_KeyUp [keycode: " << keyCode << ", mod state " << modState << "]";
-    return ss.str();
-  }
-
-  std::string Message_Input_KeyDown::ToString() const
-  {
-    std::stringstream ss;
-    ss << "Input_KeyDown [keycode: " << keyCode << ", mod state " << modState << "]";
-    return ss.str();
-  }
-
-  std::string Message_Input_MouseButtonUp::ToString() const
-  {
-    std::stringstream ss;
-    ss << "Input_MouseButtonUp [button: " << button << ", x: " << x << ", y: " << y << "]";
-    return ss.str();
-  }
-
-  std::string Message_Input_MouseButtonDown::ToString() const
-  {
-    std::stringstream ss;
-    ss << "Input_MouseButtonDown [button: " << button << ", x: " << x << ", y: " << y << "]";
-    return ss.str();
-  }
-
-  std::string Message_Input_MouseMove::ToString() const
-  {
-    std::stringstream ss;
-    ss << "Input_MouseMove [x: " << x << ", y: " << y << "]";
+    ss << "Input_KeyUp [code: " << GetInputCodeString(code) << ", event: " << GetInputEventString(event) << ", mod state " << modState 
+      << ", x:" << x << ", y:" << y << "]";
     return ss.str();
   }
 

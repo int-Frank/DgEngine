@@ -175,7 +175,12 @@ namespace Engine
   ITEM(MOUSE_WHEEL_DOWN, 0x105)\
   ITEM(MOUSE_MOTION, 0x106)\
   ITEM(TEXT, 0x107)\
-  ITEM(COUNT, 0x0)\
+  ITEM(COUNT, 0xFFFF)\
+
+#define INPUT_EVENTS \
+  ITEM(VALUE_CHANGE)\
+  ITEM(BUTTON_UP)\
+  ITEM(BUTTON_DOWN)
 
   enum InputCode : uint16_t
   {
@@ -186,19 +191,13 @@ namespace Engine
 
   enum InputEvent : uint8_t
   {
-    IE_VALUE_CHANGE,
-    IE_BUTTON_UP,
-    IE_BUTTON_DOWN
-  };
-
-  enum InputCodeIndex
-  {
 #undef ITEM
-#define ITEM(name, val) nIC_##name,
-    INPUT_CODES
+#define ITEM(name) IE_ ## name,
+    INPUT_EVENTS
   };
 
-  extern uint16_t const InputKeyMap[nIC_COUNT + 1];
+  char const * GetInputCodeString(InputCode);
+  char const * GetInputEventString(InputEvent);
 
   //enum InputCode : uint16_t
   //{

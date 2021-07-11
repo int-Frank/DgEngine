@@ -59,6 +59,8 @@ Colour * GenerateTexture(uint32_t dim)
   return pPixels;
 }
 
+MAKE_SYSTEM_DEFINITION(RenderDemo)
+
 void RenderDemo::OnAttach()
 {
   uint32_t const dim = 256;

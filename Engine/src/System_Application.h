@@ -15,7 +15,7 @@ namespace Engine
   {
   public:
 
-    MAKE_SYSTEM_DECL(RSID_Application)
+    MAKE_SYSTEM_DECL
 
     System_Application();
     ~System_Application();

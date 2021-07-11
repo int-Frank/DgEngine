@@ -15,10 +15,9 @@ namespace Engine
 
   class System_Window : public System
   {
-
   public:
 
-    MAKE_SYSTEM_DECL(RSID_Window)
+    MAKE_SYSTEM_DECL
 
     System_Window(IWindow *);
     ~System_Window();

@@ -10,7 +10,7 @@ class GUIDemo : public Engine::System
 {
 public:
 
-  MAKE_SYSTEM_DECL(SID_GUIDemo)
+  MAKE_SYSTEM_DECL
 
   void OnAttach() override;
   void HandleMessage(Engine::Message * a_pMsg) override {}

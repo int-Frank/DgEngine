@@ -18,13 +18,13 @@ namespace Engine
 {
   class IEventPoller;
 
-  typedef void (*InputMessageTranslator)(Message_Input const *);
+  typedef void (*InputMessageTranslator)(Message const *);
 
   class System_Input : public System
   {
   public:
 
-    MAKE_SYSTEM_DECL(RSID_Input)
+    MAKE_SYSTEM_DECL
 
     System_Input();
     ~System_Input();

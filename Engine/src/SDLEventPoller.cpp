@@ -358,19 +358,19 @@ namespace Engine
         }
         case SDL_MOUSEMOTION:
         {
-          TRef<Message_Input> pMsg = TRef<Message_Input>::New();
+          TRef<Message_Input_MouseEvent> pMsg = TRef<Message_Input_MouseEvent>::New();
           pMsg->code = IC_MOUSE_MOTION;
           pMsg->event = IE_VALUE_CHANGE;
           pMsg->modState = GetModState();
           if (SDL_GetRelativeMouseMode() == SDL_TRUE)
           {
-            pMsg->mousePosition.x = event.motion.xrel;
-            pMsg->mousePosition.y = event.motion.yrel;
+            pMsg->x = event.motion.xrel;
+            pMsg->y = event.motion.yrel;
           }
           else
           {
-            pMsg->mousePosition.x = event.motion.x;
-            pMsg->mousePosition.y = event.motion.y;
+            pMsg->x = event.motion.x;
+            pMsg->y = event.motion.y;
           }
           return StaticPointerCast<Message>(pMsg);
         }
