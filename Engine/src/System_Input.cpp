@@ -51,9 +51,9 @@ namespace Engine
         break;
 
       // Document InputCodes mapping to message types
-      if (pMsg->GetID() == Message_Input::GetStaticID())
+      if (pMsg->GetID() == Message_Input_Key::GetStaticID())
       {
-        TRef<Message_Input> pTemp = StaticPointerCast<Message_Input, Message>(pMsg);
+        TRef<Message_Input_Key> pTemp = StaticPointerCast<Message_Input_Key, Message>(pMsg);
         uint32_t code = GET_FULL_INPUT_CODE(pTemp->code, pTemp->event);
         auto it = m_bindings.find(code);
         if (it != m_bindings.end())
@@ -67,9 +67,9 @@ namespace Engine
         if (it != m_bindings.end())
           it->second(pTemp.Get());
       }
-      else if (pMsg->GetID() == Message_Input_MouseEvent::GetStaticID())
+      else if (pMsg->GetID() == Message_Input_Mouse::GetStaticID())
       {
-        TRef<Message_Input_MouseEvent> pTemp = StaticPointerCast<Message_Input_MouseEvent, Message>(pMsg);
+        TRef<Message_Input_Mouse> pTemp = StaticPointerCast<Message_Input_Mouse, Message>(pMsg);
         uint32_t code = GET_FULL_INPUT_CODE(pTemp->code, pTemp->event);
         auto it = m_bindings.find(code);
         if (it != m_bindings.end())

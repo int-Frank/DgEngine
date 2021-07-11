@@ -37,9 +37,9 @@
   ITEM(Window_Focus_Lost, Window) \
   ITEM(Quit, None) \
   ITEM(Window_Take_Focus, Window) \
-  ITEM(Input, Input) \
+  ITEM(Input_Key, Input) \
   ITEM(Input_Text, Input) \
-  ITEM(Input_MouseEvent, Input)
+  ITEM(Input_Mouse, Input)
 
 #undef ITEM
 #define ITEM(TYPE, CLASS) MESSAGE_DEFINITIONS(Message_ ## TYPE, MC_ ## CLASS)
@@ -146,7 +146,7 @@ namespace Engine
     return ss.str();
   }
 
-  std::string Message_Input::ToString() const
+  std::string Message_Input_Key::ToString() const
   {
     std::stringstream ss;
     ss << "Input_KeyUp [code: " << GetInputCodeString(code) << ", event: " << GetInputEventString(event) << ", mod state " << modState << "]";
@@ -160,7 +160,7 @@ namespace Engine
     return ss.str();
   }
 
-  std::string Message_Input_MouseEvent::ToString() const
+  std::string Message_Input_Mouse::ToString() const
   {
     std::stringstream ss;
     ss << "Input_KeyUp [code: " << GetInputCodeString(code) << ", event: " << GetInputEventString(event) << ", mod state " << modState 

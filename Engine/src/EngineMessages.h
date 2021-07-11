@@ -82,13 +82,25 @@ namespace Engine
   class Message_Quit : public Message { MESSAGE_HEADER };
   class Message_Window_Take_Focus : public Message { MESSAGE_HEADER };
 
-  class Message_Input : public Message
+  // These are generated from raw input
+  class Message_Input_Key : public Message
   {
     MESSAGE_HEADER
 
     InputCode code;
     InputEvent event;
     uint16_t   modState;
+  };
+
+  class Message_Input_Mouse : public Message
+  {
+    MESSAGE_HEADER
+
+    InputCode code;
+    InputEvent event;
+    uint16_t   modState;
+    int32_t    x;
+    int32_t    y;
   };
 
   class Message_Input_Text : public Message
@@ -99,17 +111,6 @@ namespace Engine
     InputEvent event;
     uint16_t   modState;
     char text[TEXT_INPUT_TEXT_SIZE];
-  };
-
-  class Message_Input_MouseEvent : public Message
-  {
-    MESSAGE_HEADER
-
-    InputCode code;
-    InputEvent event;
-    uint16_t   modState;
-    int32_t    x;
-    int32_t    y;
   };
 }
 #endif

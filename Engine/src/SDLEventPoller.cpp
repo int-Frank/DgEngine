@@ -311,7 +311,7 @@ namespace Engine
           if (event.key.repeat)
             break;
 
-          TRef<Message_Input> pMsg = TRef<Message_Input>::New();
+          TRef<Message_Input_Key> pMsg = TRef<Message_Input_Key>::New();
           pMsg->code = TranslateKeyCode(event.key.keysym.scancode);
           pMsg->event = IE_BUTTON_DOWN;
           pMsg->modState = GetModState();
@@ -319,7 +319,7 @@ namespace Engine
         }
         case SDL_KEYUP:
         {
-          TRef<Message_Input> pMsg = TRef<Message_Input>::New();
+          TRef<Message_Input_Key> pMsg = TRef<Message_Input_Key>::New();
           pMsg->code = TranslateKeyCode(event.key.keysym.scancode);
           pMsg->event = IE_BUTTON_UP;
           pMsg->modState = GetModState();
@@ -327,7 +327,7 @@ namespace Engine
         }
         case SDL_MOUSEBUTTONDOWN:
         {
-          TRef<Message_Input_MouseEvent> pMsg = TRef<Message_Input_MouseEvent>::New();
+          TRef<Message_Input_Mouse> pMsg = TRef<Message_Input_Mouse>::New();
           pMsg->code = TranslateMouseButtonCode(event.button.button);
           pMsg->event = IE_BUTTON_DOWN;
           pMsg->modState = GetModState();
@@ -337,7 +337,7 @@ namespace Engine
         }
         case SDL_MOUSEBUTTONUP:
         {
-          TRef<Message_Input_MouseEvent> pMsg = TRef<Message_Input_MouseEvent>::New();
+          TRef<Message_Input_Mouse> pMsg = TRef<Message_Input_Mouse>::New();
           pMsg->code = TranslateMouseButtonCode(event.button.button);
           pMsg->event = IE_BUTTON_UP;
           pMsg->modState = GetModState();
@@ -347,7 +347,7 @@ namespace Engine
         }
         case SDL_MOUSEWHEEL:
         {
-          TRef<Message_Input> pMsg = TRef<Message_Input>::New();
+          TRef<Message_Input_Key> pMsg = TRef<Message_Input_Key>::New();
           pMsg->event = IE_VALUE_CHANGE;
           pMsg->modState = GetModState();
           if (event.wheel.y > 0)
@@ -358,7 +358,7 @@ namespace Engine
         }
         case SDL_MOUSEMOTION:
         {
-          TRef<Message_Input_MouseEvent> pMsg = TRef<Message_Input_MouseEvent>::New();
+          TRef<Message_Input_Mouse> pMsg = TRef<Message_Input_Mouse>::New();
           pMsg->code = IC_MOUSE_MOTION;
           pMsg->event = IE_VALUE_CHANGE;
           pMsg->modState = GetModState();

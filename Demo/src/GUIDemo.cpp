@@ -151,7 +151,7 @@ void GUIDemo::BindInput()
   layer->AddBinding(Engine::IC_MOUSE_MOTION, Engine::IE_VALUE_CHANGE,
     [](Engine::Message const * pMsg)
     {
-      Engine::Message_Input_MouseEvent * pIn = (Engine::Message_Input_MouseEvent *)pMsg;
+      Engine::Message_Input_Mouse * pIn = (Engine::Message_Input_Mouse *)pMsg;
       Engine::Message_GUI_PointerMove * pOut = nullptr;
       EMPLACE_POST(Engine::Message_GUI_PointerMove, pOut);
       pOut->x = pIn->x;
@@ -167,7 +167,7 @@ void GUIDemo::BindInput()
   layer->AddBinding(Engine::IC_MOUSE_BUTTON_LEFT, Engine::IE_BUTTON_DOWN,
     [](Engine::Message const * pMsg)
     {
-      Engine::Message_Input_MouseEvent * pIn = (Engine::Message_Input_MouseEvent *)pMsg;
+      Engine::Message_Input_Mouse * pIn = (Engine::Message_Input_Mouse *)pMsg;
       Engine::Message_GUI_PointerDown * pOut = nullptr;
       EMPLACE_POST(Engine::Message_GUI_PointerDown, pOut);
       pOut->x = pIn->x;
@@ -177,7 +177,7 @@ void GUIDemo::BindInput()
   layer->AddBinding(Engine::IC_MOUSE_BUTTON_LEFT, Engine::IE_BUTTON_UP,
     [](Engine::Message const * pMsg)
     {
-      Engine::Message_Input_MouseEvent * pIn = (Engine::Message_Input_MouseEvent *)pMsg;
+      Engine::Message_Input_Mouse * pIn = (Engine::Message_Input_Mouse *)pMsg;
       Engine::Message_GUI_PointerUp * pOut = nullptr;
       EMPLACE_POST(Engine::Message_GUI_PointerUp, pOut);
       pOut->x = pIn->x;
