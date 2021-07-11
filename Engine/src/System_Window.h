@@ -15,10 +15,9 @@ namespace Engine
 
   class System_Window : public System
   {
-
   public:
 
-    MAKE_SYSTEM_DECL(RSID_Window)
+    MAKE_SYSTEM_DECL
 
     System_Window(IWindow *);
     ~System_Window();
@@ -43,6 +42,8 @@ namespace Engine
     void HandleMessage(Message_Window_Focus_Lost *);
     void HandleMessage(Message_Quit *);
     void HandleMessage(Message_Window_Take_Focus *);
+
+    void GetDimensions(int & w, int & h);
 
   private:
 

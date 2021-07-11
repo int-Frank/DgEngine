@@ -5,12 +5,23 @@
 
 #include <stdint.h>
 
+#include "Message.h"
+#include "DgWorkerPool.h"
+
 uint32_t NextID();
 
-enum SystemID : Engine::SystemID
+enum MyMessageClass
 {
-  SID_RenderDemo = Engine::RSID_BEGIN,
-  SID_GUIDemo,
+  MMC_Input = Engine::MC_CLIENT_BEGIN
 };
+
+struct State
+{
+  Dg::WorkerPool *pWorkerPool;
+};
+
+void InitWorkerPool(uint32_t threadCount);
+void DestroyWorkerPool();
+Dg::WorkerPool * GetWorkerPool();
 
 #endif

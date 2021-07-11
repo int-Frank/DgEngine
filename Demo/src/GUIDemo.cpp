@@ -15,6 +15,8 @@
 using namespace Engine;
 using namespace Engine::GUI;
 
+MAKE_SYSTEM_DEFINITION(GUIDemo)
+
 void GUIDemo::OnAttach()
 {
   m_textColour = 0xFFFFFFFF;
@@ -146,44 +148,36 @@ void GUIDemo::BindInput()
   }
 
   // TODO A helper function should live in the Engine to set up default GUI bindings
-  layer->AddBinding(Engine::Message_Input_MouseMove::GetStaticID(),
+  layer->AddBinding(Engine::IC_MOUSE_MOTION, Engine::IE_VALUE_CHANGE,
     [](Engine::Message const * pMsg)
     {
-      Engine::Message_Input_MouseMove * pIn = (Engine::Message_Input_MouseMove *)pMsg;
+      Engine::Message_Input_Mouse * pIn = (Engine::Message_Input_Mouse *)pMsg;
       Engine::Message_GUI_PointerMove * pOut = nullptr;
       EMPLACE_POST(Engine::Message_GUI_PointerMove, pOut);
       pOut->x = pIn->x;
       pOut->y = pIn->y;
     });
 
-  layer->AddBinding(Engine::Message_Input_KeyDown::GetStaticID(),
-    [](Engine::Message const * pMsg)
+  layer->AddBinding(Engine::IC_KEY_Q, Engine::IE_BUTTON_DOWN,
+    [](Engine::Message const *)
     {
-      Engine::Message_Input_KeyDown * pIn = (Engine::Message_Input_KeyDown *)pMsg;
-      if (pIn->keyCode == Engine::IC_KEY_Q && (pIn->modState & KM_ALT) != 0)
-        EMPLACE_POST(Engine::Message_Quit);
+      EMPLACE_POST(Engine::Message_Quit);
     });
 
-  layer->AddBinding(Engine::Message_Input_MouseButtonDown::GetStaticID(),
+  layer->AddBinding(Engine::IC_MOUSE_BUTTON_LEFT, Engine::IE_BUTTON_DOWN,
     [](Engine::Message const * pMsg)
     {
-      Engine::Message_Input_MouseButtonDown * pIn = (Engine::Message_Input_MouseButtonDown *)pMsg;
-      if (pIn->button != Engine::IC_MOUSE_BUTTON_LEFT)
-        return;
-
+      Engine::Message_Input_Mouse * pIn = (Engine::Message_Input_Mouse *)pMsg;
       Engine::Message_GUI_PointerDown * pOut = nullptr;
       EMPLACE_POST(Engine::Message_GUI_PointerDown, pOut);
       pOut->x = pIn->x;
       pOut->y = pIn->y;
     });
 
-  layer->AddBinding(Engine::Message_Input_MouseButtonUp::GetStaticID(),
+  layer->AddBinding(Engine::IC_MOUSE_BUTTON_LEFT, Engine::IE_BUTTON_UP,
     [](Engine::Message const * pMsg)
     {
-      Engine::Message_Input_MouseButtonUp * pIn = (Engine::Message_Input_MouseButtonUp *)pMsg;
-      if (pIn->button != Engine::IC_MOUSE_BUTTON_LEFT)
-        return;
-
+      Engine::Message_Input_Mouse * pIn = (Engine::Message_Input_Mouse *)pMsg;
       Engine::Message_GUI_PointerUp * pOut = nullptr;
       EMPLACE_POST(Engine::Message_GUI_PointerUp, pOut);
       pOut->x = pIn->x;

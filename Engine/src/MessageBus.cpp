@@ -40,20 +40,21 @@ namespace Engine
 
   void * MessageBus::_ReserveAndRegister(size_t a_msgSize)
   {
-    m_mutex.lock();
+    std::unique_lock<std::mutex> lock(m_mutex);
     void * buf = m_buf[m_writeBuffer].Allocate(a_msgSize);
     m_messageQueue[m_writeBuffer].push_back(static_cast<Message *>(buf));
-    m_mutex.unlock();
     return buf;
   }
 
   void MessageBus::Register(TRef<Message> const & a_message)
   {
     size_t sze = a_message->Size();
-    m_mutex.lock();
-    void * buf = m_buf[m_writeBuffer].Allocate(sze);
-    m_messageQueue[m_writeBuffer].push_back(static_cast<Message *>(buf));
-    m_mutex.unlock();
+    void * buf = nullptr;
+    {
+      std::unique_lock<std::mutex> lock(m_mutex);
+      buf = m_buf[m_writeBuffer].Allocate(sze);
+      m_messageQueue[m_writeBuffer].push_back(static_cast<Message *>(buf));
+    }
     a_message->Clone(buf);
   }
 

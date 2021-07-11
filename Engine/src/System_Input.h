@@ -4,7 +4,7 @@
 #define EN_SYSTEM_INPUT_H
 
 #include <stdint.h>
-#include <initializer_list>
+#include <vector>
 
 #include "DgMap_AVL.h"
 
@@ -24,7 +24,7 @@ namespace Engine
   {
   public:
 
-    MAKE_SYSTEM_DECL(RSID_Input)
+    MAKE_SYSTEM_DECL
 
     System_Input();
     ~System_Input();
@@ -34,12 +34,12 @@ namespace Engine
 
     void HandleMessage(Message*) override;
 
-    // LayerHandler will own the input Message *
-    void AddBinding(uint32_t inputMessageID, InputMessageTranslator);
+    void AddBinding(InputCode, InputEvent, InputMessageTranslator);
 
   private:
 
     IEventPoller     * m_pEventPoller;
+    std::vector<uint32_t> keyFlags;
     Dg::Map_AVL<uint32_t, InputMessageTranslator> m_bindings;
 
   };

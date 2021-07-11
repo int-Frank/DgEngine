@@ -29,48 +29,25 @@ namespace Engine
 
   private:
 
-    void UpdateModState(SDL_Event const & a_event);
-
-  private:
-
     uint16_t m_modState;
   };
 
-  void FW_EventPoller::UpdateModState(SDL_Event const & a_event)
+  static uint16_t GetModState()
   {
-    if (a_event.type == SDL_KEYDOWN)
-    {
-      switch (a_event.key.keysym.sym)
-      {
-        case SDLK_LSHIFT:       m_modState |= KM_LSHIFT; break;
-        case SDLK_LCTRL:        m_modState |= KM_LCTRL; break;
-        case SDLK_LALT:         m_modState |= KM_LALT; break;
-        case SDLK_LGUI:         m_modState |= KM_LGUI; break;
-        case SDLK_RSHIFT:       m_modState |= KM_RSHIFT; break;
-        case SDLK_RCTRL:        m_modState |= KM_RCTRL; break;
-        case SDLK_RALT:         m_modState |= KM_RALT; break;
-        case SDLK_RGUI:         m_modState |= KM_RGUI; break;
-        case SDLK_NUMLOCKCLEAR: m_modState &= ~KM_NUM; break;
-        case SDLK_CAPSLOCK:     m_modState &= ~KM_CAPS; break;
-        case SDLK_MODE:         m_modState &= ~KM_MODE; break;
-        default: break;
-      }
-    }
-    else if (a_event.type == SDL_KEYUP)
-    {
-      switch (a_event.key.keysym.sym)
-      {
-        case SDLK_LSHIFT:       m_modState &= ~KM_LSHIFT; break;
-        case SDLK_LCTRL:        m_modState &= ~KM_LCTRL; break;
-        case SDLK_LALT:         m_modState &= ~KM_LALT; break;
-        case SDLK_LGUI:         m_modState &= ~KM_LGUI; break;
-        case SDLK_RSHIFT:       m_modState &= ~KM_RSHIFT; break;
-        case SDLK_RCTRL:        m_modState &= ~KM_RCTRL; break;
-        case SDLK_RALT:         m_modState &= ~KM_RALT; break;
-        case SDLK_RGUI:         m_modState &= ~KM_RGUI; break;
-        default: break;
-      }
-    }
+    SDL_Keymod mods = SDL_GetModState();
+    uint16_t result = 0;
+    if ((mods & KMOD_LSHIFT) != 0)  result |= KM_LSHIFT;
+    if ((mods & KMOD_LCTRL) != 0)   result |= KM_LCTRL;
+    if ((mods & KMOD_LALT) != 0)    result |= KM_LALT;
+    if ((mods & KMOD_LGUI) != 0)    result |= KM_LGUI;
+    if ((mods & KMOD_RSHIFT) != 0)  result |= KM_RSHIFT;
+    if ((mods & KMOD_RCTRL) != 0)   result |= KM_RCTRL;
+    if ((mods & KMOD_RALT) != 0)    result |= KM_RALT;
+    if ((mods & KMOD_RGUI) != 0)    result |= KM_RGUI;
+    if ((mods & KMOD_NUM) != 0)     result |= KM_NUM;
+    if ((mods & KMOD_CAPS) != 0)    result |= KM_CAPS;
+    if ((mods & KMOD_MODE) != 0)    result |= KM_MODE;
+    return result;
   }
 
   Dg::ErrorCode Framework::InitEventPoller()
@@ -94,7 +71,7 @@ namespace Engine
 
   }
 
-  static uint32_t TranslateKeyCode(SDL_Scancode a_key)
+  static InputCode TranslateKeyCode(SDL_Scancode a_key)
   {
     switch (a_key)
     {
@@ -235,13 +212,13 @@ namespace Engine
       case SDL_SCANCODE_RSHIFT:
       case SDL_SCANCODE_RALT:
       case SDL_SCANCODE_RGUI:
-        return uint32_t(a_key);
+        return InputCode(a_key);
       default:
         return IC_UNKNOWN;
     }
   }
 
-  static uint32_t TranslateMouseButtonCode(int a_code)
+  static InputCode TranslateMouseButtonCode(int a_code)
   {
     switch (a_code)
     {
@@ -323,6 +300,9 @@ namespace Engine
         case SDL_TEXTINPUT:
         {
           TRef<Message_Input_Text> pMsg = TRef<Message_Input_Text>::New();
+          pMsg->code = IC_TEXT;
+          pMsg->event = IE_VALUE_CHANGE;
+          pMsg->modState = GetModState();
           strncpy_s(pMsg->text, event.text.text, TEXT_INPUT_TEXT_SIZE);
           return StaticPointerCast<Message>(pMsg);
         }
@@ -331,46 +311,57 @@ namespace Engine
           if (event.key.repeat)
             break;
 
-          UpdateModState(event);
-          TRef<Message_Input_KeyDown> pMsg = TRef<Message_Input_KeyDown>::New();
-          pMsg->keyCode = TranslateKeyCode(event.key.keysym.scancode);
-          pMsg->modState = m_modState;
+          TRef<Message_Input_Key> pMsg = TRef<Message_Input_Key>::New();
+          pMsg->code = TranslateKeyCode(event.key.keysym.scancode);
+          pMsg->event = IE_BUTTON_DOWN;
+          pMsg->modState = GetModState();
           return StaticPointerCast<Message>(pMsg);
         }
         case SDL_KEYUP:
         {
-          UpdateModState(event);
-          TRef<Message_Input_KeyUp> pMsg = TRef<Message_Input_KeyUp>::New();
-          pMsg->keyCode = TranslateKeyCode(event.key.keysym.scancode);
-          pMsg->modState = m_modState;
+          TRef<Message_Input_Key> pMsg = TRef<Message_Input_Key>::New();
+          pMsg->code = TranslateKeyCode(event.key.keysym.scancode);
+          pMsg->event = IE_BUTTON_UP;
+          pMsg->modState = GetModState();
           return StaticPointerCast<Message>(pMsg);
         }
         case SDL_MOUSEBUTTONDOWN:
         {
-          TRef<Message_Input_MouseButtonDown> pMsg = TRef<Message_Input_MouseButtonDown>::New();
-          pMsg->button = TranslateMouseButtonCode(event.button.button);
+          TRef<Message_Input_Mouse> pMsg = TRef<Message_Input_Mouse>::New();
+          pMsg->code = TranslateMouseButtonCode(event.button.button);
+          pMsg->event = IE_BUTTON_DOWN;
+          pMsg->modState = GetModState();
           pMsg->x = event.button.x;
           pMsg->y = event.button.y;
           return StaticPointerCast<Message>(pMsg);
         }
         case SDL_MOUSEBUTTONUP:
         {
-          TRef<Message_Input_MouseButtonUp> pMsg = TRef<Message_Input_MouseButtonUp>::New();
-          pMsg->button = TranslateMouseButtonCode(event.button.button);
+          TRef<Message_Input_Mouse> pMsg = TRef<Message_Input_Mouse>::New();
+          pMsg->code = TranslateMouseButtonCode(event.button.button);
+          pMsg->event = IE_BUTTON_UP;
+          pMsg->modState = GetModState();
           pMsg->x = event.button.x;
           pMsg->y = event.button.y;
           return StaticPointerCast<Message>(pMsg);
         }
         case SDL_MOUSEWHEEL:
         {
+          TRef<Message_Input_Key> pMsg = TRef<Message_Input_Key>::New();
+          pMsg->event = IE_VALUE_CHANGE;
+          pMsg->modState = GetModState();
           if (event.wheel.y > 0)
-            return StaticPointerCast<Message>(TRef<Message_Input_MouseWheelUp>::New());
+            pMsg->code = IC_MOUSE_WHEEL_UP;
           else
-            return StaticPointerCast<Message>(TRef<Message_Input_MouseWheelDown>::New());
+            pMsg->code = IC_MOUSE_WHEEL_DOWN;
+          return StaticPointerCast<Message>(pMsg);
         }
         case SDL_MOUSEMOTION:
         {
-          TRef<Message_Input_MouseMove> pMsg = TRef<Message_Input_MouseMove>::New();
+          TRef<Message_Input_Mouse> pMsg = TRef<Message_Input_Mouse>::New();
+          pMsg->code = IC_MOUSE_MOTION;
+          pMsg->event = IE_VALUE_CHANGE;
+          pMsg->modState = GetModState();
           if (SDL_GetRelativeMouseMode() == SDL_TRUE)
           {
             pMsg->x = event.motion.xrel;
@@ -384,11 +375,17 @@ namespace Engine
           return StaticPointerCast<Message>(pMsg);
         }
         case SDL_WINDOWEVENT:
+        {
           return TranslateWindowEvent(event.window);
+        }
         case SDL_QUIT:
+        {
           return StaticPointerCast<Message>(TRef<Message_Quit>::New());
+        }
         default:
+        {
           break;
+        }
       }
     }
     return TRef<Message>();

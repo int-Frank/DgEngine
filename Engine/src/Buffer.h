@@ -40,6 +40,14 @@ namespace Engine
     DynamicCopy = 3,
   };
 
+
+  enum BufferFlags
+  {
+    BF_None = 0,
+    BF_Mapped = 1
+  };
+
+
   struct BufferElement
   {
     ShaderDataType type;
@@ -95,8 +103,8 @@ namespace Engine
   class VertexBuffer : public RenderResource
   {
   private:
-    VertexBuffer(void const * data, uint32_t size, BufferUsage a_usage = BufferUsage::Static);
-    VertexBuffer(uint32_t size, BufferUsage a_usage = BufferUsage::Static);
+    VertexBuffer(void const * data, uint32_t size, uint32_t a_flags, BufferUsage a_usage = BufferUsage::Static);
+    VertexBuffer(uint32_t size, uint32_t a_flags, BufferUsage a_usage = BufferUsage::Static);
 
     VertexBuffer(VertexBuffer const&) = delete;
     VertexBuffer& operator=(VertexBuffer const&) = delete;
@@ -105,12 +113,19 @@ namespace Engine
     
     static Ref<VertexBuffer> Create(void const * a_pData,
                                   uint32_t a_size,
+                                  uint32_t a_flags,
                                   BufferUsage a_usage = BufferUsage::Static);
-
+    
     static Ref<VertexBuffer> Create(uint32_t a_size,
+                                    uint32_t a_flags,
                                     BufferUsage a_usage = BufferUsage::Static);
 
     ~VertexBuffer();
+
+    // What I'm trying to do here is come up with a way to write to a mapped buffer without
+    // having to bubble up the buffer pointer to the main thread.
+    typedef void (*MyFunc)(void * pMappedMemory, void * pUserData);
+    void WriteToMapped(MyFunc, void *pUserData = nullptr);
 
     void SetData(void const * data, uint32_t size, uint32_t offset = 0);
     void Bind() const;
@@ -122,6 +137,7 @@ namespace Engine
   // UniformBuffer
   //------------------------------------------------------------------------------------------------
 
+  // TODO update constructors with flags
   class UniformBuffer : public RenderResource
   {
   private:
@@ -179,6 +195,7 @@ namespace Engine
   // IndexBuffer
   //------------------------------------------------------------------------------------------------
 
+  // TODO update constructors with flags
   class IndexBuffer : public RenderResource
   {
     IndexBuffer(void const * a_pData, IndexDataType a_dataType, uint32_t a_count);

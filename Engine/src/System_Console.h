@@ -13,17 +13,13 @@ namespace Engine
   {
   public:
 
-    MAKE_SYSTEM_DECL(RSID_Console)
+    MAKE_SYSTEM_DECL
 
     System_Console();
     ~System_Console();
 
     void HandleMessage(Message*) override;
     void HandleMessage(Message_Command*);
-
-#undef ITEM
-#define ITEM(TYPE, CATEGORY) void HandleMessage(Message_##TYPE *);
-    MESSAGE_LIST;
 
     void Update(float);
 

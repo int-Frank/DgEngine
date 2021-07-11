@@ -57,8 +57,8 @@ namespace Engine
   };
   static_assert(std::is_trivially_destructible<Message>::value, "Message must be trivially destructible");
 
-#define MESSAGE_CLASS_HEADER(MESSAGE_TYPE) class Message_##MESSAGE_TYPE : public Message\
-  {\
+#define MESSAGE_HEADER \
+  private:\
     static uint32_t s_ID;\
   public:\
     static uint32_t GetStaticID();\
@@ -68,7 +68,36 @@ namespace Engine
     void Clone(void * a_buf) const override;\
     std::string ToString() const override;
 
-  MESSAGE_CLASS_HEADER(Command)
+  #define MESSAGE_DEFINITIONS(TYPE, CLASS) uint32_t TYPE::s_ID(0);\
+  static_assert(std::is_trivially_destructible<TYPE>::value, #TYPE " must be trivially destructible");\
+  uint32_t TYPE::GetStaticID()\
+  {\
+    if (s_ID == 0)\
+      s_ID = GetNewID(CLASS);\
+    return s_ID;\
+  }\
+  uint32_t TYPE::GetID() const\
+  {\
+    return GetStaticID();\
+  }\
+  size_t TYPE::Size() const\
+  {\
+    return sizeof(*this);\
+  }\
+  TRef<Message> TYPE::CloneAsTRef() const\
+  {\
+    TRef<TYPE> cpy = TRef<TYPE>::MakeCopy(this); \
+    return StaticPointerCast<Message>(cpy); \
+  }\
+  void TYPE::Clone(void * a_buf) const\
+  {\
+    new (a_buf) TYPE(*this);\
+  }
+
+  class Message_Command : public Message
+  {
+    MESSAGE_HEADER
+
     template<typename FuncT>
     static TRef<Message> New(FuncT&& func)
     {

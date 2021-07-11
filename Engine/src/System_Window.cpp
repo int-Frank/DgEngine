@@ -11,6 +11,8 @@
 
 namespace Engine
 {
+  MAKE_SYSTEM_DEFINITION(System_Window)
+
   System_Window::System_Window(IWindow * a_pWindow)
     : m_pWindow(a_pWindow)
   {

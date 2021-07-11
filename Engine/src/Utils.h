@@ -65,16 +65,16 @@ namespace Engine
     uint32_t data;
   };
 
-  //Advance a void pointer a number of bytes
+  // Advance a void pointer a number of bytes
   void * AdvancePtr(void *, size_t);
   void const * AdvancePtr(void const *, size_t);
 
   std::string ImportTextFile(std::string const & path);
 
-  //Compare a std::string to a serialized string
+  // Compare a std::string to a serialized string
   bool AreEqual(std::string const &, void const *);
 
-  //Compare two serialized strings
+  // Compare two serialized strings
   bool AreEqual(void const *, void const *);
 }
 

@@ -74,7 +74,7 @@ namespace Engine
     template<typename FuncT>
     void Submit(RenderState a_state, FuncT&& func)
     {
-      static_assert(std::is_trivially_destructible<FuncT>::value, "FuncT must be trivially destructible");
+      BSR_ASSERT(std::is_trivially_destructible<FuncT>::value, "FuncT must be trivially destructible");
       RenderCommandFn renderCmd = [](void* ptr)
       {
         auto pFunc = (FuncT*)ptr;

@@ -6,6 +6,9 @@
 #include <string>
 #include "System.h"
 
+// Helpful macros
+#define GET_SYSTEM(SYSTEM) static_cast<SYSTEM*>(::Engine::Application::Instance()->GetSystem(SYSTEM::GetStaticID()))
+
 namespace Engine
 {
   class System;

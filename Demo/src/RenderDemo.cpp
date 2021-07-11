@@ -7,6 +7,11 @@
 
 using namespace Engine;
 
+struct UBOData
+{
+  uint32_t uint_0;
+};
+
 static char const * g_vs = R"(
      #version 430
      layout (location = 0) in vec2 inPos;
@@ -53,6 +58,8 @@ Colour * GenerateTexture(uint32_t dim)
 
   return pPixels;
 }
+
+MAKE_SYSTEM_DEFINITION(RenderDemo)
 
 void RenderDemo::OnAttach()
 {
@@ -103,14 +110,14 @@ void RenderDemo::OnAttach()
   uint16_t indices[] ={0, 1, 2, 0, 2, 3};
 
   {
-    m_vb_box = VertexBuffer::Create(verts, SIZEOF32(verts));
+    m_vb_box = VertexBuffer::Create(verts, SIZEOF32(verts), BF_None);
     m_vb_box->SetLayout(
       {
         { ShaderDataType::VEC2 }, // inPos
         { ShaderDataType::VEC2 }, // inTexCoord
       });
 
-    m_vb_offsets = VertexBuffer::Create(offsets, SIZEOF32(offsets));
+    m_vb_offsets = VertexBuffer::Create(offsets, SIZEOF32(offsets), BF_None);
     m_vb_offsets->SetLayout(
       {
         { ShaderDataType::VEC2 }, // inOffset
@@ -148,6 +155,11 @@ void RenderDemo::OnAttach()
 
     m_material = Material::Create(refProg);
     m_material->SetTexture("tex", m_texture);
+
+    // Set Uniform Buffer
+    m_bindingPoint = BindingPoint::Create(StorageBlockType::Uniform, ShaderDomain::Fragment);
+    m_ubo = UniformBuffer::Create((uint32_t)sizeof(UBOData));
+    m_ubo->Bind(m_bindingPoint);
   }
 }
 
