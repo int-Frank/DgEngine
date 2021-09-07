@@ -12,7 +12,7 @@
 #include "RT_Texture.h"
 #include "RenderResource.h"
 
-namespace Engine
+namespace DgE
 {
   class RenderThreadData
   {

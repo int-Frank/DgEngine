@@ -12,7 +12,7 @@
 #include "Options.h"
 #include "Log.h"
 #include "IWindow.h"
-#include "BSR_Assert.h"
+#include "Options.h"
 #include "Message.h"
 #include "Memory.h"
 #include "Renderer.h"
@@ -26,7 +26,7 @@
 #include "System_GUI.h"
 #include "System_Application.h"
 
-namespace Engine
+namespace DgE
 {
   class Application::PIMPL
   {
@@ -77,7 +77,7 @@ namespace Engine
   Application::Application(Opts const & a_opts)
     : m_pimpl(new PIMPL())
   {
-    BSR_ASSERT(s_instance == nullptr, "Error, Application already created!");
+    DG_ASSERT(s_instance == nullptr, "Error, Application already created!");
     s_instance = this;
 
     ResourceManager::Init();
@@ -146,7 +146,7 @@ namespace Engine
       });
 
     Renderer::Instance()->SwapBuffers();
-    Engine::TBUFClear();
+    DgE::TBUFClear();
     RenderThread::Instance()->Continue();
   }
 

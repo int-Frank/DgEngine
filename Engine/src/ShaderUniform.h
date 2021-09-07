@@ -23,7 +23,7 @@
 #include <vector>
 #include <stdint.h>
 
-#include "BSR_Assert.h"
+#include "Options.h"
 #include "Memory.h"
 #include "RenderResource.h"
 #include "ShaderUtils.h"
@@ -32,7 +32,7 @@
 
 #define BIT(x) (1 << x)
 #define INVALID_INDEX -1
-namespace Engine
+namespace DgE
 {
   class UniformBufferElementHeader
   {

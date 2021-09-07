@@ -23,7 +23,7 @@
 #include "RT_RendererAPI.h"
 #include "RT_BindingPoint.h"
 
-namespace Engine
+namespace DgE
 {
   class RT_BindingPoint;
 

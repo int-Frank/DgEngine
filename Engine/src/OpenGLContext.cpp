@@ -5,10 +5,10 @@
 #include "glad/glad.h"
 #include "Log.h"
 #include "DgError.h"
-#include "BSR_Assert.h"
+#include "Options.h"
 #include "SDL.h"
 
-namespace Engine
+namespace DgE
 {
   Dg::ErrorCode Framework::InitGraphicsContext()
   {
@@ -37,7 +37,7 @@ namespace Engine
 
   Dg::ErrorCode OpenGLContext::Init()
   {
-    BSR_ASSERT(m_pWindow != nullptr, "Render context does not have a window! Make sure you set the window first!");
+    DG_ASSERT(m_pWindow != nullptr, "Render context does not have a window! Make sure you set the window first!");
 
     // Create OpenGL context
     m_context = SDL_GL_CreateContext(m_pWindow);

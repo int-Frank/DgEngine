@@ -32,10 +32,10 @@
 #include "VertexArray.h"
 #include "RenderCommon.h"
 
-#define RENDER_SUBMIT(state, ...) ::Engine::Renderer::Instance()->Submit(state, __VA_ARGS__)
-#define RENDER_ALLOCATE(size) ::Engine::Renderer::Instance()->Allocate(size)
+#define RENDER_SUBMIT(state, ...) ::DgE::Renderer::Instance()->Submit(state, __VA_ARGS__)
+#define RENDER_ALLOCATE(size) ::DgE::Renderer::Instance()->Allocate(size)
 
-namespace Engine
+namespace DgE
 {
   struct GlobalRenderState;
 
@@ -74,7 +74,7 @@ namespace Engine
     template<typename FuncT>
     void Submit(RenderState a_state, FuncT&& func)
     {
-      BSR_ASSERT(std::is_trivially_destructible<FuncT>::value, "FuncT must be trivially destructible");
+      DG_ASSERT(std::is_trivially_destructible<FuncT>::value, "FuncT must be trivially destructible");
       RenderCommandFn renderCmd = [](void* ptr)
       {
         auto pFunc = (FuncT*)ptr;

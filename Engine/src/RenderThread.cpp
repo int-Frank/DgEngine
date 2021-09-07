@@ -1,6 +1,6 @@
 //@group Renderer/RenderThread
 
-#include "BSR_Assert.h"
+#include "Options.h"
 #include "RenderThread.h"
 #include "Framework.h"
 #include "RT_RendererAPI.h"
@@ -8,7 +8,7 @@
 #include "RT_BindingPoint.h"
 #include "Renderer.h"
 
-namespace Engine
+namespace DgE
 {
   //-----------------------------------------------------------------------------------------------
   // Render Thread worker function
@@ -56,7 +56,7 @@ namespace Engine
 
   bool RenderThread::Init()
   {
-    BSR_ASSERT(s_instance == nullptr, "Trying to initialise twice!");
+    DG_ASSERT(s_instance == nullptr, "Trying to initialise twice!");
     s_instance = new RenderThread();
     return s_instance->Start();
   }
@@ -70,7 +70,7 @@ namespace Engine
 
   RenderThread* RenderThread::Instance()
   {
-    BSR_ASSERT(s_instance != nullptr, "RenderThread not initialised!");
+    DG_ASSERT(s_instance != nullptr, "RenderThread not initialised!");
     return s_instance;
   }
 

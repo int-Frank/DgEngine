@@ -5,7 +5,7 @@
 #include "DgBit.h"
 #include "DgMath.h"
 
-namespace Engine
+namespace DgE
 {
   RenderState RenderState::Create()
   {

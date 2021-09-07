@@ -25,12 +25,12 @@
 #include "Memory.h"
 #include "MemBuffer.h"
 #include "RendererProgram.h"
-#include "BSR_Assert.h"
+#include "Options.h"
 #include "DgDynamicArray.h"
 #include "DgMap_AVL.h"
 #include "Texture.h"
 
-namespace Engine
+namespace DgE
 {
   namespace impl
   {

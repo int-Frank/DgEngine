@@ -3,9 +3,9 @@
 #include <glad/glad.h>
 
 #include "ShaderUtils.h"
-#include "BSR_Assert.h"
+#include "Options.h"
 
-namespace Engine
+namespace DgE
 {
   struct ShaderDataTypeData
   {
@@ -129,14 +129,14 @@ namespace Engine
   ShaderDataType GetRowVectorFromMatrix(ShaderDataType a_type)
   {
     uint32_t ind = static_cast<uint32_t>(a_type);
-    BSR_ASSERT(SDT_data[ind].dataClass == ShaderDataClass::Matrix, "");
+    DG_ASSERT(SDT_data[ind].dataClass == ShaderDataClass::Matrix, "");
     return SDT_data[ind].matRowType;
   }
 
   ShaderDataType GetColumnVectorFromMatrix(ShaderDataType a_type)
   {
     uint32_t ind = static_cast<uint32_t>(a_type);
-    BSR_ASSERT(SDT_data[ind].dataClass == ShaderDataClass::Matrix, "");
+    DG_ASSERT(SDT_data[ind].dataClass == ShaderDataClass::Matrix, "");
     return SDT_data[ind].matColumnType;
   }
 
@@ -186,7 +186,7 @@ namespace Engine
       case ShaderDomain::Geometry:
         return GL_GEOMETRY_SHADER;
     }
-    BSR_ASSERT(false, "");
+    DG_ASSERT(false, "");
     return GL_INVALID_ENUM;
   }
 }

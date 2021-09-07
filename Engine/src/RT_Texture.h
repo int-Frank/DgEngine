@@ -6,7 +6,7 @@
 #include "RT_RendererAPI.h"
 #include "TextureData.h"
 
-namespace Engine
+namespace DgE
 {
   class RT_Texture2D
   {

@@ -7,7 +7,7 @@
 #include "Serialize.h"
 #include "Log.h"
 
-namespace Engine
+namespace DgE
 {
   //------------------------------------------------------------------------------------------------
   // Helpful functions

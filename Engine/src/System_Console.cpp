@@ -6,7 +6,7 @@
 #define IGNORE_MESSAGE(TYPE) if (a_pMsg->GetID() == TYPE::GetStaticID()) return
 #define LOG_MESSAGE(...) LOG_DEBUG(__VA_ARGS__)
 
-namespace Engine
+namespace DgE
 {
   MAKE_SYSTEM_DEFINITION(System_Console)
 

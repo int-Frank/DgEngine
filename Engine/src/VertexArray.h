@@ -23,7 +23,7 @@
 #include "Buffer.h"
 #include "RenderResource.h"
 
-namespace Engine 
+namespace DgE 
 {
   class VertexArray : public RenderResource
   {

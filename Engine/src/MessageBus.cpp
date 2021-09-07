@@ -6,7 +6,7 @@
 #include "SystemStack.h"
 #include "options.h"
 
-namespace Engine
+namespace DgE
 {
   MessageBus * MessageBus::s_instance = nullptr;
 

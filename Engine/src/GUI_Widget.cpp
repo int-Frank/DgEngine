@@ -4,7 +4,7 @@
 #include "Message.h"
 #include "GUI_Internal.h"
 
-namespace Engine
+namespace DgE
 {
   namespace GUI
   {

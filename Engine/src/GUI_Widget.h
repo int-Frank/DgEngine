@@ -28,7 +28,7 @@
 // ContentDiv: Some widgets allow content to be drawn on itself
 // Content can be text or images, and is not interactive.
 
-namespace Engine
+namespace DgE
 {
   namespace GUI
   {

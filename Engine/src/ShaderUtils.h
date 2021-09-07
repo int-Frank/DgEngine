@@ -5,11 +5,11 @@
 #include <string>
 #include <stdint.h>
 
-#define SD32(x) static_cast<uint32_t>(::Engine::ShaderDomain::x)
-#define SDT32(x) static_cast<uint32_t>(::Engine::ShaderDataType::x)
-#define SBT32(x) static_cast<uint32_t>(::Engine::StorageBlockType::x)
+#define SD32(x) static_cast<uint32_t>(::DgE::ShaderDomain::x)
+#define SDT32(x) static_cast<uint32_t>(::DgE::ShaderDataType::x)
+#define SBT32(x) static_cast<uint32_t>(::DgE::StorageBlockType::x)
 
-namespace Engine
+namespace DgE
 {
   //------------------------------------------------------------------------------------
   // Generic ...

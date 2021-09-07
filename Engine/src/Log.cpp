@@ -5,7 +5,7 @@
 #include "spdlog/sinks/basic_file_sink.h"
 #include "spdlog/fmt/ostr.h"
 
-namespace Engine
+namespace DgE
 {
   std::shared_ptr<spdlog::logger> impl::Logger::s_logger;
 

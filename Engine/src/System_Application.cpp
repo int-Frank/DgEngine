@@ -3,7 +3,7 @@
 #include "System_Application.h"
 #include "EngineMessages.h"
 
-namespace Engine
+namespace DgE
 {
   MAKE_SYSTEM_DEFINITION(System_Application)
 

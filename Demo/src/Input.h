@@ -3,7 +3,7 @@
 
 #include "System.h"
 
-using namespace Engine;
+using namespace DgE;
 
 // Handles bindings, translates input to camera movement
 class Input : public System

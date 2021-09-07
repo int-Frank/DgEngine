@@ -3,6 +3,11 @@
 #ifndef EN_OPTIONS_H
 #define EN_OPTIONS_H
 
+#ifndef DG_ASSERTS_ENABLED
+// Comment out for no Asserts
+#define DG_ASSERTS_ENABLED
+#endif
+#include "DgAssert.h"
 #include "LogLevel.h"
 
 //----------------------------------------------------------------------------
@@ -31,9 +36,9 @@
 //----------------------------------------------------------------------------
 // Logging
 //----------------------------------------------------------------------------
-#if defined(BSR_DEBUG)
+#if defined(DGE_DEBUG)
 #define LOGLEVEL LL_TRACE
-#elif defined(BSR_RELEASE)
+#elif defined(DGE_RELEASE)
 #define LOGLEVEL LL_WARN
 #else
 #define LOGLEVEL LL_OFF

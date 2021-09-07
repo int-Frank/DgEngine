@@ -10,7 +10,7 @@
 #include "Utils.h"
 #include "Memory.h"
 
-namespace Engine
+namespace DgE
 {
   //General Message command
   typedef void(*MessageCommandFn)(void*);

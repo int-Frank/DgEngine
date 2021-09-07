@@ -9,7 +9,7 @@
 #define SLIDER_MIN_RUN_PIXELS 4.0f
 #define SLIDER_MIN_CARET_WIDTH 2.0f
 
-namespace Engine
+namespace DgE
 {
   namespace GUI
   {
@@ -169,8 +169,8 @@ namespace Engine
 
     void SliderBase::InternalState::SetColour(SliderState a_state, SliderElement a_ele, Colour a_clr)
     {
-      BSR_ASSERT(a_state != SliderState::COUNT);
-      BSR_ASSERT(a_ele != SliderElement::COUNT);
+      DG_ASSERT(a_state != SliderState::COUNT);
+      DG_ASSERT(a_ele != SliderElement::COUNT);
       m_pData->clr[(int)a_state][(int)a_ele] = a_clr;
     }
 
@@ -180,7 +180,7 @@ namespace Engine
       if (!m_pData->pSlider->GetGlobalAABB(viewableWindow))
         return;
 
-      ::Engine::Renderer::SetSissorBox((int)viewableWindow.position.x(), (int)viewableWindow.position.y(), (int)viewableWindow.size.x(), (int)viewableWindow.size.y());
+      ::DgE::Renderer::SetSissorBox((int)viewableWindow.position.x(), (int)viewableWindow.position.y(), (int)viewableWindow.size.x(), (int)viewableWindow.size.y());
 
       UIAABB lower, upper, caret;
       GetInnerAABBs(lower, upper, caret);

@@ -1,9 +1,9 @@
 //@group Renderer/RenderThread
 
 #include "RenderThreadData.h"
-#include "BSR_Assert.h"
+#include "Options.h"
 
-namespace Engine
+namespace DgE
 {
   RenderThreadData* RenderThreadData::s_instance = nullptr;
 
@@ -21,7 +21,7 @@ namespace Engine
 
   bool RenderThreadData::Init()
   {
-    BSR_ASSERT(s_instance == nullptr, "RenderThreadData already intialised!");
+    DG_ASSERT(s_instance == nullptr, "RenderThreadData already intialised!");
     s_instance = new RenderThreadData();
     return true;
   }

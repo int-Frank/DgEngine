@@ -8,7 +8,7 @@
 #include "DgOpenHashMap.h"
 #include "Log.h"
 
-namespace Engine
+namespace DgE
 {
   // IDs above 0x80000000 are reserved
   typedef uint32_t ResourceID;

@@ -18,11 +18,11 @@
 
 #include "RT_RendererAPI.h"
 #include "Log.h"
-#include "BSR_Assert.h"
+#include "Options.h"
 #include "Framework.h"
 #include <glad/glad.h>
 
-namespace Engine
+namespace DgE
 {
   static void OpenGLLogMessage(GLenum a_source, GLenum a_type, GLuint a_id, GLenum a_severity, 
                                GLsizei a_length, const GLchar* a_message, const void* a_userParam)
@@ -30,7 +30,7 @@ namespace Engine
     if (a_severity != GL_DEBUG_SEVERITY_NOTIFICATION)
     {
       LOG_ERROR("{0}", a_message);
-      BSR_ASSERT(false, "");
+      DG_ASSERT(false, "");
     }
     else
     {
@@ -175,7 +175,7 @@ namespace Engine
 
   void RendererAPI::Enable(RenderFeature a_feature)
   {
-    BSR_ASSERT(a_feature != RenderFeature::COUNT);
+    DG_ASSERT(a_feature != RenderFeature::COUNT);
 
     switch (a_feature)
     {
@@ -194,7 +194,7 @@ namespace Engine
 
   void RendererAPI::Disable(RenderFeature a_feature)
   {
-    BSR_ASSERT(a_feature != RenderFeature::COUNT);
+    DG_ASSERT(a_feature != RenderFeature::COUNT);
 
     switch (a_feature)
     {

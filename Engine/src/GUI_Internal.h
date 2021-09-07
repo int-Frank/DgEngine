@@ -6,7 +6,7 @@
 #include "Utils.h"
 #include "IFontAtlas.h"
 
-namespace Engine
+namespace DgE
 {
   namespace GUI
   {

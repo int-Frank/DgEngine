@@ -9,7 +9,7 @@
 
 #define CONTAINER_GRAB_SIZE 16.0f
 
-namespace Engine
+namespace DgE
 {
   namespace GUI
   {
@@ -205,7 +205,7 @@ namespace Engine
 
         vec2 pos = m_pData->pContainer->GetGlobalPosition() + vec2(m_pData->outlineWidth, m_pData->outlineWidth);
 
-        ::Engine::Renderer::SetSissorBox((int)viewableWindow.position.x(), (int)viewableWindow.position.y(), (int)viewableWindow.size.x(), (int)viewableWindow.size.y());
+        ::DgE::Renderer::SetSissorBox((int)viewableWindow.position.x(), (int)viewableWindow.position.y(), (int)viewableWindow.size.x(), (int)viewableWindow.size.y());
         Renderer::DrawBoxWithOutline({pos, size}, m_pData->outlineWidth, m_pData->clr[(int)ContainerElement::Face], m_pData->clr[(int)ContainerElement::Outline]);
       }
 
@@ -238,7 +238,7 @@ namespace Engine
 
     void Container::InternalState::SetColour(ContainerElement a_ele, Colour a_clr)
     {
-      BSR_ASSERT(a_ele != ContainerElement::COUNT);
+      DG_ASSERT(a_ele != ContainerElement::COUNT);
 
       if ((a_ele == ContainerElement::Grab) && (m_pData->pGrab != nullptr))
         m_pData->pGrab->SetColour(ButtonState::Normal, ButtonElement::Face, a_clr);
@@ -306,7 +306,7 @@ namespace Engine
           m_pFocus = nullptr;
           m_state = WidgetState::None;
         }
-        if (a_pMsg->QueryFlag(Engine::Message::Flag::Handled))
+        if (a_pMsg->QueryFlag(DgE::Message::Flag::Handled))
           pResult = nullptr;
       }
       else if (a_pMsg->GetID() == Message_GUI_PointerDown::GetStaticID())
@@ -351,7 +351,7 @@ namespace Engine
       for (auto it = m_pData->children.begin(); it != m_pData->children.end(); it++)
       {
         (*it)->HandleMessage(a_pMsg);
-        if (a_pMsg->QueryFlag(Engine::Message::Flag::Handled))
+        if (a_pMsg->QueryFlag(DgE::Message::Flag::Handled))
         {
           if ((*it)->QueryState() == WidgetState::HasFocus)
           {
@@ -382,7 +382,7 @@ namespace Engine
       for (Widget * pWidget : m_pData->children)
       {
         pWidget->HandleMessage(a_pMsg);
-        if (a_pMsg->QueryFlag(Engine::Message::Flag::Handled))
+        if (a_pMsg->QueryFlag(DgE::Message::Flag::Handled))
         {
           if (pWidget->QueryState() == WidgetState::HasFocus)
           {
@@ -408,7 +408,7 @@ namespace Engine
       for (Widget * pWidget : m_pData->children)
       {
         pWidget->HandleMessage(a_pMsg);
-        if (a_pMsg->QueryFlag(Engine::Message::Flag::Handled))
+        if (a_pMsg->QueryFlag(DgE::Message::Flag::Handled))
         {
           if (pWidget->QueryState() == WidgetState::HasFocus)
           {

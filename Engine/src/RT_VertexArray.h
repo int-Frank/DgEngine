@@ -24,7 +24,7 @@
 #include "RT_RendererAPI.h"
 #include "RenderResource.h"
 
-namespace Engine
+namespace DgE
 {
   class RT_VertexArray
   {

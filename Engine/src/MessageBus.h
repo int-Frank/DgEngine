@@ -11,12 +11,12 @@
 #include "PODArray.h"
 #include "Memory.h"
 
-#define POST(msg) ::Engine::MessageBus::Instance()->Register(msg)
+#define POST(msg) ::DgE::MessageBus::Instance()->Register(msg)
 #define EMPLACE_POST(...) CALL_OVERLOAD(EMPLACE_POST, __VA_ARGS__)
 
 // TODO check for nullptr
-#define EMPLACE_POST2(msgType, ptr) ptr = static_cast<msgType*>(::Engine::MessageBus::Instance()->_ReserveAndRegister(sizeof(msgType))); new (ptr) msgType()
-#define EMPLACE_POST1(msgType) new (static_cast<msgType*>(::Engine::MessageBus::Instance()->_ReserveAndRegister(sizeof(msgType)))) msgType()
+#define EMPLACE_POST2(msgType, ptr) ptr = static_cast<msgType*>(::DgE::MessageBus::Instance()->_ReserveAndRegister(sizeof(msgType))); new (ptr) msgType()
+#define EMPLACE_POST1(msgType) new (static_cast<msgType*>(::DgE::MessageBus::Instance()->_ReserveAndRegister(sizeof(msgType)))) msgType()
 
 #define GLUE(x, y) x y
 
@@ -30,7 +30,7 @@
 
 #define CALL_OVERLOAD(name, ...) GLUE(OVERLOAD_MACRO(name, COUNT_ARGS_MAX5(__VA_ARGS__)), (__VA_ARGS__))
 
-namespace Engine
+namespace DgE
 {
   class SystemStack;
 

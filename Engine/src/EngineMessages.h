@@ -8,7 +8,7 @@
 
 #define TEXT_INPUT_TEXT_SIZE 32
 
-namespace Engine
+namespace DgE
 {
   //-----------------------------------------------------------------------------------
   // Message Classes

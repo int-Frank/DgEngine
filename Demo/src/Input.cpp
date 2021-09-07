@@ -73,7 +73,7 @@
 //Input::Input()
 //  : m_pimpl(new PIMPL())
 //{
-//  Engine::System_Window * pWindow = GET_SYSTEM(Engine::System_Window);
+//  DgE::System_Window * pWindow = GET_SYSTEM(DgE::System_Window);
 //  int w = 0, h = 0;
 //  if (pWindow == nullptr)
 //  {

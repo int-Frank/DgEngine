@@ -6,7 +6,7 @@
 #include "Utils.h"
 #include "Serialize.h"
 
-namespace Engine
+namespace DgE
 {
   void* AdvancePtr(void* a_ptr, size_t a_increment)
   {

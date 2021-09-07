@@ -1,4 +1,4 @@
-workspace "BlakeStoneRemake"
+workspace "DgEngine"
   location ""
   architecture "x64"
   
@@ -124,17 +124,17 @@ project "Engine"
   include "./Engine_vpaths.lua"
   
   filter "configurations:Debug"
-		defines "BSR_DEBUG"
+		defines "DGE_DEBUG"
 		runtime "Debug"
 		symbols "on"
 
 	filter "configurations:Release"
-		defines "BSR_RELEASE"
+		defines "DGE_RELEASE"
 		runtime "Release"
 		optimize "on"
 
 	filter "configurations:Dist"
-		defines "BSR_DIST"
+		defines "DGE_DIST"
 		runtime "Release"
 		optimize "on"
 
@@ -176,17 +176,17 @@ project "Engine"
     }
     
     filter "configurations:Debug"
-      defines "BSR_DEBUG"
+      defines "DGE_DEBUG"
       runtime "Debug"
       symbols "on"
 
     filter "configurations:Release"
-      defines "BSR_RELEASE"
+      defines "DGE_RELEASE"
       runtime "Release"
       optimize "on"
 
     filter "configurations:Dist"
-      defines "BSR_DIST"
+      defines "DGE_DIST"
       runtime "Release"
       optimize "on"
   

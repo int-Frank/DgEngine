@@ -8,16 +8,15 @@
 #include "DgMap_AVL.h"
 #include "DgBinPacker.h"
 #include "Framework.h"
-#include "BSR_Assert.h"
+#include "Options.h"
 #include "Options.h"
 
 #include <ft2build.h>
 #include FT_FREETYPE_H
 
-namespace Engine
+namespace DgE
 {
   typedef uint64_t GlyphID;
-  typedef Dg::BinPacker<uint32_t, GlyphID> BinPacker;
 
   class FontSizeData
   {
@@ -50,8 +49,8 @@ namespace Engine
 
   static GlyphID PackGlyphID(FontID fID, CodePoint cp, uint32_t size)
   {
-    BSR_ASSERT(fID < 0xFFFF, "Invalid font ID");
-    BSR_ASSERT(size < 0xFFFF, "Invalid glyph size");
+    DG_ASSERT(fID < 0xFFFF, "Invalid font ID");
+    DG_ASSERT(size < 0xFFFF, "Invalid glyph size");
     return GlyphID(uint64_t(fID) << 48) | (uint64_t(size) << 32) | (uint64_t(cp));
   }
 
@@ -357,7 +356,7 @@ epilogue:
   {
     Dg::ErrorCode result;
     FT_Error err;
-    BinPacker binPacker;
+    Dg::BinPacker<uint32_t, GlyphID> binPacker;
     std::vector<FT_Face> fonts;
     size_t previousRemaining = 0;
     size_t remaining = m_charMap.size();

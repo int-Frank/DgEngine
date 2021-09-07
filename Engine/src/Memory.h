@@ -7,9 +7,9 @@
 #include <type_traits>
 #include <stdint.h>
 #include "Log.h"
-#include "BSR_Assert.h"
+#include "Options.h"
 
-namespace Engine
+namespace DgE
 {
   //---------------------------------------------------------------------------------------
   // Declarations

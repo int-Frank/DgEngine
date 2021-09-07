@@ -20,7 +20,7 @@
 #include "Renderer.h"
 #include "RT_RendererAPI.h"
 #include "VertexArray.h"
-#include "BSR_Assert.h"
+#include "Options.h"
 #include "Memory.h"
 #include "Message.h"
 #include "MessageBus.h"
@@ -28,7 +28,7 @@
 
 #include "glad/glad.h"
 
-namespace Engine
+namespace DgE
 {
   VertexArray::VertexArray()
   {
@@ -38,8 +38,8 @@ namespace Engine
 
     RENDER_SUBMIT(state, [resID = m_id]() mutable
       {
-        ::Engine::RT_VertexArray * pVA = ::Engine::RT_VertexArray::Create();
-        ::Engine::RenderThreadData::Instance()->VAOs.insert(resID, pVA);
+        ::DgE::RT_VertexArray * pVA = ::DgE::RT_VertexArray::Create();
+        ::DgE::RenderThreadData::Instance()->VAOs.insert(resID, pVA);
       });
   }
 
@@ -64,7 +64,7 @@ namespace Engine
         }
         delete (*ppVA);
         *ppVA = nullptr;
-        ::Engine::RenderThreadData::Instance()->VAOs.erase(resID);
+        ::DgE::RenderThreadData::Instance()->VAOs.erase(resID);
       });
   }
 
@@ -124,7 +124,7 @@ namespace Engine
 
   void VertexArray::AddVertexBuffer(Ref<VertexBuffer> const & a_vertexBuffer)
   {
-    BSR_ASSERT(a_vertexBuffer.get() != nullptr);
+    DG_ASSERT(a_vertexBuffer.get() != nullptr);
     RenderState state = RenderState::Create();
     state.Set<RenderState::Attr::Type>(RenderState::Type::Command);
     state.Set<RenderState::Attr::Command>(RenderState::Command::VertexArrayAddVertexBuffer);
@@ -143,7 +143,7 @@ namespace Engine
 
   void VertexArray::SetIndexBuffer(Ref<IndexBuffer> const & a_indexBuffer)
   {
-    BSR_ASSERT(a_indexBuffer.get() != nullptr);
+    DG_ASSERT(a_indexBuffer.get() != nullptr);
     m_indexBuffer = a_indexBuffer;
 
     RenderState state = RenderState::Create();

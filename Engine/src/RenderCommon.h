@@ -5,7 +5,7 @@
 
 #include <stdint.h>
 
-namespace Engine
+namespace DgE
 {
   enum class RenderFeature
   {

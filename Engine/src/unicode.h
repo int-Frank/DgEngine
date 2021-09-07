@@ -5,7 +5,7 @@
 
 #include <stdint.h>
 
-namespace Engine
+namespace DgE
 {
   typedef uint32_t CodePoint;
   CodePoint const INVALID_CHAR = 0xFFFF'FFFFul;

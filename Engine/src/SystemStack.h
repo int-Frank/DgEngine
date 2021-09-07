@@ -23,7 +23,7 @@
 #include "DgDoublyLinkedList.h"
 #include "System.h"
 
-namespace Engine
+namespace DgE
 {
   class System;
 

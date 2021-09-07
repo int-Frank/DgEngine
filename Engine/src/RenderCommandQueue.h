@@ -28,7 +28,7 @@
 #include "MemBuffer.h"
 #include "options.h"
 
-namespace Engine
+namespace DgE
 {
   class RenderSortCriterion
   {

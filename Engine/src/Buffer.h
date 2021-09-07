@@ -24,13 +24,13 @@
 #include <vector>
 
 #include "Memory.h"
-#include "BSR_Assert.h"
+#include "Options.h"
 #include "RenderResource.h"
 #include "ShaderUniform.h"
 #include "ShaderUtils.h"
 #include "RenderCommon.h"
 
-namespace Engine 
+namespace DgE 
 {
   enum class BufferUsage
   {

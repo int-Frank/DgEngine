@@ -14,17 +14,17 @@ void TEST_UniformBuffer()
 
 void TEST_BufferLayout()
 {
-  Engine::BufferLayout layout(
+  DgE::BufferLayout layout(
     {
-      {Engine::ShaderDataType::FLOAT, true},
-      {Engine::ShaderDataType::VEC3, false},
-      {Engine::ShaderDataType::MAT3, true},
-      {Engine::ShaderDataType::IVEC2, false}
+      {DgE::ShaderDataType::FLOAT, true},
+      {DgE::ShaderDataType::VEC3, false},
+      {DgE::ShaderDataType::MAT3, true},
+      {DgE::ShaderDataType::IVEC2, false}
     });
 
   unsigned char * buf = new unsigned char[layout.Size()];
   layout.Serialize(buf);
-  Engine::BufferLayout output;
+  DgE::BufferLayout output;
   output.Deserialize(buf);
 
   CHECK(layout.GetStride() == output.GetStride());
@@ -63,9 +63,9 @@ void TEST_Serialize()
 
   uint8_t buf[128] = {};
 
-  Engine::Serialize(buf, strList, 6);
+  DgE::Serialize(buf, strList, 6);
   std::string outList[6] = {};
-  Engine::Deserialize(buf, outList, 6);
+  DgE::Deserialize(buf, outList, 6);
 
   CHECK(strList[0] == outList[0]);
   CHECK(strList[1] == outList[1]);
@@ -79,7 +79,7 @@ void TEST_UTF8()
 {
   uint8_t const utf8Str[] = {0x61, 0x73, 0x64, 0x66, 0xF3, 0x9A, 0x8D, 0xA0, 0x00};
 
-  Engine::UTF8Parser parser((char*)utf8Str);
+  DgE::UTF8Parser parser((char*)utf8Str);
 
   CHECK(parser.Next() == 0x61);
   CHECK(parser.Next() == 0x73);

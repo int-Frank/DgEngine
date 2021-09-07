@@ -8,22 +8,22 @@
 #include "MessageHandler.h"
 #include "Memory.h"
 
-#define MAKE_SYSTEM_DECL static ::Engine::SystemID GetStaticID();\
-::Engine::SystemID GetID() const override;
+#define MAKE_SYSTEM_DECL static ::DgE::SystemID GetStaticID();\
+::DgE::SystemID GetID() const override;
 
-#define MAKE_SYSTEM_DEFINITION(CLASS) ::Engine::SystemID CLASS::GetStaticID()\
+#define MAKE_SYSTEM_DEFINITION(CLASS) ::DgE::SystemID CLASS::GetStaticID()\
 {\
-  static ::Engine::SystemID s_ID = 0;\
+  static ::DgE::SystemID s_ID = 0;\
   if (s_ID == 0)\
     s_ID = _GetNewID();\
   return s_ID;\
 }\
-::Engine::SystemID CLASS::GetID() const\
+::DgE::SystemID CLASS::GetID() const\
 {\
   return GetStaticID();\
 }
 
-namespace Engine
+namespace DgE
 {
   class MessageBus;
 
@@ -35,7 +35,7 @@ namespace Engine
 
     virtual ~System(){}
 
-    virtual ::Engine::SystemID GetID() const = 0;
+    virtual ::DgE::SystemID GetID() const = 0;
 
     virtual void OnAttach(){}
     virtual void OnDetach(){}

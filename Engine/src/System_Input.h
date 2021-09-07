@@ -14,7 +14,7 @@
 #include "System.h"
 #include "InputCodes.h"
 
-namespace Engine
+namespace DgE
 {
   class IEventPoller;
 

@@ -5,7 +5,7 @@
 
 #include <string>
 
-namespace Engine
+namespace DgE
 {
   class IFileSystem
   {

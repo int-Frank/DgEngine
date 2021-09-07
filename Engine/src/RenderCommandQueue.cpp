@@ -19,7 +19,7 @@
 #include "RenderCommandQueue.h"
 #include "Log.h"
 
-namespace Engine
+namespace DgE
 {
   RenderCommandQueue::Buffer::Buffer(size_t a_size)
     : buf(a_size)

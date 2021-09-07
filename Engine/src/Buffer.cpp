@@ -25,7 +25,7 @@
 #include "ShaderUtils.h"
 #include "Serialize.h"
 
-namespace Engine 
+namespace DgE 
 {
   //------------------------------------------------------------------------------------------------
   // BufferElement
@@ -41,7 +41,7 @@ namespace Engine
 
   uint32_t BufferElement::GetComponentCount() const
   {
-    return ::Engine::GetComponentCount(type);
+    return ::DgE::GetComponentCount(type);
   }
 
   size_t BufferElement::Size() const
@@ -56,10 +56,10 @@ namespace Engine
   {
     void * pBuf = a_out;
     uint32_t type32 = static_cast<uint32_t>(type);
-    pBuf = ::Engine::Serialize(pBuf, &type32);
-    pBuf = ::Engine::Serialize(pBuf, &size);
-    pBuf = ::Engine::Serialize(pBuf, &offset);
-    pBuf = ::Engine::Serialize(pBuf, &normalized);
+    pBuf = ::DgE::Serialize(pBuf, &type32);
+    pBuf = ::DgE::Serialize(pBuf, &size);
+    pBuf = ::DgE::Serialize(pBuf, &offset);
+    pBuf = ::DgE::Serialize(pBuf, &normalized);
     return pBuf;
   }
 
@@ -67,11 +67,11 @@ namespace Engine
   {
     void const * pBuf = a_buf;
     uint32_t type32(0);
-    pBuf = ::Engine::Deserialize(pBuf, &type32);
+    pBuf = ::DgE::Deserialize(pBuf, &type32);
     type = uint_ToShaderDataType(type32);
-    pBuf = ::Engine::Deserialize(pBuf, &size);
-    pBuf = ::Engine::Deserialize(pBuf, &offset);
-    pBuf = ::Engine::Deserialize(pBuf, &normalized);
+    pBuf = ::DgE::Deserialize(pBuf, &size);
+    pBuf = ::DgE::Deserialize(pBuf, &offset);
+    pBuf = ::DgE::Deserialize(pBuf, &normalized);
     return pBuf;
   }
 
@@ -147,8 +147,8 @@ namespace Engine
   {
     uint32_t nElements = static_cast<uint32_t>(m_elements.size());
     void* pBuf = a_out;
-    pBuf = ::Engine::Serialize(pBuf, &m_stride);
-    pBuf = ::Engine::Serialize(pBuf, &nElements);
+    pBuf = ::DgE::Serialize(pBuf, &m_stride);
+    pBuf = ::DgE::Serialize(pBuf, &nElements);
     for (auto const& item : m_elements)
       pBuf = item.Serialize(pBuf);
     return pBuf;
@@ -158,8 +158,8 @@ namespace Engine
   {
     uint32_t nElements = 0;
     void const * pBuf = a_buf;
-    pBuf = ::Engine::Deserialize(pBuf, &m_stride);
-    pBuf = ::Engine::Deserialize(pBuf, &nElements);
+    pBuf = ::DgE::Deserialize(pBuf, &m_stride);
+    pBuf = ::DgE::Deserialize(pBuf, &nElements);
     for (uint32_t i = 0; i < nElements; i++)
     {
       BufferElement ele;
@@ -175,7 +175,7 @@ namespace Engine
   
   VertexBuffer::VertexBuffer(void const * a_pData, uint32_t a_size, uint32_t a_flags, BufferUsage a_usage)
   {
-    BSR_ASSERT(a_pData != nullptr);
+    DG_ASSERT(a_pData != nullptr);
 
     uint8_t * data = (uint8_t*)RENDER_ALLOCATE(a_size);
     memcpy(data, a_pData, a_size);
@@ -186,13 +186,13 @@ namespace Engine
 
     RENDER_SUBMIT(state, [resID = m_id, size = a_size, flags = a_flags, usage = a_usage, data]()
       {
-        ::Engine::RT_VertexBuffer * pVB = ::Engine::RT_VertexBuffer::Create(data, size, flags, usage);
+        ::DgE::RT_VertexBuffer * pVB = ::DgE::RT_VertexBuffer::Create(data, size, flags, usage);
         if (pVB == nullptr)
         {
           LOG_WARN("VertexBuffer::VertexBuffer(): Failed to create vertex buffer!");
           return;
         }
-        ::Engine::RenderThreadData::Instance()->VBOs.insert(resID, pVB);
+        ::DgE::RenderThreadData::Instance()->VBOs.insert(resID, pVB);
       });
   }
 
@@ -204,13 +204,13 @@ namespace Engine
 
     RENDER_SUBMIT(state, [resID = m_id, size = a_size, flags = a_flags, usage = a_usage]()
       {
-        ::Engine::RT_VertexBuffer * pVB = ::Engine::RT_VertexBuffer::Create(size, flags, usage);
+        ::DgE::RT_VertexBuffer * pVB = ::DgE::RT_VertexBuffer::Create(size, flags, usage);
         if (pVB == nullptr)
         {
           LOG_WARN("VertexBuffer::VertexBuffer(): Failed to create vertex buffer!");
           return;
         }
-        ::Engine::RenderThreadData::Instance()->VBOs.insert(resID, pVB);
+        ::DgE::RenderThreadData::Instance()->VBOs.insert(resID, pVB);
       });
   }
   
@@ -230,13 +230,13 @@ namespace Engine
         }
         delete *ppVBO;
         *ppVBO = nullptr;
-        ::Engine::RenderThreadData::Instance()->VBOs.erase(resID);
+        ::DgE::RenderThreadData::Instance()->VBOs.erase(resID);
       });
   }
 
   void VertexBuffer::SetData(void const * a_pData, uint32_t a_size, uint32_t a_offset)
   {
-    BSR_ASSERT(a_pData != nullptr);
+    DG_ASSERT(a_pData != nullptr);
 
     uint8_t* data = (uint8_t*)RENDER_ALLOCATE(a_size);
     memcpy(data, a_pData, a_size);
@@ -247,7 +247,7 @@ namespace Engine
 
     RENDER_SUBMIT(state, [resID = m_id, offset = a_offset, size = a_size, data]()
       {
-        ::Engine::RT_VertexBuffer ** ppVBO = ::Engine::RenderThreadData::Instance()->VBOs.at(resID);
+        ::DgE::RT_VertexBuffer ** ppVBO = ::DgE::RenderThreadData::Instance()->VBOs.at(resID);
         if (ppVBO == nullptr)
         {
           LOG_WARN("VertexBuffer::SetData(): RefID '{}' does not exist!", resID);
@@ -266,7 +266,7 @@ namespace Engine
 
     RENDER_SUBMIT(state, [resID = m_id, func = a_func, pUserData = a_pUserData]()
       {
-        ::Engine::RT_VertexBuffer ** ppVBO = ::Engine::RenderThreadData::Instance()->VBOs.at(resID);
+        ::DgE::RT_VertexBuffer ** ppVBO = ::DgE::RenderThreadData::Instance()->VBOs.at(resID);
         if (ppVBO == nullptr)
         {
           LOG_WARN("VertexBuffer::WriteToMapped(): RefID '{}' does not exist!", resID);
@@ -292,7 +292,7 @@ namespace Engine
 
     RENDER_SUBMIT(state, [resID = m_id]()
       {
-        ::Engine::RT_VertexBuffer ** ppVBO = ::Engine::RenderThreadData::Instance()->VBOs.at(resID);
+        ::DgE::RT_VertexBuffer ** ppVBO = ::DgE::RenderThreadData::Instance()->VBOs.at(resID);
         if (ppVBO == nullptr)
         {
           LOG_WARN("VertexBuffer::Bind(): RefID '{}' does not exist!", resID);
@@ -314,7 +314,7 @@ namespace Engine
 
     RENDER_SUBMIT(state, [resID = m_id, buffer = buffer]()
     {
-      ::Engine::RT_VertexBuffer ** ppVBO = ::Engine::RenderThreadData::Instance()->VBOs.at(resID);
+      ::DgE::RT_VertexBuffer ** ppVBO = ::DgE::RenderThreadData::Instance()->VBOs.at(resID);
       if (ppVBO == nullptr)
       {
         LOG_WARN("VertexBuffer::SetLayout(): RefID '{}' does not exist!", resID);
@@ -331,7 +331,7 @@ namespace Engine
                                          uint32_t a_flags,
                                          BufferUsage a_usage)
   {
-    BSR_ASSERT(a_pData != nullptr);
+    DG_ASSERT(a_pData != nullptr);
 
     return Ref<VertexBuffer>(new VertexBuffer(a_pData, a_size, a_flags, a_usage));
   }
@@ -367,7 +367,7 @@ namespace Engine
 
   UniformBuffer::UniformBuffer(void const * a_pData, uint32_t a_size, BufferUsage a_usage)
   {
-    BSR_ASSERT(a_pData != nullptr);
+    DG_ASSERT(a_pData != nullptr);
 
     uint8_t * data = (uint8_t *)RENDER_ALLOCATE(a_size);
     memcpy(data, a_pData, a_size);
@@ -378,13 +378,13 @@ namespace Engine
 
     RENDER_SUBMIT(state, [resID = m_id, size = a_size, usage = a_usage, data]()
       {
-        ::Engine::RT_UniformBuffer * pUB = ::Engine::RT_UniformBuffer::Create(data, size, usage);
+        ::DgE::RT_UniformBuffer * pUB = ::DgE::RT_UniformBuffer::Create(data, size, usage);
         if (pUB == nullptr)
         {
           LOG_WARN("UniformBuffer::UniformBuffer(): Failed to create uniform buffer!");
           return;
         }
-        ::Engine::RenderThreadData::Instance()->UBOs.insert(resID, pUB);
+        ::DgE::RenderThreadData::Instance()->UBOs.insert(resID, pUB);
       });
   }
 
@@ -404,7 +404,7 @@ namespace Engine
       }
       delete *ppUB;
       *ppUB = nullptr;
-      ::Engine::RenderThreadData::Instance()->UBOs.erase(resID);
+      ::DgE::RenderThreadData::Instance()->UBOs.erase(resID);
     });
   }
 
@@ -419,7 +419,7 @@ namespace Engine
 
     RENDER_SUBMIT(state, [resID = m_id, offset = a_offset, size = a_size, data]()
       {
-        ::Engine::RT_UniformBuffer ** ppUBO = ::Engine::RenderThreadData::Instance()->UBOs.at(resID);
+        ::DgE::RT_UniformBuffer ** ppUBO = ::DgE::RenderThreadData::Instance()->UBOs.at(resID);
         if (ppUBO == nullptr)
         {
           LOG_WARN("UniformBuffer::SetData(): RefID '{}' does not exist!", resID);
@@ -434,7 +434,7 @@ namespace Engine
                                            uint32_t a_size,
                                            BufferUsage a_usage)
   {
-    BSR_ASSERT(a_pData != nullptr);
+    DG_ASSERT(a_pData != nullptr);
 
     return Ref<UniformBuffer>(new UniformBuffer(a_pData, a_size, a_usage));
   }
@@ -453,14 +453,14 @@ namespace Engine
 
     RENDER_SUBMIT(state, [uboID = m_id, bpID = a_bp->GetID()]()
     {
-      ::Engine::RT_UniformBuffer ** ppUB = ::Engine::RenderThreadData::Instance()->UBOs.at(uboID);
+      ::DgE::RT_UniformBuffer ** ppUB = ::DgE::RenderThreadData::Instance()->UBOs.at(uboID);
       if (ppUB == nullptr)
       {
         LOG_WARN("UniformBuffer::SetLayout(): UBO RefID '{}' does not exist!", uboID);
         return;
       }
 
-      ::Engine::RT_BindingPoint ** ppBP = ::Engine::RenderThreadData::Instance()->bindingPoints.at(bpID);
+      ::DgE::RT_BindingPoint ** ppBP = ::DgE::RenderThreadData::Instance()->bindingPoints.at(bpID);
       if (ppBP == nullptr)
       {
         LOG_WARN("UniformBuffer::SetLayout(): BP RefID '{}' does not exist!", bpID);
@@ -477,7 +477,7 @@ namespace Engine
   
   /*ShaderStorageBuffer::ShaderStorageBuffer(void const * a_pData, uint32_t a_size, BufferUsage a_usage)
   {
-    BSR_ASSERT(a_pData != nullptr);
+    DG_ASSERT(a_pData != nullptr);
 
     uint8_t* data = (uint8_t*)RENDER_ALLOCATE(a_size);
     memcpy(data, a_pData, a_size);
@@ -536,7 +536,7 @@ namespace Engine
 
   void ShaderStorageBuffer::SetData(void const * a_pData, uint32_t a_size, uint32_t a_offset)
   {
-    BSR_ASSERT(a_pData != nullptr);
+    DG_ASSERT(a_pData != nullptr);
 
     uint8_t* data = (uint8_t*)RENDER_ALLOCATE(a_size);
     memcpy(data, a_pData, a_size);
@@ -604,7 +604,7 @@ namespace Engine
                                            uint32_t a_size,
                                            BufferUsage a_usage)
   {
-    BSR_ASSERT(a_pData != nullptr);
+    DG_ASSERT(a_pData != nullptr);
 
     return Ref<ShaderStorageBuffer>(new ShaderStorageBuffer(a_pData, a_size, a_usage));
   }
@@ -630,7 +630,7 @@ namespace Engine
         return;
       }
 
-      ::Engine::RT_BindingPoint ** ppBP = ::Engine::RenderThreadData::Instance()->bindingPoints.at(bpID);
+      ::DgE::RT_BindingPoint ** ppBP = ::DgE::RenderThreadData::Instance()->bindingPoints.at(bpID);
       if (ppBP == nullptr)
       {
         LOG_WARN("ShaderStorageBuffer::SetLayout(): BP RefID '{}' does not exist!", bpID);
@@ -649,7 +649,7 @@ namespace Engine
     : m_dataType(a_dataType)
     , m_elementCount(a_count)
   {
-    BSR_ASSERT(a_pData != nullptr);
+    DG_ASSERT(a_pData != nullptr);
     uint32_t dataSize = GetIndexDataTypeSize(m_dataType) * a_count;
     uint8_t* pData = (uint8_t*)RENDER_ALLOCATE(dataSize);
     memcpy(pData, a_pData, dataSize);
@@ -672,19 +672,19 @@ namespace Engine
 
   Ref<IndexBuffer> IndexBuffer::Create(uint8_t const * a_pData, uint32_t a_count)
   {
-    BSR_ASSERT(a_pData != nullptr);
+    DG_ASSERT(a_pData != nullptr);
     return Ref<IndexBuffer>(new IndexBuffer(a_pData, IndexDataType::unsigned_8, a_count));
   }
 
   Ref<IndexBuffer> IndexBuffer::Create(uint16_t const * a_pData, uint32_t a_count)
   {
-    BSR_ASSERT(a_pData != nullptr);
+    DG_ASSERT(a_pData != nullptr);
     return Ref<IndexBuffer>(new IndexBuffer(a_pData, IndexDataType::unsigned_16, a_count));
   }
 
   Ref<IndexBuffer> IndexBuffer::Create(uint32_t const * a_pData, uint32_t a_count)
   {
-    BSR_ASSERT(a_pData != nullptr);
+    DG_ASSERT(a_pData != nullptr);
     return Ref<IndexBuffer>(new IndexBuffer(a_pData, IndexDataType::unsigned_32, a_count));
   }
 
@@ -710,7 +710,7 @@ namespace Engine
 
   void IndexBuffer::SetData(void const * a_pData, uint32_t a_size, uint32_t a_offset)
   {
-    BSR_ASSERT(a_pData != nullptr);
+    DG_ASSERT(a_pData != nullptr);
 
     uint8_t* data = (uint8_t*)RENDER_ALLOCATE(a_size);
     memcpy(data, a_pData, a_size);

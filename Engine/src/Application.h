@@ -7,9 +7,9 @@
 #include "System.h"
 
 // Helpful macros
-#define GET_SYSTEM(SYSTEM) static_cast<SYSTEM*>(::Engine::Application::Instance()->GetSystem(SYSTEM::GetStaticID()))
+#define GET_SYSTEM(SYSTEM) static_cast<SYSTEM*>(::DgE::Application::Instance()->GetSystem(SYSTEM::GetStaticID()))
 
-namespace Engine
+namespace DgE
 {
   class System;
   class IWindow;
@@ -28,7 +28,7 @@ namespace Engine
     {
       Opts()
         : logFile("log_output.txt")
-        , loggerName("BSR")
+        , loggerName("DgE")
         , loggerType(E_UseStdOutLogger)
       {
       

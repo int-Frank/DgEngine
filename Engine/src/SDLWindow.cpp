@@ -7,14 +7,14 @@
 #include "Options.h"
 #include "Log.h"
 #include "IWindow.h"
-#include "BSR_Assert.h"
+#include "Options.h"
 #include "OpenGLContext.h"
 #include "glad/glad.h"
 
 #define OPENGL_MAJOR 4
 #define OPENGL_MINOR 6
 
-namespace Engine
+namespace DgE
 {
   class FW_SDLWindow : public IWindow
   {
@@ -87,7 +87,7 @@ namespace Engine
 
   Dg::ErrorCode FW_SDLWindow::Init(WindowProps const & a_props)
   {
-    BSR_ASSERT(m_pWindow == nullptr, "FW_SDLWindow already initialised!");
+    DG_ASSERT(m_pWindow == nullptr, "FW_SDLWindow already initialised!");
 
     SDL_GL_SetAttribute(SDL_GL_ACCELERATED_VISUAL, 1);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, OPENGL_MAJOR);

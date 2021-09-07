@@ -7,7 +7,7 @@
 #include "System.h"
 
 //Perhaps we can remove this from the Engine. It really belongs in the Game project.
-namespace Engine
+namespace DgE
 {
   class System_Console : public System
   {

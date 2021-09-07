@@ -9,29 +9,29 @@
 #include "Material.h"
 #include "Texture.h"
 
-class RenderDemo : public Engine::System
+class RenderDemo : public DgE::System
 {
 public:
 
   MAKE_SYSTEM_DECL
 
   void OnAttach() override;
-  void HandleMessage(Engine::Message * a_pMsg) override {}
+  void HandleMessage(DgE::Message * a_pMsg) override {}
   void OnDetach() override {}
   void Render() override;
   void Update(float a_dt) override {}
 
 private:
 
-  Engine::Ref<Engine::VertexBuffer>   m_vb_box;
-  Engine::Ref<Engine::VertexBuffer>   m_vb_offsets;
-  Engine::Ref<Engine::UniformBuffer>  m_ubo;
+  DgE::Ref<DgE::VertexBuffer>   m_vb_box;
+  DgE::Ref<DgE::VertexBuffer>   m_vb_offsets;
+  DgE::Ref<DgE::UniformBuffer>  m_ubo;
 
-  Engine::Ref<Engine::IndexBuffer>  m_ib;
-  Engine::Ref<Engine::VertexArray>  m_va;
-  Engine::Ref<Engine::Texture2D>    m_texture;
-  Engine::Ref<Engine::Material>     m_material;
-  Engine::Ref<Engine::BindingPoint> m_bindingPoint;
+  DgE::Ref<DgE::IndexBuffer>  m_ib;
+  DgE::Ref<DgE::VertexArray>  m_va;
+  DgE::Ref<DgE::Texture2D>    m_texture;
+  DgE::Ref<DgE::Material>     m_material;
+  DgE::Ref<DgE::BindingPoint> m_bindingPoint;
 };
 
 #endif

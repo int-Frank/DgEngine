@@ -6,7 +6,7 @@
 #include <stdint.h>
 #include "Utils.h"
 
-namespace Engine
+namespace DgE
 {
 
   enum class TextureWrap

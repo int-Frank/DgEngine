@@ -2,7 +2,7 @@
 
 #include "RenderResource.h"
 
-namespace Engine
+namespace DgE
 {
   RenderResourceID RenderResource::s_nextID = 0;
 

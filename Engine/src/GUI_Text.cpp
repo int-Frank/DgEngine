@@ -12,7 +12,7 @@
 
 #define MAX_TEXTURES 1024
 
-namespace Engine
+namespace DgE
 {
   namespace GUI
   {
@@ -273,7 +273,7 @@ namespace Engine
 
           default:
           {
-            BSR_ASSERT(false, "Malformed state machine!");
+            DG_ASSERT(false, "Malformed state machine!");
           }
         }
 
@@ -518,7 +518,7 @@ namespace Engine
             GlyphData * pData = Renderer::GetGlyphData(cp, a_size);
             if (pData == nullptr)
               pData = Renderer::GetGlyphData(uint32_t('?'), a_size);
-            BSR_ASSERT(pData != nullptr, "Default font atlas missing '?' character");
+            DG_ASSERT(pData != nullptr, "Default font atlas missing '?' character");
             s_glyphData[count].cp = cp;
             s_glyphData[count].data = *pData;
             if (pData->textureID != INVALID_FONT_TEXTURE)
@@ -597,7 +597,7 @@ namespace Engine
       context.lineSpacing = int16_t(m_attributes.lineSpacing * (context.ascent - context.descent));
       context.cpCount = DecodeText(m_text, textureCount, m_attributes.size);
       
-      ::Engine::Renderer::SetSissorBox((int)viewableWindow.position.x(), (int)viewableWindow.position.y(), (int)viewableWindow.size.x(), (int)viewableWindow.size.y());
+      ::DgE::Renderer::SetSissorBox((int)viewableWindow.position.x(), (int)viewableWindow.position.y(), (int)viewableWindow.size.x(), (int)viewableWindow.size.y());
       
       for (uint32_t i = 0; i < textureCount; i++)
       {
@@ -652,7 +652,7 @@ namespace Engine
         return;
 
       if (PointInBox(vec2((float)a_pMsg->x, (float)a_pMsg->y), aabb))
-        a_pMsg->SetFlag(Engine::Message::Flag::Handled, true);
+        a_pMsg->SetFlag(DgE::Message::Flag::Handled, true);
     }
 
     void Text::HandleMessage(Message_GUI_PointerMove * a_pMsg)

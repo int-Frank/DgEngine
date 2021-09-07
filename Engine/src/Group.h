@@ -6,7 +6,7 @@
 #include <stdint.h>
 #include "PODArray.h"
 
-namespace Engine
+namespace DgE
 {
   class Group
   {

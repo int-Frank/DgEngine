@@ -2,7 +2,7 @@
 
 #include "RenderCommon.h"
 
-namespace Engine
+namespace DgE
 {
   uint32_t GetIndexDataTypeSize(IndexDataType a_type)
   {

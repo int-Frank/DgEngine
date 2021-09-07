@@ -5,7 +5,7 @@
 #include <thread>
 #include <atomic>
 
-namespace Engine
+namespace DgE
 {
   class RenderThread
   {

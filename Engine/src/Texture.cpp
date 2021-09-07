@@ -6,7 +6,7 @@
 #include "RT_Texture.h"
 #include "RenderThreadData.h"
 
-namespace Engine
+namespace DgE
 {
   Texture2D::Texture2D()
   {

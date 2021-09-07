@@ -1,9 +1,9 @@
 //@group Memory
 
 #include "ResourceManager.h"
-#include "BSR_Assert.h"
+#include "Options.h"
 
-namespace Engine
+namespace DgE
 {
   //--------------------------------------------------------------------------------------
   // ResourceWrapperBase
@@ -37,7 +37,7 @@ namespace Engine
 
   void ResourceManager::Init()
   {
-    BSR_ASSERT(s_instance == nullptr, "Trying to initialise ResourceManager more than once!");
+    DG_ASSERT(s_instance == nullptr, "Trying to initialise ResourceManager more than once!");
     s_instance = new ResourceManager();
   }
 

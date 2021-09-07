@@ -3,11 +3,11 @@
 #include "System_GUI.h"
 #include "InputCodes.h"
 #include "Options.h"
-#include "BSR_Assert.h"
+#include "Options.h"
 #include "GUI_Internal.h"
 #include "Renderer.h"
 
-namespace Engine
+namespace DgE
 {
   MAKE_SYSTEM_DEFINITION(System_GUI)
 

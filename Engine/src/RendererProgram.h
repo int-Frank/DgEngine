@@ -9,7 +9,7 @@
 #include "Memory.h"
 #include "Utils.h"
 
-namespace Engine
+namespace DgE
 {
   class RendererProgram : public RenderResource
   {

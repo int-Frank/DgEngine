@@ -2,7 +2,7 @@
 
 #include "InputCodes.h"
 
-namespace Engine
+namespace DgE
 {
   char const * GetInputCodeString(InputCode a_code)
   {

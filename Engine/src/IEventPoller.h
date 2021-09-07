@@ -6,7 +6,7 @@
 #include "Memory.h"
 #include "Message.h"
 
-namespace Engine
+namespace DgE
 {
   class Message;
 

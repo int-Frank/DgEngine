@@ -8,7 +8,7 @@
 
 struct SDL_Window;
 
-namespace Engine
+namespace DgE
 {
   typedef void *SDL_GLContext;
 

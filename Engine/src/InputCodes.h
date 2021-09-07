@@ -8,12 +8,12 @@
 
 #define GET_FULL_INPUT_CODE(code, event) ((static_cast<uint32_t>(code) << 16) | static_cast<uint32_t>(event))
 
-#define KM_SHIFT (::Engine::KeyMod::KM_LSHIFT | ::Engine::KeyMod::KM_RSHIFT)
-#define KM_CTRL (::Engine::KeyMod::KM_LCTRL | ::Engine::KeyMod::KM_RCTRL)
-#define KM_ALT  (::Engine::KeyMod::KM_LALT | ::Engine::KeyMod::KM_RALT)
-#define KM_GUI  (::Engine::KeyMod::KM_LGUI | ::Engine::KeyMod::KM_RGUI)
+#define KM_SHIFT (::DgE::KeyMod::KM_LSHIFT | ::DgE::KeyMod::KM_RSHIFT)
+#define KM_CTRL (::DgE::KeyMod::KM_LCTRL | ::DgE::KeyMod::KM_RCTRL)
+#define KM_ALT  (::DgE::KeyMod::KM_LALT | ::DgE::KeyMod::KM_RALT)
+#define KM_GUI  (::DgE::KeyMod::KM_LGUI | ::DgE::KeyMod::KM_RGUI)
 
-namespace Engine
+namespace DgE
 {
   enum KeyMod : uint16_t
   {

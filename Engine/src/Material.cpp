@@ -21,7 +21,7 @@
 #include "Message.h"
 #include "Serialize.h"
 
-namespace Engine
+namespace DgE
 {
   //-----------------------------------------------------------------------------------------------
   // MaterialData
@@ -52,8 +52,8 @@ namespace Engine
       , m_bufSize(0)
       , m_materialData(a_materialData)
     {
-      BSR_ASSERT(m_materialData != nullptr);
-      BSR_ASSERT(m_materialData->m_prog != nullptr);
+      DG_ASSERT(m_materialData != nullptr);
+      DG_ASSERT(m_materialData->m_prog != nullptr);
 
       m_bufSize = m_materialData->m_prog->UniformBufferSize();
       m_pBuf = new byte[m_bufSize]{};
@@ -73,7 +73,7 @@ namespace Engine
     ShaderUniformDeclaration const* MaterialBase::FindUniform(std::string const& a_name)
     {
       ShaderUniformDeclaration const* pdecl = m_materialData->m_prog->FindUniformDeclaration(a_name);
-      BSR_ASSERT(pdecl != nullptr);
+      DG_ASSERT(pdecl != nullptr);
       
       return pdecl;
     }
@@ -81,7 +81,7 @@ namespace Engine
     UniformBufferElementHeader MaterialBase::CreateHeader(ShaderUniformDeclaration const * a_pdecl, uint32_t a_size)
     {
       uint32_t count = a_size / SizeOfShaderDataType(a_pdecl->GetType());
-      BSR_ASSERT(a_pdecl->GetCount() >= count);
+      DG_ASSERT(a_pdecl->GetCount() >= count);
       UniformBufferElementHeader header;
       header.SetSize(a_size);
       return header;
@@ -113,7 +113,7 @@ namespace Engine
 
   Ref<Material> Material::Create(Ref<RendererProgram> a_prog)
   {
-    BSR_ASSERT(a_prog != nullptr);
+    DG_ASSERT(a_prog != nullptr);
 
     return Ref<Material>(new Material(impl::MaterialData::Create(a_prog)));
   }

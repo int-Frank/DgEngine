@@ -5,7 +5,7 @@
 
 #include <stdint.h>
 
-namespace Engine
+namespace DgE
 {
   typedef uint32_t RenderResourceID;
 #define INVALID_RENDER_RESOURE_ID 0xFFFFFFFF

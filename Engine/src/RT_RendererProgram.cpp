@@ -24,7 +24,7 @@
 #include "DgError.h"
 #include "Log.h"
 #include "Utils.h"
-#include "BSR_Assert.h"
+#include "Options.h"
 #include "DgStringFunctions.h"
 #include "Serialize.h"
 #include "ResourceManager.h"
@@ -33,7 +33,7 @@
 
 //TODO Parse uniform blocks, shader storage blocks
 
-namespace Engine
+namespace DgE
 {
   //--------------------------------------------------------------------------------------------------
   // RT_RendererProgram
@@ -135,7 +135,7 @@ namespace Engine
         // We don't need the shader anymore.
         glDeleteShader(shaderRendererID);
 
-        BSR_ASSERT(false, "Failed");
+        DG_ASSERT(false, "Failed");
         result = false;
       }
 
@@ -297,7 +297,7 @@ namespace Engine
       }
       default:
       {
-        BSR_ASSERT(false, "This type is not handled!");
+        DG_ASSERT(false, "This type is not handled!");
       }
     }
   }
@@ -320,7 +320,7 @@ namespace Engine
       }
       default:
       {
-        BSR_ASSERT(false, "This type is not handled!");
+        DG_ASSERT(false, "This type is not handled!");
       }
     }
   }
@@ -328,7 +328,7 @@ namespace Engine
   void RT_RendererProgram::UploadUniform(uint32_t a_index, void const * a_pbuf, uint32_t a_count)
   {
     ShaderUniformDeclaration const * pdecl = &m_pShaderData->GetUniforms()[a_index];
-    BSR_ASSERT(a_count <= pdecl->GetCount());
+    DG_ASSERT(a_count <= pdecl->GetCount());
 
     if (pdecl->IsArray())
       UploadUniformArray(m_uniformLocations[a_index], pdecl->GetType(), a_pbuf, a_count);

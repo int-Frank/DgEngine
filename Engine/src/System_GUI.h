@@ -7,7 +7,7 @@
 #include "System.h"
 #include "GUI_Container.h"
 
-namespace Engine
+namespace DgE
 {
   class System_GUI : public System
   {

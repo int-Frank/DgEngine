@@ -12,7 +12,7 @@
 #define GUI_FONT_SIZE_TICK 22
 #define GUI_FONT_SIZE_RADIO 32
 
-namespace Engine
+namespace DgE
 {
   namespace GUI
   {

@@ -16,13 +16,13 @@
   Copyright 2017-2019 Frank Hart <frankhart010@gmail.com>
 */
 
-#include "BSR_Assert.h"
+#include "Options.h"
 #include "RT_Buffer.h"
 #include "RT_RendererAPI.h"
 #include "RT_BindingPoint.h"
 #include <glad/glad.h>
 
-namespace Engine
+namespace DgE
 {
   //------------------------------------------------------------------------------------------------
   // Helper functions
@@ -35,7 +35,7 @@ namespace Engine
       case BufferUsage::Static:    return GL_STATIC_DRAW;
       case BufferUsage::Dynamic:   return GL_DYNAMIC_DRAW;
     }
-    BSR_ASSERT(false, "Unknown vertex buffer usage");
+    DG_ASSERT(false, "Unknown vertex buffer usage");
     return 0;
   }
 
@@ -48,7 +48,7 @@ namespace Engine
       case BufferType::Uniform:       return GL_UNIFORM_BUFFER;
       case BufferType::ShaderStorage: return GL_SHADER_STORAGE_BUFFER;
     }
-    BSR_ASSERT(false, "Unknown buffer type");
+    DG_ASSERT(false, "Unknown buffer type");
     return 0;
   }
 

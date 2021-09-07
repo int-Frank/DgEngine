@@ -1,9 +1,9 @@
 //@group Core
 
 #include "Group.h"
-#include "BSR_Assert.h"
+#include "Options.h"
 
-namespace Engine
+namespace DgE
 {
   Group::Group()
     : m_currentID(NONE)
@@ -13,7 +13,7 @@ namespace Engine
 
   Group::IDType Group::BeginNewGroup()
   {
-    BSR_ASSERT(m_currentID < 0xFFFF, "To many groups!");
+    DG_ASSERT(m_currentID < 0xFFFF, "To many groups!");
     m_currentID++;
     m_IDStack.push_back(m_currentID);
     return m_currentID;

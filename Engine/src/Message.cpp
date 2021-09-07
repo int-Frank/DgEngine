@@ -49,7 +49,7 @@
   return std::string(#TYPE);\
 }
 
-namespace Engine
+namespace DgE
 {
   uint32_t Message::GetNewID(uint32_t a_group)
   {

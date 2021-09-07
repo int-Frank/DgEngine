@@ -8,7 +8,7 @@
 #include "RenderThreadData.h"
 #include "ResourceManager.h"
 
-namespace Engine
+namespace DgE
 {
   void RendererProgram::Init(ResourceID a_shaderSourceID)
   {
@@ -58,14 +58,14 @@ namespace Engine
       }
       delete (*ppRP);
       *ppRP = nullptr;
-      ::Engine::RenderThreadData::Instance()->rendererPrograms.erase(resID);
+      ::DgE::RenderThreadData::Instance()->rendererPrograms.erase(resID);
     });
   }
 
   uint32_t RendererProgram::UniformBufferSize() const
   {
     ShaderData * ptr = ResourceManager::Instance()->GetResource<ShaderData>(m_shaderDataID);
-    BSR_ASSERT(ptr != nullptr);
+    DG_ASSERT(ptr != nullptr);
 
     return ptr->GetUniformDataSize();
   }
@@ -131,7 +131,7 @@ namespace Engine
   {
     //TODO Store pointer to avoid look-up each call to UploadUniformBuffer()
     ShaderData * pShaderData = ResourceManager::Instance()->GetResource<ShaderData>(m_shaderDataID);
-    BSR_ASSERT(pShaderData != nullptr);
+    DG_ASSERT(pShaderData != nullptr);
 
     RenderState state = RenderState::Create();
     state.Set<RenderState::Attr::Type>(RenderState::Type::Command);
@@ -155,7 +155,7 @@ namespace Engine
   ShaderUniformDeclaration const* RendererProgram::FindUniformDeclaration(std::string const& a_name) const
   {
     ShaderData * pShaderData = ResourceManager::Instance()->GetResource<ShaderData>(m_shaderDataID);
-    BSR_ASSERT(pShaderData != nullptr);
+    DG_ASSERT(pShaderData != nullptr);
 
     for (size_t i = 0; i < pShaderData->GetUniforms().size(); i++)
     {

@@ -6,14 +6,14 @@
 #include "common.h"
 
 // We just use this system to generate the GUI
-class GUIDemo : public Engine::System
+class GUIDemo : public DgE::System
 {
 public:
 
   MAKE_SYSTEM_DECL
 
   void OnAttach() override;
-  void HandleMessage(Engine::Message * a_pMsg) override {}
+  void HandleMessage(DgE::Message * a_pMsg) override {}
   void OnDetach() override {}
   void Render() override {};
   void Update(float a_dt) override {}
@@ -23,7 +23,7 @@ private:
   void BuildGUI();
   void BindInput();
 
-  Engine::Colour m_textColour;
+  DgE::Colour m_textColour;
 };
 
 #endif

@@ -12,8 +12,8 @@
 #include "GUI_Checkbox.h"
 #include "GUI_Slider.h"
 
-using namespace Engine;
-using namespace Engine::GUI;
+using namespace DgE;
+using namespace DgE::GUI;
 
 MAKE_SYSTEM_DEFINITION(GUIDemo)
 
@@ -44,8 +44,8 @@ void GUIDemo::BuildGUI()
   attr.size = GUI_FONT_SIZE; // TODO This should not be exposed
   attr.colourText = GetStyle().colours[col_Text];
   attr.lineSpacing = GetStyle().textLineSpacing;
-  attr.horizontalAlign = Engine::GUI::HorizontalAlignment::Left;
-  attr.verticalAlign = Engine::GUI::VerticalAlignment::Top;
+  attr.horizontalAlign = DgE::GUI::HorizontalAlignment::Left;
+  attr.verticalAlign = DgE::GUI::VerticalAlignment::Top;
   attr.wrapText = true;
   Text * pText = Text::Create(pTextWindow, pStr, {0.0f, 0.0f}, {0.0f, 0.0f}, &attr, {WidgetFlag::StretchHeight, WidgetFlag::StretchWidth, WidgetFlag::NotResponsive});
 
@@ -140,7 +140,7 @@ void GUIDemo::BuildGUI()
 
 void GUIDemo::BindInput()
 {
-  System_Input * layer = static_cast<Engine::System_Input *>(Application::Instance()->GetSystem(Engine::System_Input::GetStaticID()));
+  System_Input * layer = static_cast<DgE::System_Input *>(Application::Instance()->GetSystem(DgE::System_Input::GetStaticID()));
   if (!layer)
   {
     LOG_ERROR("Couldn't find input layer!");
@@ -148,38 +148,38 @@ void GUIDemo::BindInput()
   }
 
   // TODO A helper function should live in the Engine to set up default GUI bindings
-  layer->AddBinding(Engine::IC_MOUSE_MOTION, Engine::IE_VALUE_CHANGE,
-    [](Engine::Message const * pMsg)
+  layer->AddBinding(DgE::IC_MOUSE_MOTION, DgE::IE_VALUE_CHANGE,
+    [](DgE::Message const * pMsg)
     {
-      Engine::Message_Input_Mouse * pIn = (Engine::Message_Input_Mouse *)pMsg;
-      Engine::Message_GUI_PointerMove * pOut = nullptr;
-      EMPLACE_POST(Engine::Message_GUI_PointerMove, pOut);
+      DgE::Message_Input_Mouse * pIn = (DgE::Message_Input_Mouse *)pMsg;
+      DgE::Message_GUI_PointerMove * pOut = nullptr;
+      EMPLACE_POST(DgE::Message_GUI_PointerMove, pOut);
       pOut->x = pIn->x;
       pOut->y = pIn->y;
     });
 
-  layer->AddBinding(Engine::IC_KEY_Q, Engine::IE_BUTTON_DOWN,
-    [](Engine::Message const *)
+  layer->AddBinding(DgE::IC_KEY_Q, DgE::IE_BUTTON_DOWN,
+    [](DgE::Message const *)
     {
-      EMPLACE_POST(Engine::Message_Quit);
+      EMPLACE_POST(DgE::Message_Quit);
     });
 
-  layer->AddBinding(Engine::IC_MOUSE_BUTTON_LEFT, Engine::IE_BUTTON_DOWN,
-    [](Engine::Message const * pMsg)
+  layer->AddBinding(DgE::IC_MOUSE_BUTTON_LEFT, DgE::IE_BUTTON_DOWN,
+    [](DgE::Message const * pMsg)
     {
-      Engine::Message_Input_Mouse * pIn = (Engine::Message_Input_Mouse *)pMsg;
-      Engine::Message_GUI_PointerDown * pOut = nullptr;
-      EMPLACE_POST(Engine::Message_GUI_PointerDown, pOut);
+      DgE::Message_Input_Mouse * pIn = (DgE::Message_Input_Mouse *)pMsg;
+      DgE::Message_GUI_PointerDown * pOut = nullptr;
+      EMPLACE_POST(DgE::Message_GUI_PointerDown, pOut);
       pOut->x = pIn->x;
       pOut->y = pIn->y;
     });
 
-  layer->AddBinding(Engine::IC_MOUSE_BUTTON_LEFT, Engine::IE_BUTTON_UP,
-    [](Engine::Message const * pMsg)
+  layer->AddBinding(DgE::IC_MOUSE_BUTTON_LEFT, DgE::IE_BUTTON_UP,
+    [](DgE::Message const * pMsg)
     {
-      Engine::Message_Input_Mouse * pIn = (Engine::Message_Input_Mouse *)pMsg;
-      Engine::Message_GUI_PointerUp * pOut = nullptr;
-      EMPLACE_POST(Engine::Message_GUI_PointerUp, pOut);
+      DgE::Message_Input_Mouse * pIn = (DgE::Message_Input_Mouse *)pMsg;
+      DgE::Message_GUI_PointerUp * pOut = nullptr;
+      EMPLACE_POST(DgE::Message_GUI_PointerUp, pOut);
       pOut->x = pIn->x;
       pOut->y = pIn->y;
     });

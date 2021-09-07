@@ -7,7 +7,7 @@
 #include "RenderDemo.h"
 #include "GUIDemo.h"
 
-class Game : public Engine::Application
+class Game : public DgE::Application
 {
 public:
   Game(Opts const & a_opts)
@@ -35,7 +35,7 @@ public:
 
 };
 
-Engine::Application* Engine::CreateApplication()
+DgE::Application* DgE::CreateApplication()
 {
   Application::Opts opts;
   return new Game(opts);

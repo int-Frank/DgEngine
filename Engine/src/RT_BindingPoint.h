@@ -6,7 +6,7 @@
 #include <stdint.h>
 #include "ShaderUniform.h"
 
-namespace Engine
+namespace DgE
 {
   class RT_BindingPoint
   {

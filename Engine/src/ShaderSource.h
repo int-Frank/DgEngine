@@ -6,7 +6,7 @@
 #include <string>
 #include "ShaderUtils.h"
 
-namespace Engine
+namespace DgE
 {
   enum class StrType
   {

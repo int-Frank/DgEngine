@@ -17,7 +17,7 @@
 
 static_assert(TEXT_INPUT_TEXT_SIZE == SDL_TEXTINPUTEVENT_TEXT_SIZE, "text container incorrect size");
 
-namespace Engine
+namespace DgE
 {
   class FW_EventPoller : public IEventPoller
   {

@@ -10,7 +10,7 @@
 #define CHECKBOX_SIZE vec2(25.0f, 25.0f)
 #define CHECKBOX_THICKNESS 2.0f
 
-namespace Engine
+namespace DgE
 {
   namespace GUI
   {
@@ -85,7 +85,7 @@ namespace Engine
       {
         m_isChecked = !m_isChecked;
         m_clbk_CheckChanged(m_isChecked);
-        a_pMsg->SetFlag(Engine::Message::Flag::Handled, true);
+        a_pMsg->SetFlag(DgE::Message::Flag::Handled, true);
       }
     }
 
@@ -124,7 +124,7 @@ namespace Engine
       if (!GetGlobalAABB(viewableWindow))
         return;
 
-      ::Engine::Renderer::SetSissorBox((int)viewableWindow.position.x(), (int)viewableWindow.position.y(), (int)viewableWindow.size.x(), (int)viewableWindow.size.y());
+      ::DgE::Renderer::SetSissorBox((int)viewableWindow.position.x(), (int)viewableWindow.position.y(), (int)viewableWindow.size.x(), (int)viewableWindow.size.y());
 
       vec2 pos = GetGlobalPosition() + vec2(CHECKBOX_THICKNESS, CHECKBOX_THICKNESS);
       vec2 size = GetSize() - 2.0f * vec2(CHECKBOX_THICKNESS, CHECKBOX_THICKNESS);
@@ -183,8 +183,8 @@ namespace Engine
 
     void CheckBox::SetColour(CheckboxState a_state, CheckboxElement a_ele, Colour a_clr)
     {
-      BSR_ASSERT(a_state != CheckboxState::COUNT);
-      BSR_ASSERT(a_ele != CheckboxElement::COUNT);
+      DG_ASSERT(a_state != CheckboxState::COUNT);
+      DG_ASSERT(a_ele != CheckboxElement::COUNT);
       m_clr[(int)a_state][(int)a_ele] = a_clr;
     }
     

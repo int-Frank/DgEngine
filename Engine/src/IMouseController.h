@@ -5,7 +5,7 @@
 
 #include "DgError.h"
 
-namespace Engine
+namespace DgE
 {
   class IMouseController
   {

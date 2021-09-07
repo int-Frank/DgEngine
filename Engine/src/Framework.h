@@ -22,7 +22,7 @@
  ITEM(GraphicsContext)\
  ITEM(FileSystem)
 
-namespace Engine
+namespace DgE
 {
   class Framework
   {

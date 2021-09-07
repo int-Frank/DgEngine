@@ -9,7 +9,7 @@
 #include "Framework.h"
 #include "Renderer.h"
 
-namespace Engine
+namespace DgE
 {
   MAKE_SYSTEM_DEFINITION(System_Window)
 

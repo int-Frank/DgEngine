@@ -5,7 +5,7 @@
 
 #include "Serialize.h"
 
-namespace Engine
+namespace DgE
 {
   template<>
   void* Serialize<byte>(void* a_dest, byte const* a_ptr, size_t a_count)

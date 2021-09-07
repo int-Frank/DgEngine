@@ -8,7 +8,7 @@
 #define CLR_OUTLINE 0xFF683A0E
 #define CLR_TEXT 0xFFF9F0E5
 
-namespace Engine
+namespace DgE
 {
   namespace GUI
   {

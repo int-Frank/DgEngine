@@ -28,7 +28,7 @@
 #include "ShaderSource.h"
 #include "ResourceManager.h"
 
-namespace Engine
+namespace DgE
 {
   class RT_BindingPoint;
 

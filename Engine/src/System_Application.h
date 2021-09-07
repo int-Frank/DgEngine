@@ -9,7 +9,7 @@
 #include "System.h"
 #include "Memory.h"
 
-namespace Engine
+namespace DgE
 {
   class System_Application : public System
   {

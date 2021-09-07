@@ -5,9 +5,9 @@
 #include "Log.h"
 #include "Framework.h"
 #include "InputCodes.h"
-#include "BSR_Assert.h"
+#include "Options.h"
 
-namespace Engine
+namespace DgE
 {
   static char* g_ClipboardTextData = nullptr;
 
@@ -53,13 +53,13 @@ namespace Engine
 
   Framework * Framework::Instance()
   {
-    BSR_ASSERT(s_instance != nullptr, "Framework not initialized!");
+    DG_ASSERT(s_instance != nullptr, "Framework not initialized!");
     return s_instance;
   }
 
   Dg::ErrorCode Framework::Init()
   {
-    BSR_ASSERT(s_instance == nullptr, "Framework already initialized!");
+    DG_ASSERT(s_instance == nullptr, "Framework already initialized!");
     s_instance = new Framework();
     Dg::ErrorCode result = Dg::ErrorCode::None;
     do
@@ -109,6 +109,6 @@ namespace Engine
   UNROLL_FRAMEWORK_CLASSES
 
 #undef ITEM
-#define ITEM(m) void Framework::Set##m(I##m * a_ptr) { BSR_ASSERT(m_pimpl->p##m == nullptr, #m " already exists!"); m_pimpl->p##m = a_ptr;}
+#define ITEM(m) void Framework::Set##m(I##m * a_ptr) { DG_ASSERT(m_pimpl->p##m == nullptr, #m " already exists!"); m_pimpl->p##m = a_ptr;}
   UNROLL_FRAMEWORK_CLASSES
 }

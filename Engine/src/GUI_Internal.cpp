@@ -2,7 +2,7 @@
 
 #include "GUI.h"
 #include "GUI_Internal.h"
-#include "BSR_Assert.h"
+#include "Options.h"
 #include "Framework.h"
 #include "Material.h"
 #include "ShaderUniform.h"
@@ -14,7 +14,7 @@
 // TODO This needs to come from input args or something
 #define DEFAULT_FONT_PATH "../Engine/assets/fonts/NotoSans-BSR.ttf"
 
-namespace Engine
+namespace DgE
 {
   namespace GUI
   {
@@ -127,23 +127,23 @@ namespace Engine
         s_pRenderContext->vb_unitBox = VertexBuffer::Create(g_unitBoxVerts, SIZEOF32(g_unitBoxVerts), BF_None);
         s_pRenderContext->vb_unitBox->SetLayout(
           {
-            { Engine::ShaderDataType::VEC2 }
+            { DgE::ShaderDataType::VEC2 }
           });
 
-        s_pRenderContext->ib_unitBox = Engine::IndexBuffer::Create(g_unitBoxIndices, ARRAY_SIZE_32(g_unitBoxIndices));
-        s_pRenderContext->va_unitBox = Engine::VertexArray::Create();
+        s_pRenderContext->ib_unitBox = DgE::IndexBuffer::Create(g_unitBoxIndices, ARRAY_SIZE_32(g_unitBoxIndices));
+        s_pRenderContext->va_unitBox = DgE::VertexArray::Create();
 
         s_pRenderContext->va_unitBox->AddVertexBuffer(s_pRenderContext->vb_unitBox);
         s_pRenderContext->va_unitBox->SetIndexBuffer(s_pRenderContext->ib_unitBox);
 
-        Engine::ShaderData * pSD = new ShaderData({
-            { Engine::ShaderDomain::Vertex, Engine::StrType::Source, g_flatShader_vs },
-            { Engine::ShaderDomain::Fragment, Engine::StrType::Source, g_flatShader_fs }
+        DgE::ShaderData * pSD = new ShaderData({
+            { DgE::ShaderDomain::Vertex, DgE::StrType::Source, g_flatShader_vs },
+            { DgE::ShaderDomain::Fragment, DgE::StrType::Source, g_flatShader_fs }
           });
 
         ResourceManager::Instance()->RegisterResource(ir_GUIBoxShader, pSD);
-        Ref<Engine::RendererProgram> refProg;
-        refProg = Engine::RendererProgram::Create(ir_GUIBoxShader);
+        Ref<DgE::RendererProgram> refProg;
+        refProg = DgE::RendererProgram::Create(ir_GUIBoxShader);
         s_pRenderContext->materialColourBox = Material::Create(refProg);
       }
 
@@ -152,23 +152,23 @@ namespace Engine
         s_pRenderContext->vb_boxBorder = VertexBuffer::Create(sizeof(float) * 2 * 8, BF_None);
         s_pRenderContext->vb_boxBorder->SetLayout(
           {
-            { Engine::ShaderDataType::VEC2 }
+            { DgE::ShaderDataType::VEC2 }
           });
 
-        s_pRenderContext->ib_boxBorder = Engine::IndexBuffer::Create(g_boxBorderIndices, ARRAY_SIZE_32(g_boxBorderIndices));
-        s_pRenderContext->va_boxBorder = Engine::VertexArray::Create();
+        s_pRenderContext->ib_boxBorder = DgE::IndexBuffer::Create(g_boxBorderIndices, ARRAY_SIZE_32(g_boxBorderIndices));
+        s_pRenderContext->va_boxBorder = DgE::VertexArray::Create();
 
         s_pRenderContext->va_boxBorder->AddVertexBuffer(s_pRenderContext->vb_boxBorder);
         s_pRenderContext->va_boxBorder->SetIndexBuffer(s_pRenderContext->ib_boxBorder);
 
-        Engine::ShaderData * pSD = new ShaderData({
-            { Engine::ShaderDomain::Vertex, Engine::StrType::Source, g_boxBorderShader_vs },
-            { Engine::ShaderDomain::Fragment, Engine::StrType::Source, g_flatShader_fs }
+        DgE::ShaderData * pSD = new ShaderData({
+            { DgE::ShaderDomain::Vertex, DgE::StrType::Source, g_boxBorderShader_vs },
+            { DgE::ShaderDomain::Fragment, DgE::StrType::Source, g_flatShader_fs }
           });
 
         ResourceManager::Instance()->RegisterResource(ir_GUIBoxBorderShader, pSD);
-        Ref<Engine::RendererProgram> refProg;
-        refProg = Engine::RendererProgram::Create(ir_GUIBoxBorderShader);
+        Ref<DgE::RendererProgram> refProg;
+        refProg = DgE::RendererProgram::Create(ir_GUIBoxBorderShader);
         s_pRenderContext->materialBoxBorder = Material::Create(refProg);
       }
 
@@ -177,12 +177,12 @@ namespace Engine
         s_pRenderContext->vb_textInstance = VertexBuffer::Create(MAX_TEXT_CHARACTERS * sizeof(float) * 6, BF_None);
         s_pRenderContext->vb_textInstance->SetLayout(
           {
-            { Engine::ShaderDataType::VEC2 }, // inPosOffset
-            { Engine::ShaderDataType::VEC2 }, // inTexOffset
-            { Engine::ShaderDataType::VEC2 }  // inScale
+            { DgE::ShaderDataType::VEC2 }, // inPosOffset
+            { DgE::ShaderDataType::VEC2 }, // inTexOffset
+            { DgE::ShaderDataType::VEC2 }  // inScale
           });
 
-        s_pRenderContext->va_text = Engine::VertexArray::Create();
+        s_pRenderContext->va_text = DgE::VertexArray::Create();
 
         s_pRenderContext->va_text->AddVertexBuffer(s_pRenderContext->vb_unitBox);
         s_pRenderContext->va_text->AddVertexBuffer(s_pRenderContext->vb_textInstance);
@@ -191,14 +191,14 @@ namespace Engine
         s_pRenderContext->va_text->SetVertexAttributeDivisor(2, 1);
         s_pRenderContext->va_text->SetVertexAttributeDivisor(3, 1);
 
-        Engine::ShaderData * pSD = new ShaderData({
-            { Engine::ShaderDomain::Vertex, Engine::StrType::Source, g_textShader_vs },
-            { Engine::ShaderDomain::Fragment, Engine::StrType::Source, g_textShader_fs }
+        DgE::ShaderData * pSD = new ShaderData({
+            { DgE::ShaderDomain::Vertex, DgE::StrType::Source, g_textShader_vs },
+            { DgE::ShaderDomain::Fragment, DgE::StrType::Source, g_textShader_fs }
           });
       
         ResourceManager::Instance()->RegisterResource(ir_GUITextShader, pSD);
-        Ref<Engine::RendererProgram> refProg;
-        refProg = Engine::RendererProgram::Create(ir_GUITextShader);
+        Ref<DgE::RendererProgram> refProg;
+        refProg = DgE::RendererProgram::Create(ir_GUITextShader);
         s_pRenderContext->materialText = Material::Create(refProg);
       }
 
@@ -260,7 +260,7 @@ namespace Engine
         s_pRenderContext->materialColourBox->Bind();
         s_pRenderContext->va_unitBox->Bind();
 
-        ::Engine::Renderer::DrawIndexed(s_pRenderContext->va_unitBox, RenderMode::Triangles, 1);
+        ::DgE::Renderer::DrawIndexed(s_pRenderContext->va_unitBox, RenderMode::Triangles, 1);
       }
 
       void DrawBoxOutline(UIAABB const & a_inner, float a_thickness, Colour a_colour)
@@ -287,7 +287,7 @@ namespace Engine
         s_pRenderContext->materialBoxBorder->Bind();
         s_pRenderContext->va_boxBorder->Bind();
 
-        ::Engine::Renderer::DrawIndexed(s_pRenderContext->va_boxBorder, RenderMode::Triangles, 1);
+        ::DgE::Renderer::DrawIndexed(s_pRenderContext->va_boxBorder, RenderMode::Triangles, 1);
       }
 
       void DrawBoxWithOutline(UIAABB const & inner, float thickness, Colour clrInner, Colour clrOutline)
@@ -315,7 +315,7 @@ namespace Engine
         s_pRenderContext->materialText->Bind();
         s_pRenderContext->va_text->Bind();
 
-        ::Engine::Renderer::DrawIndexed(s_pRenderContext->va_text, RenderMode::Triangles, a_count);
+        ::DgE::Renderer::DrawIndexed(s_pRenderContext->va_text, RenderMode::Triangles, a_count);
       }
 
       GlyphData * GetGlyphData(CodePoint a_cp, uint32_t a_size)
@@ -328,7 +328,7 @@ namespace Engine
         a_ascent = 0;
         a_descent = 0;
         Dg::ErrorCode result = s_pRenderContext->fontAtlas->GetCharacterSizeRange(s_pRenderContext->defaultFont, a_size, a_ascent, a_descent);
-        BSR_ASSERT(result == Dg::ErrorCode::None, "No glyphs for size!");
+        DG_ASSERT(result == Dg::ErrorCode::None, "No glyphs for size!");
       }
     }
 

@@ -6,12 +6,12 @@
 #include <string>
 #include "DgError.h"
 
-namespace Engine
+namespace DgE
 {
   struct WindowProps
   {
     WindowProps()
-      : name("BSR")
+      : name("DgEngine")
       , width(1024)
       , height(768)
       , fullscreen(false)

@@ -19,7 +19,7 @@
 #include "SystemStack.h"
 #include "System.h"
 
-namespace Engine
+namespace DgE
 {
   SystemStack::SystemStack()
   {
@@ -33,7 +33,7 @@ namespace Engine
 
   bool SystemStack::PushSystem(System * a_pLayer, SystemID a_ID)
   {
-    BSR_ASSERT(a_pLayer != nullptr);
+    DG_ASSERT(a_pLayer != nullptr);
 
     if (Find(a_ID) != m_systemStack.end())
       return false;

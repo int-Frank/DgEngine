@@ -8,15 +8,15 @@
 #include <new>
 
 #include "Utils.h"
-#include "BSR_Assert.h"
+#include "Options.h"
 
-namespace Engine
+namespace DgE
 {
   template<typename T>
   void * Serialize(void * a_dest, T const * a_ptr, size_t a_count = 1)
   {
     static_assert(std::is_fundamental<T>::value, "T is not a fundamental type");
-    BSR_ASSERT(a_ptr != nullptr, "");
+    DG_ASSERT(a_ptr != nullptr, "");
 
     void * pOut = a_dest;
     for (size_t i = 0; i < a_count; i++)
@@ -35,7 +35,7 @@ namespace Engine
   void const* Deserialize(void const * a_src, T * a_out, size_t a_count = 1)
   {
     static_assert(std::is_fundamental<T>::value, "T is not a fundamental type");
-    BSR_ASSERT(a_src != nullptr, "");
+    DG_ASSERT(a_src != nullptr, "");
 
     void const * pOut = a_src;
     for (size_t i = 0; i < a_count; i++)

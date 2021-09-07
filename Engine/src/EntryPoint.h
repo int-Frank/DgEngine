@@ -6,7 +6,7 @@
 #include <fstream>
 #include <exception>
 
-extern Engine::Application * Engine::CreateApplication();
+extern DgE::Application * DgE::CreateApplication();
 
 int main(int argc, char** argv)
 {
@@ -15,11 +15,11 @@ int main(int argc, char** argv)
   ofs.open(CRASH_REPORT_FILE, std::ofstream::out | std::ofstream::trunc);
   ofs.close();
   
-  Engine::Application * app(nullptr);
+  DgE::Application * app(nullptr);
 
   try
   {
-    app = Engine::CreateApplication();
+    app = DgE::CreateApplication();
   }
   catch (std::exception & e)
   {

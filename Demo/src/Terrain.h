@@ -8,7 +8,7 @@
 #include "Material.h"
 #include "Texture.h"
 
-using namespace Engine;
+using namespace DgE;
 
 uint32_t const CHUNK_DIMENSION = 256;
 uint32_t const MAP_DIMENSION = 4096;

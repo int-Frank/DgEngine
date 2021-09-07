@@ -5,7 +5,7 @@
 #include "Memory.h"
 #include "Options.h"
 
-namespace Engine
+namespace DgE
 {
   namespace impl
   {

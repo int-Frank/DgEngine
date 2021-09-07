@@ -12,7 +12,7 @@ uint32_t NextID();
 
 enum MyMessageClass
 {
-  MMC_Input = Engine::MC_CLIENT_BEGIN
+  MMC_Input = DgE::MC_CLIENT_BEGIN
 };
 
 struct State

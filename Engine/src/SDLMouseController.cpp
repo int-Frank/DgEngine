@@ -5,7 +5,7 @@
 #include "Framework.h"
 #include "IMouseController.h"
 
-namespace Engine
+namespace DgE
 {
   class FW_SDLMouseController : public IMouseController
   {

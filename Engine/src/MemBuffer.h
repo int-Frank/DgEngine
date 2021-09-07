@@ -6,68 +6,71 @@
 #include <exception>
 #include <cstdlib>
 #include "DgMath.h"
-#include "BSR_Assert.h"
+#include "Options.h"
 #include "PODArray.h"
 #include "Utils.h"
 
-class MemBufferDynamic
+namespace DgE
 {
-  static size_t const s_defaultSize = 1024;
-  static size_t const s_defaultAlignment = __STDCPP_DEFAULT_NEW_ALIGNMENT__;
+  class MemBufferDynamic
+  {
+    static size_t const s_defaultSize = 1024;
+    static size_t const s_defaultAlignment = __STDCPP_DEFAULT_NEW_ALIGNMENT__;
 
-public:
+  public:
 
-  typedef std::ptrdiff_t Index;
+    typedef std::ptrdiff_t Index;
 
-public:
+  public:
 
-  MemBufferDynamic();
-  MemBufferDynamic(size_t initialSize, size_t alignment);
-  ~MemBufferDynamic();
+    MemBufferDynamic();
+    MemBufferDynamic(size_t initialSize, size_t alignment);
+    ~MemBufferDynamic();
 
-  MemBufferDynamic(MemBufferDynamic const& a_other);
-  MemBufferDynamic& operator=(MemBufferDynamic const& a_other);
+    MemBufferDynamic(MemBufferDynamic const & a_other);
+    MemBufferDynamic & operator=(MemBufferDynamic const & a_other);
 
-  Index Allocate(size_t);
-  void * GetAddress(Index);
-  void Write(Engine::byte *, size_t, Index);
-  void clear();
-  size_t size() const;
+    Index Allocate(size_t);
+    void * GetAddress(Index);
+    void Write(byte *, size_t, Index);
+    void clear();
+    size_t size() const;
 
-private:
+  private:
 
-  size_t          m_alignment;
-  size_t          m_cursor;
-  PODArray<Engine::byte>  m_memblock;
-};
+    size_t          m_alignment;
+    size_t          m_cursor;
+    PODArray<byte>  m_memblock;
+  };
 
-class MemBuffer
-{
-  static size_t const s_defaultSize = 1024;
-  static size_t const s_defaultAlignment = __STDCPP_DEFAULT_NEW_ALIGNMENT__;
+  class MemBuffer
+  {
+    static size_t const s_defaultSize = 1024;
+    static size_t const s_defaultAlignment = __STDCPP_DEFAULT_NEW_ALIGNMENT__;
 
-private:
+  private:
 
-  MemBuffer(MemBuffer const&) = delete;
-  MemBuffer& operator=(MemBuffer const&) = delete;
+    MemBuffer(MemBuffer const &) = delete;
+    MemBuffer & operator=(MemBuffer const &) = delete;
 
-public:
+  public:
 
-  MemBuffer();
-  MemBuffer(size_t size);
-  MemBuffer(size_t size, size_t alignment);
-  ~MemBuffer();
+    MemBuffer();
+    MemBuffer(size_t size);
+    MemBuffer(size_t size, size_t alignment);
+    ~MemBuffer();
 
-  void* Allocate(size_t a_size);
-  void clear();
-  size_t size() const;
+    void * Allocate(size_t a_size);
+    void clear();
+    size_t size() const;
 
-private:
+  private:
 
-  size_t  m_size;
-  size_t  m_alignment;
-  size_t  m_cursor;
-  Engine::byte *  m_memblock;
-};
+    size_t  m_size;
+    size_t  m_alignment;
+    size_t  m_cursor;
+    byte * m_memblock;
+  };
+}
 
 #endif

@@ -11,7 +11,7 @@
 #include "Memory.h"
 #include "Texture.h"
 
-namespace Engine
+namespace DgE
 {
   typedef uint32_t FontID;
   uint16_t const INVALID_FONT_TEXTURE = 0xFFFF;

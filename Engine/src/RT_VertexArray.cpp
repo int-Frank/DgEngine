@@ -23,7 +23,7 @@
 #include "ShaderUtils.h"
 #include <glad/glad.h>
 
-namespace Engine
+namespace DgE
 {
   RT_VertexArray::RT_VertexArray()
     : m_rendererID(0)
@@ -68,8 +68,8 @@ namespace Engine
       return;
     }
     RT_VertexBuffer *pVB = *ppVB;
-    BSR_ASSERT(pVB != nullptr, "A vertex Buffer in the render data is null!");
-    BSR_ASSERT(pVB->GetLayout().GetElements().size(), "Vertex Buffer has no layout!");
+    DG_ASSERT(pVB != nullptr, "A vertex Buffer in the render data is null!");
+    DG_ASSERT(pVB->GetLayout().GetElements().size(), "Vertex Buffer has no layout!");
     Bind();
     pVB->Bind();
 

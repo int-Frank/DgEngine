@@ -7,7 +7,7 @@
 #include "GUI_Text.h"
 #include "Renderer.h"
 
-namespace Engine
+namespace DgE
 {
   namespace GUI
   {
@@ -92,7 +92,7 @@ namespace Engine
       if (PointInBox(vec2((float)a_pMsg->x, (float)a_pMsg->y), aabb) && m_clbk_Select != nullptr)
       {
         m_clbk_Select();
-        a_pMsg->SetFlag(Engine::Message::Flag::Handled, true);
+        a_pMsg->SetFlag(DgE::Message::Flag::Handled, true);
       }
     }
 
@@ -142,7 +142,7 @@ namespace Engine
       vec2 pos = GetGlobalPosition() + vec2(m_outlineWidth, m_outlineWidth);
       int s = m_state == WidgetState::HoverOn ? (int)ButtonState::Hover : (int)ButtonState::Normal;
 
-      ::Engine::Renderer::SetSissorBox((int)viewableWindow.position.x(), (int)viewableWindow.position.y(), (int)viewableWindow.size.x(), (int)viewableWindow.size.y());
+      ::DgE::Renderer::SetSissorBox((int)viewableWindow.position.x(), (int)viewableWindow.position.y(), (int)viewableWindow.size.x(), (int)viewableWindow.size.y());
       Renderer::DrawBoxWithOutline({pos, size}, m_outlineWidth, m_clr[s][(int)ButtonElement::Face], m_clr[s][(int)ButtonElement::Outline]);
 
       m_pText->SetColour(m_clr[s][(int)ButtonElement::Text]);
@@ -201,8 +201,8 @@ namespace Engine
 
     void Button::SetColour(ButtonState a_state, ButtonElement a_ele, Colour a_clr)
     {
-      BSR_ASSERT(a_state != ButtonState::COUNT);
-      BSR_ASSERT(a_ele != ButtonElement::COUNT);
+      DG_ASSERT(a_state != ButtonState::COUNT);
+      DG_ASSERT(a_ele != ButtonElement::COUNT);
       m_clr[(int)a_state][(int)a_ele] = a_clr;
     }
 

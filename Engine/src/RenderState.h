@@ -17,7 +17,7 @@
  ITEM(VAO)\
  ITEM(Material)\
 
-namespace Engine
+namespace DgE
 {
   class RenderState
   {

@@ -12,7 +12,7 @@
 #include "IEventPoller.h"
 #include "IMouseController.h"
 
-namespace Engine
+namespace DgE
 {
   MAKE_SYSTEM_DEFINITION(System_Input)
 
@@ -81,7 +81,7 @@ namespace Engine
       }
       else
       {
-        BSR_ASSERT("Unhandled Input Message!");
+        DG_ASSERT("Unhandled Input Message!");
       }
     }
   }

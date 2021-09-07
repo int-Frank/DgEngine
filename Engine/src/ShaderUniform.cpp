@@ -30,7 +30,7 @@
 #include "DgMath.h"
 #include "Utils.h"
 #include "Serialize.h"
-#include "BSR_Assert.h"
+#include "Options.h"
 #include "DgBit.h"
 
 #define ALIGN Dg::ForwardAlign<uint32_t>
@@ -53,7 +53,7 @@
 #define UNIFORM_VAR_EXPRESSION    REG_UNIFORM _S_ VAR _S_ VAR _OS_ OARRAY _OS_ SC
 #define STRUCT_EXPRESSION         REG_STRUCT  _S_ VAR BLOCK_CONTENTS
 
-namespace Engine
+namespace DgE
 {
   //---------------------------------------------------------------------------------------------------
   // UniformBufferElementHeader
@@ -89,17 +89,17 @@ namespace Engine
 
   void * UniformBufferElementHeader::Serialize(void * a_buf) const
   {
-    return ::Engine::Serialize(a_buf, &m_data);
+    return ::DgE::Serialize(a_buf, &m_data);
   }
 
   void const * UniformBufferElementHeader::Deserialize(void const * a_buf)
   {
-    return ::Engine::Deserialize(a_buf, &m_data);
+    return ::DgE::Deserialize(a_buf, &m_data);
   }
 
   void UniformBufferElementHeader::SetSize(uint32_t a_count)
   {
-    BSR_ASSERT(a_count <= uint32_t(Dg::Mask<uint32_t,
+    DG_ASSERT(a_count <= uint32_t(Dg::Mask<uint32_t,
       static_cast<uint32_t>(impl_UniformBufferElementHeader::Begin::Size),
       static_cast<uint32_t>(impl_UniformBufferElementHeader::Size::Size)>::value));
     
@@ -187,7 +187,7 @@ namespace Engine
     , m_isArray(a_isArray)
     , m_dataOffset(0)
   {
-    BSR_ASSERT(a_type != ShaderDataType::STRUCT);
+    DG_ASSERT(a_type != ShaderDataType::STRUCT);
   }
   
   void ShaderUniformDeclaration::Log() const
@@ -321,7 +321,7 @@ namespace Engine
       bool isArray = false;
       if (match.str(3) != "")
       {
-        BSR_ASSERT(Dg::StringToNumber<uint32_t>(count, match.str(3), std::dec), "");
+        DG_ASSERT(Dg::StringToNumber<uint32_t>(count, match.str(3), std::dec), "");
         isArray = true;
       }
       result.push_back(varDecl{match.str(1), match.str(2), isArray, count});
@@ -464,7 +464,7 @@ namespace Engine
       if (t == ShaderDataType::NONE)
       {
         size_t structIndex = FindStruct(var.type, a_structs);
-        BSR_ASSERT(structIndex != INVALID_INDEX, "Undefined struct!");
+        DG_ASSERT(structIndex != INVALID_INDEX, "Undefined struct!");
         ShaderStruct const * pStruct = &a_structs.data[structIndex];
         for (size_t i = 0; i < pStruct->GetFields().size(); i++)
         {

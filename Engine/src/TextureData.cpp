@@ -4,7 +4,7 @@
 #include "Serialize.h"
 #include "DgBit.h"
 
-namespace Engine
+namespace DgE
 {
   namespace
   {
@@ -192,10 +192,10 @@ namespace Engine
   {
     void* pCurrent = a_pBuf;
     uint32_t attrData = attrs.GetData();
-    pCurrent = ::Engine::Serialize(pCurrent, &attrData, 1);
-    pCurrent = ::Engine::Serialize(pCurrent, &width, 1);
-    pCurrent = ::Engine::Serialize(pCurrent, &height, 1);
-    pCurrent = ::Engine::Serialize(pCurrent, pPixels, size_t(width) * height * GetPixelSize(attrs.GetPixelType()));
+    pCurrent = ::DgE::Serialize(pCurrent, &attrData, 1);
+    pCurrent = ::DgE::Serialize(pCurrent, &width, 1);
+    pCurrent = ::DgE::Serialize(pCurrent, &height, 1);
+    pCurrent = ::DgE::Serialize(pCurrent, pPixels, size_t(width) * height * GetPixelSize(attrs.GetPixelType()));
     return pCurrent;
   }
 
@@ -203,12 +203,12 @@ namespace Engine
   {
     void const * pCurrent = a_pBuf;
     uint32_t attrData(0);
-    pCurrent = ::Engine::Deserialize(pCurrent, &attrData, 1);
+    pCurrent = ::DgE::Deserialize(pCurrent, &attrData, 1);
     attrs.SetData(attrData);
 
-    pCurrent = ::Engine::Deserialize(pCurrent, &width, 1);
-    pCurrent = ::Engine::Deserialize(pCurrent, &height, 1);
-    pCurrent = ::Engine::Deserialize(pCurrent, pPixels, size_t(width) * height * GetPixelSize(attrs.GetPixelType()));
+    pCurrent = ::DgE::Deserialize(pCurrent, &width, 1);
+    pCurrent = ::DgE::Deserialize(pCurrent, &height, 1);
+    pCurrent = ::DgE::Deserialize(pCurrent, pPixels, size_t(width) * height * GetPixelSize(attrs.GetPixelType()));
     return pCurrent;
   }
 

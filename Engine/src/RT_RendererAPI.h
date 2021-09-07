@@ -24,7 +24,7 @@
 
 #include "RenderCommon.h"
 
-namespace Engine
+namespace DgE
 {
   using RendererID = uint32_t;
 #define INVALID_RENDERER_ID 0xFFFFFFFFUL

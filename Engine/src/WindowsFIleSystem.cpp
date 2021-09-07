@@ -5,7 +5,7 @@
 #include "IFileSystem.h"
 #include "Framework.h"
 
-namespace Engine
+namespace DgE
 {
   class WindowsFileSystem : public IFileSystem
   {

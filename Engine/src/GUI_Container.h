@@ -6,7 +6,7 @@
 #include "Utils.h"
 #include "GUI_Widget.h"
 
-namespace Engine
+namespace DgE
 {
   namespace GUI
   {

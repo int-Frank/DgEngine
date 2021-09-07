@@ -2,10 +2,10 @@
 
 #include "RT_Texture.h"
 #include "RT_RendererAPI.h"
-#include "BSR_Assert.h"
+#include "Options.h"
 #include <glad/glad.h>
 
-namespace Engine
+namespace DgE
 {
   static GLenum GetGL(TextureWrap a_val)
   {
@@ -79,7 +79,7 @@ namespace Engine
       }
       default:
       {
-        BSR_ASSERT(false, "Pixel type not yet implemented!");
+        DG_ASSERT(false, "Pixel type not yet implemented!");
       }
     }
 

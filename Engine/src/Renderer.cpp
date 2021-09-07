@@ -18,14 +18,14 @@
 
 #include "Renderer.h"
 #include "Log.h"
-#include "BSR_Assert.h"
+#include "Options.h"
 #include "Framework.h"
 #include "Log.h"
 #include "RT_RendererAPI.h"
 #include "RenderThread.h"
 #include "Memory.h"
 
-namespace Engine
+namespace DgE
 {
   struct GlobalRenderState
   {
@@ -39,7 +39,7 @@ namespace Engine
 
   Renderer * Renderer::Instance()
   {
-    BSR_ASSERT(s_instance != nullptr, "Renderer not initialised!");
+    DG_ASSERT(s_instance != nullptr, "Renderer not initialised!");
     return s_instance;
   }
 
@@ -50,7 +50,7 @@ namespace Engine
 
   bool Renderer::Init()
   {
-    BSR_ASSERT(s_instance == nullptr, "Renderer instance already initialised!");
+    DG_ASSERT(s_instance == nullptr, "Renderer instance already initialised!");
     s_instance = new Renderer();
     return s_instance->__Init();
   }
@@ -73,10 +73,10 @@ namespace Engine
 
   void Renderer::DrawIndexed(Ref<VertexArray> const & a_va, RenderMode a_mode, uint32_t a_instanceCount, uint32_t a_elementCount)
   {
-    BSR_ASSERT(a_va.get() != nullptr);
-    Engine::RenderState state = Engine::RenderState::Create();
-    state.Set<Engine::RenderState::Attr::Type>(Engine::RenderState::Type::Command);
-    state.Set<Engine::RenderState::Attr::Command>(Engine::RenderState::Command::Draw);
+    DG_ASSERT(a_va.get() != nullptr);
+    DgE::RenderState state = DgE::RenderState::Create();
+    state.Set<DgE::RenderState::Attr::Type>(DgE::RenderState::Type::Command);
+    state.Set<DgE::RenderState::Attr::Command>(DgE::RenderState::Command::Draw);
 
     uint32_t count = a_elementCount == 0 ? a_va->GetIndexBuffer()->ElementCount() : a_elementCount;
 
@@ -88,9 +88,9 @@ namespace Engine
 
   void Renderer::Clear()
   {
-    Engine::RenderState state = Engine::RenderState::Create();
-    state.Set<Engine::RenderState::Attr::Type>(Engine::RenderState::Type::Command);
-    state.Set<Engine::RenderState::Attr::Command>(Engine::RenderState::Command::Clear);
+    DgE::RenderState state = DgE::RenderState::Create();
+    state.Set<DgE::RenderState::Attr::Type>(DgE::RenderState::Type::Command);
+    state.Set<DgE::RenderState::Attr::Command>(DgE::RenderState::Command::Clear);
 
     RENDER_SUBMIT(state, []()
       {
@@ -100,9 +100,9 @@ namespace Engine
 
   void Renderer::Clear(float a_r, float a_g, float a_b, float a_a)
   {
-    Engine::RenderState state = Engine::RenderState::Create();
-    state.Set<Engine::RenderState::Attr::Type>(Engine::RenderState::Type::Command);
-    state.Set<Engine::RenderState::Attr::Command>(Engine::RenderState::Command::Clear);
+    DgE::RenderState state = DgE::RenderState::Create();
+    state.Set<DgE::RenderState::Attr::Type>(DgE::RenderState::Type::Command);
+    state.Set<DgE::RenderState::Attr::Command>(DgE::RenderState::Command::Clear);
 
     RENDER_SUBMIT(state, [r = a_r, g = a_g, b = a_b, a = a_a]()
       {
@@ -112,9 +112,9 @@ namespace Engine
 
   void Renderer::SetClearColor(float a_r, float a_g, float a_b, float a_a)
   {
-    Engine::RenderState state = Engine::RenderState::Create();
-    state.Set<Engine::RenderState::Attr::Type>(Engine::RenderState::Type::Command);
-    state.Set<Engine::RenderState::Attr::Command>(Engine::RenderState::Command::SetClearColor);
+    DgE::RenderState state = DgE::RenderState::Create();
+    state.Set<DgE::RenderState::Attr::Type>(DgE::RenderState::Type::Command);
+    state.Set<DgE::RenderState::Attr::Command>(DgE::RenderState::Command::SetClearColor);
 
     RENDER_SUBMIT(state, [r = a_r, g = a_g, b = a_b, a = a_a]()
       {
@@ -124,9 +124,9 @@ namespace Engine
 
   void Renderer::SetSissorBox(int a_x, int a_y, int a_w, int a_h)
   {
-    Engine::RenderState state = Engine::RenderState::Create();
-    state.Set<Engine::RenderState::Attr::Type>(Engine::RenderState::Type::Command);
-    state.Set<Engine::RenderState::Attr::Command>(Engine::RenderState::Command::SetClearColor);
+    DgE::RenderState state = DgE::RenderState::Create();
+    state.Set<DgE::RenderState::Attr::Type>(DgE::RenderState::Type::Command);
+    state.Set<DgE::RenderState::Attr::Command>(DgE::RenderState::Command::SetClearColor);
 
     RENDER_SUBMIT(state, [x = a_x, y = a_y, w = a_w, h = a_h]()
       {
@@ -141,9 +141,9 @@ namespace Engine
 
   void Renderer::Enable(RenderFeature a_feature)
   {
-    Engine::RenderState state = Engine::RenderState::Create();
-    state.Set<Engine::RenderState::Attr::Type>(Engine::RenderState::Type::Command);
-    state.Set<Engine::RenderState::Attr::Command>(Engine::RenderState::Command::EnableFeature);
+    DgE::RenderState state = DgE::RenderState::Create();
+    state.Set<DgE::RenderState::Attr::Type>(DgE::RenderState::Type::Command);
+    state.Set<DgE::RenderState::Attr::Command>(DgE::RenderState::Command::EnableFeature);
 
     RENDER_SUBMIT(state, [a_feature]() { RendererAPI::Enable(a_feature); });
     g_renderState.RenderFeatureState[static_cast<uint32_t>(a_feature)] = true;
@@ -151,9 +151,9 @@ namespace Engine
 
   void Renderer::Disable(RenderFeature a_feature)
   {
-    Engine::RenderState state = Engine::RenderState::Create();
-    state.Set<Engine::RenderState::Attr::Type>(Engine::RenderState::Type::Command);
-    state.Set<Engine::RenderState::Attr::Command>(Engine::RenderState::Command::DisableFeature);
+    DgE::RenderState state = DgE::RenderState::Create();
+    state.Set<DgE::RenderState::Attr::Type>(DgE::RenderState::Type::Command);
+    state.Set<DgE::RenderState::Attr::Command>(DgE::RenderState::Command::DisableFeature);
 
     RENDER_SUBMIT(state, [a_feature]() { RendererAPI::Disable(a_feature); });
     g_renderState.RenderFeatureState[static_cast<uint32_t>(a_feature)] = false;

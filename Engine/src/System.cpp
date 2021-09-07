@@ -2,7 +2,7 @@
 
 #include "System.h"
 
-namespace Engine
+namespace DgE
 {
   SystemID System::_GetNewID()
   {

@@ -5,7 +5,7 @@
 #include "DgMath.h"
 #include "Renderer.h"
 
-using namespace Engine;
+using namespace DgE;
 
 struct UBOData
 {
@@ -168,5 +168,5 @@ void RenderDemo::Render()
   m_material->Bind();
   m_va->Bind();
 
-  Renderer::DrawIndexed(m_va, Engine::RenderMode::Triangles, 25);
+  Renderer::DrawIndexed(m_va, DgE::RenderMode::Triangles, 25);
 }

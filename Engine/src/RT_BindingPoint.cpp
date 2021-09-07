@@ -2,10 +2,10 @@
 
 
 #include "RT_BindingPoint.h"
-#include "BSR_Assert.h"
+#include "Options.h"
 #include <glad/glad.h>
 
-namespace Engine
+namespace DgE
 {
   RT_BindingPoint::BindingPointData RT_BindingPoint::s_addresses[SBT32(COUNT)][ShaderDomain_COUNT] = {};
   static uint32_t const INVALID_BINDING_ID = 0xFFFFFFFF;
@@ -80,8 +80,8 @@ namespace Engine
                             ShaderDomain a_domain,
                             uint32_t a_index)
   {
-    BSR_ASSERT(a_index < 0xFFFF, "Index to high!");
-    BSR_ASSERT(a_type != StorageBlockType::COUNT, "Invalid Storage block type!");
+    DG_ASSERT(a_index < 0xFFFF, "Index to high!");
+    DG_ASSERT(a_type != StorageBlockType::COUNT, "Invalid Storage block type!");
 
     m_bindingData = a_index;
     m_bindingData = m_bindingData | (static_cast<uint32_t>(a_domain) << 16);

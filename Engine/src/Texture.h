@@ -25,7 +25,7 @@
 #include "RenderResource.h"
 #include "Memory.h"
 
-namespace Engine
+namespace DgE
 {
   enum class ResizeMethod
   {
