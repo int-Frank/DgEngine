@@ -37,9 +37,9 @@ namespace DgE
     m_bindings.clear();
   }
 
-  void System_Input::AddBinding(InputCode a_code, InputEvent a_event, InputMessageTranslator a_callback)
+  void System_Input::AddBinding(InputCode a_code, InputEvent a_event, InputMessageTranslator a_callback, void *a_pData)
   {
-    m_bindings[GET_FULL_INPUT_CODE(a_code, a_event)] = a_callback;
+    m_bindings[GET_FULL_INPUT_CODE(a_code, a_event)] = {a_callback, a_pData};
   }
 
   void System_Input::Update(float a_dt)
@@ -57,7 +57,7 @@ namespace DgE
         uint32_t code = GET_FULL_INPUT_CODE(pTemp->code, pTemp->event);
         auto it = m_bindings.find(code);
         if (it != m_bindings.end())
-          it->second(pTemp.Get());
+          it->second.func(pTemp.Get(), it->second.pData);
       }
       else if (pMsg->GetID() == Message_Input_Text::GetStaticID())
       {
@@ -65,7 +65,7 @@ namespace DgE
         uint32_t code = GET_FULL_INPUT_CODE(pTemp->code, pTemp->event);
         auto it = m_bindings.find(code);
         if (it != m_bindings.end())
-          it->second(pTemp.Get());
+          it->second.func(pTemp.Get(), it->second.pData);
       }
       else if (pMsg->GetID() == Message_Input_Mouse::GetStaticID())
       {
@@ -73,7 +73,7 @@ namespace DgE
         uint32_t code = GET_FULL_INPUT_CODE(pTemp->code, pTemp->event);
         auto it = m_bindings.find(code);
         if (it != m_bindings.end())
-          it->second(pTemp.Get());
+          it->second.func(pTemp.Get(), it->second.pData);
       }
       else if (pMsg->GetCategory() != MC_Input) // Pass on everything but raw input
       {

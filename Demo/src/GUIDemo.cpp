@@ -149,7 +149,7 @@ void GUIDemo::BindInput()
 
   // TODO A helper function should live in the Engine to set up default GUI bindings
   layer->AddBinding(DgE::IC_MOUSE_MOTION, DgE::IE_VALUE_CHANGE,
-    [](DgE::Message const * pMsg)
+    [](DgE::Message const * pMsg, void *)
     {
       DgE::Message_Input_Mouse * pIn = (DgE::Message_Input_Mouse *)pMsg;
       DgE::Message_GUI_PointerMove * pOut = nullptr;
@@ -159,13 +159,13 @@ void GUIDemo::BindInput()
     });
 
   layer->AddBinding(DgE::IC_KEY_Q, DgE::IE_BUTTON_DOWN,
-    [](DgE::Message const *)
+    [](DgE::Message const *, void *)
     {
       EMPLACE_POST(DgE::Message_Quit);
     });
 
   layer->AddBinding(DgE::IC_MOUSE_BUTTON_LEFT, DgE::IE_BUTTON_DOWN,
-    [](DgE::Message const * pMsg)
+    [](DgE::Message const * pMsg, void *)
     {
       DgE::Message_Input_Mouse * pIn = (DgE::Message_Input_Mouse *)pMsg;
       DgE::Message_GUI_PointerDown * pOut = nullptr;
@@ -175,7 +175,7 @@ void GUIDemo::BindInput()
     });
 
   layer->AddBinding(DgE::IC_MOUSE_BUTTON_LEFT, DgE::IE_BUTTON_UP,
-    [](DgE::Message const * pMsg)
+    [](DgE::Message const * pMsg, void *)
     {
       DgE::Message_Input_Mouse * pIn = (DgE::Message_Input_Mouse *)pMsg;
       DgE::Message_GUI_PointerUp * pOut = nullptr;

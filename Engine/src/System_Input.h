@@ -18,7 +18,7 @@ namespace DgE
 {
   class IEventPoller;
 
-  typedef void (*InputMessageTranslator)(Message const *);
+  typedef void (*InputMessageTranslator)(Message const *, void * pData);
 
   class System_Input : public System
   {
@@ -34,13 +34,19 @@ namespace DgE
 
     void HandleMessage(Message*) override;
 
-    void AddBinding(InputCode, InputEvent, InputMessageTranslator);
+    void AddBinding(InputCode, InputEvent, InputMessageTranslator, void *pData = nullptr);
 
   private:
 
+    struct Data
+    {
+      InputMessageTranslator func;
+      void * pData;
+    };
+
     IEventPoller     * m_pEventPoller;
     std::vector<uint32_t> keyFlags;
-    Dg::Map_AVL<uint32_t, InputMessageTranslator> m_bindings;
+    Dg::Map_AVL<uint32_t, Data> m_bindings;
 
   };
 }
