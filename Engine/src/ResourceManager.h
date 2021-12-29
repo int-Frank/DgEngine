@@ -14,12 +14,18 @@ namespace DgE
   typedef uint32_t ResourceID;
 #define INVALID_RESOURCE_ID 0xFFFFFFFF
 
+  // User Defioned IDs:   0 <= id < 0x80000000
+  // Sequential IDs:      0x80000000 <= id < 0xF0000000
+  // Internal static IDs: 0xF0000000 <= id < 0xFFFFFFFF
   enum InternalResourceID : ResourceID
   {
-    ir_GUIBoxShader = 0x80000000,
+    ir_InternalIDStart = 0x80000000,
+    ir_GUIBoxShader = 0xF0000000,
     ir_GUITextShader,
     ir_GUIBoxBorderShader
   };
+
+  ResourceID GetNextResourceID();
 
   class ResourceWrapperBase
   {

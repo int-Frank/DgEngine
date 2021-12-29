@@ -138,11 +138,8 @@ void RenderDemo::OnAttach()
       { ShaderDomain::Fragment, StrType::Source, g_fs }
       });
 
-    ResourceID sdID = NextID();
-    ResourceManager::Instance()->RegisterResource(sdID, pSD);
-
     Ref<RendererProgram> refProg;
-    refProg = RendererProgram::Create(sdID);
+    refProg = RendererProgram::Create(pSD);
 
     TextureAttributes attrs;
     attrs.SetFilter(TextureFilter::Linear);

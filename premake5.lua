@@ -190,4 +190,4 @@ project "Engine"
       runtime "Release"
       optimize "on"
   
- 
+ include("Demo/premake5.lua")

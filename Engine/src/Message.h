@@ -102,7 +102,7 @@ namespace DgE
     static TRef<Message> New(FuncT&& func)
     {
       static_assert(std::is_trivially_destructible<FuncT>::value, "FuncT must be trivially destructible");
-      MessageCommandFn renderCmd = [](void* ptr)
+      MessageCommandFn msgCmd = [](void* ptr)
       {
         auto pFunc = (FuncT*)ptr;
         (*pFunc)();
@@ -115,7 +115,7 @@ namespace DgE
       *static_cast<uint64_t*>(pBuf) = sze;
 
       void* ptr = AdvancePtr(pBuf, sizeof(uint64_t));
-      *static_cast<MessageCommandFn*>(ptr) = renderCmd;
+      *static_cast<MessageCommandFn*>(ptr) = msgCmd;
 
       ptr = AdvancePtr(ptr, sizeof(MessageCommandFn));
       new (ptr) FuncT(std::forward<FuncT>(func));

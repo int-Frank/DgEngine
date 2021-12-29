@@ -34,11 +34,19 @@ namespace DgE
   
   }
 
-  Ref<RendererProgram> RendererProgram::Create(ResourceID a_shaderSourceID)
+  Ref<RendererProgram> RendererProgram::Create(ShaderData * pShaderData)
   {
-    RendererProgram* pRP = new RendererProgram();
+    ResourceID id = GetNextResourceID();
+    ResourceManager::Instance()->RegisterResource(id, pShaderData);
+
+    return Create(id);
+  }
+
+  Ref<RendererProgram> RendererProgram::Create(ResourceID shaderSourceID)
+  {
+    RendererProgram * pRP = new RendererProgram();
     Ref<RendererProgram> ref(pRP);
-    pRP->Init(a_shaderSourceID);
+    pRP->Init(shaderSourceID);
     return ref;
   }
 

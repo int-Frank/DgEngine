@@ -11,6 +11,8 @@
 
 namespace DgE
 {
+  class ShaderData;
+
   class RendererProgram : public RenderResource
   {
     void Init(ResourceID shaderSourceID);
@@ -20,6 +22,7 @@ namespace DgE
     RendererProgram& operator=(RendererProgram const&) = delete;
   public:
 
+    static Ref<RendererProgram> Create(ShaderData * pShaderData);
     static Ref<RendererProgram> Create(ResourceID shaderSourceID);
 
     ~RendererProgram();

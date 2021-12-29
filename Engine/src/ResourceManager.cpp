@@ -5,6 +5,12 @@
 
 namespace DgE
 {
+  ResourceID GetNextResourceID()
+  {
+    static ResourceID s_nextID = ir_InternalIDStart;
+    return s_nextID++;
+  }
+
   //--------------------------------------------------------------------------------------
   // ResourceWrapperBase
   //--------------------------------------------------------------------------------------

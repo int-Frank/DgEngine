@@ -9,6 +9,7 @@
 #include "DgVector.h"
 #include "DgMatrix44.h"
 #include "DgMatrix33.h"
+#include "DgQuaternion.h"
 #include "DgBit.h"
 
 #define BIT(x) (1 << x)
@@ -22,6 +23,7 @@ namespace DgE
   typedef Dg::Vector2<float>    vec2;
   typedef Dg::Vector3<float>    vec3;
   typedef Dg::Vector4<float>    vec4;
+  typedef Dg::Quaternion<float> quat;
   typedef Dg::Matrix33<float>   mat33;
   typedef Dg::Matrix44<float>   mat44;
 
