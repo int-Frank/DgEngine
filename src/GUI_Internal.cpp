@@ -12,7 +12,7 @@
 #include <algorithm>
 
 // TODO This needs to come from input args or something
-#define DEFAULT_FONT_PATH "../Engine/assets/fonts/NotoSans-BSR.ttf"
+#define DEFAULT_FONT_PATH "../DgEngine/assets/fonts/NotoSans-BSR.ttf"
 
 namespace DgE
 {
