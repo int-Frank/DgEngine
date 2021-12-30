@@ -1,5 +1,4 @@
 #Custom
-Engine/Engine_vpaths.lua
 
 # Prerequisites
 *.d
@@ -381,5 +380,4 @@ MigrationBackup/
 *.vcxproj
 *.sln
 build/
-/DgLib_vpaths.lua
-/Engine_vpaths.lua
+DgEngine_vpaths.lua
