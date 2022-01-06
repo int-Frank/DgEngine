@@ -22,7 +22,7 @@ namespace DgE
       SliderContext()
         : value(0)
         , length(100.0f)
-        , majorAxis(0)
+        , isVertical(false)
         , position{}
         , style{}
         , pSlider{}
@@ -36,7 +36,7 @@ namespace DgE
 
       float value; // normalised between 0 and 1
       float length;
-      int majorAxis;
+      bool isVertical;
       vec2 position;
       Style::Slider style;
       SliderBase *pSlider;
@@ -53,26 +53,43 @@ namespace DgE
 
     void SliderContext::GetAABBs(UIAABB &a_lower, UIAABB &a_upper, UIAABB &a_caret)
     {
-      int const i = majorAxis;
-      int const j = (i + 1) & 1;
-
       vec2 globalPos = pSlider->GetGlobalPosition();
       vec2 size = pSlider->GetSize();
 
-      a_lower.position[i] = globalPos[i];
-      a_lower.position[j] = globalPos[j] + (size[j] - style.components[Style::Slider::c_LowerBar].height) / 2.0f;
-      a_lower.size[i] = GetLowerLength();
-      a_lower.size[j] = style.components[Style::Slider::c_LowerBar].height;
+      if (!isVertical)
+      {
+        a_lower.position.x() = globalPos.x();
+        a_lower.position.y() = globalPos.y() + (size.y() - style.components[Style::Slider::c_LowerBar].height) / 2.0f;
+        a_lower.size.x() = GetLowerLength();
+        a_lower.size.y() = style.components[Style::Slider::c_LowerBar].height;
 
-      a_upper.position[i] = globalPos[i] + GetLowerLength();
-      a_upper.position[j] = globalPos[j] + (size[j] - style.components[Style::Slider::c_UpperBar].height) / 2.0f;
-      a_upper.size[i] = length - GetLowerLength();
-      a_upper.size[j] = style.components[Style::Slider::c_UpperBar].height;
+        a_upper.position.x() = globalPos.x() + GetLowerLength();
+        a_upper.position.y() = globalPos.y() + (size.y() - style.components[Style::Slider::c_UpperBar].height) / 2.0f;
+        a_upper.size.x() = length - GetLowerLength();
+        a_upper.size.y() = style.components[Style::Slider::c_UpperBar].height;
 
-      a_caret.position[i] = globalPos[i] + GetLowerLength() - style.caretWidth / 2.0f;
-      a_caret.position[j] = globalPos[j] + (size[j] - style.components[Style::Slider::c_Caret].height) / 2.0f;
-      a_caret.size[i] = style.caretWidth;
-      a_caret.size[j] = style.components[Style::Slider::c_Caret].height;
+        a_caret.position.x() = globalPos.x() + GetLowerLength() - style.caretWidth / 2.0f;
+        a_caret.position.y() = globalPos.y() + (size.y() - style.components[Style::Slider::c_Caret].height) / 2.0f;
+        a_caret.size.x() = style.caretWidth;
+        a_caret.size.y() = style.components[Style::Slider::c_Caret].height;
+      }
+      else
+      {
+        a_lower.position.x() = globalPos.x() + (size.x() - style.components[Style::Slider::c_LowerBar].height) / 2.0f;
+        a_lower.position.y() = globalPos.y() + length - GetLowerLength();
+        a_lower.size.x() = style.components[Style::Slider::c_LowerBar].height;
+        a_lower.size.y() = GetLowerLength();
+
+        a_upper.position.x() = globalPos.x() + (size.x() - style.components[Style::Slider::c_UpperBar].height) / 2.0f;
+        a_upper.position.y() = globalPos.y();
+        a_upper.size.x() = style.components[Style::Slider::c_UpperBar].height;
+        a_upper.size.y() = length - GetLowerLength();
+
+        a_caret.position.x() = globalPos.x() + (size.x() - style.components[Style::Slider::c_Caret].height) / 2.0f;
+        a_caret.position.y() = globalPos.y() + length - GetLowerLength() - style.caretWidth / 2.0f;
+        a_caret.size.x() = style.components[Style::Slider::c_Caret].height;
+        a_caret.size.y() = style.caretWidth;
+      }
     }
 
     void SliderContext::GetInnerAABBs(UIAABB &a_lower, UIAABB &a_upper, UIAABB &a_caret)
@@ -94,9 +111,17 @@ namespace DgE
 
     void SliderContext::SetValFromScreenCoord(vec2 const &point)
     {
-      int const i = majorAxis;
-      float start = pSlider->GetGlobalPosition()[i] + style.caretWidth / 2.0f;
-      value = (point[i] - start) / (length - style.caretWidth);
+      if (!isVertical)
+      {
+        float start = pSlider->GetGlobalPosition().x() + style.caretWidth / 2.0f;
+        value = (point.x() - start) / (length - style.caretWidth);
+      }
+      else
+      {
+        float start = pSlider->GetGlobalPosition().y() + length - style.caretWidth / 2.0f;
+        value = (start - point.y()) / (length - style.caretWidth);
+      }
+
       if (value < 0.0f)
         value = 0.0f;
       else if (value > 1.0f)
@@ -221,9 +246,14 @@ namespace DgE
 
       if (PointInBox(point, caret))
       {
-        int const i = m_pContext->majorAxis;
         a_pMsg->SetFlag(Message::Flag::Handled, true);
-        float caretOffset = aabb.position[i] + m_pContext->GetLowerLength() - point[i];
+
+        float caretOffset;
+        if (!m_pContext->isVertical)
+          caretOffset = aabb.position.x() + m_pContext->GetLowerLength() - point.x();
+        else
+          caretOffset = aabb.position.y() + m_pContext->length - m_pContext->GetLowerLength() - point.y();
+
         return new SliderActiveState(m_pContext, caretOffset);
       }
       else if (PointInBox(point, barLower) || PointInBox(point, barUpper))
@@ -343,7 +373,7 @@ namespace DgE
     {
       SetStyle(style);
 
-      m_pimpl->context.majorAxis = isVertical ? 1 : 0;
+      m_pimpl->context.isVertical = isVertical;
 
       if (m_pimpl->context.style.caretWidth < SLIDER_MIN_CARET_WIDTH)
         m_pimpl->context.style.caretWidth = SLIDER_MIN_CARET_WIDTH;
@@ -500,7 +530,7 @@ namespace DgE
       if (l > h) h = l;
       if (u > h) h = u;
 
-      int const i = m_pimpl->context.majorAxis;
+      int const i = m_pimpl->context.isVertical ? 1 : 0;
       int const j = (i + 1) & 1;
 
       vec2 result;
