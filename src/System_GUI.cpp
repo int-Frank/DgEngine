@@ -6,6 +6,7 @@
 #include "Options.h"
 #include "GUI_Internal.h"
 #include "Renderer.h"
+#include "GUI.h"
 
 namespace DgE
 {
@@ -15,8 +16,8 @@ namespace DgE
     : m_dt(1.0f / 60.0f)
     , m_pScreen(nullptr)
   {
-    m_pScreen = GUI::Container::Create(nullptr, {0.f, 0.f}, {(float)a_windowW, (float)a_windowH}, {GUI::WidgetFlag::NoBackground});
-    m_pScreen->SetContentMargin(0.0f);
+    GUI::Style::Container style{};
+    m_pScreen = GUI::Container::Create(nullptr, {0.f, 0.f}, {(float)a_windowW, (float)a_windowH}, style, {GUI::WidgetFlag::NoBackground});
   }
 
   System_GUI::~System_GUI()

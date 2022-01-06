@@ -9,67 +9,127 @@
 #define GUI_FONT_SIZE 16
 #define GUI_FONT_SIZE_GRAB 16
 #define GUI_FONT_SIZE_BOX 32
-#define GUI_FONT_SIZE_TICK 22
+#define GUI_FONT_SIZE_TICK 13
 #define GUI_FONT_SIZE_RADIO 32
 
 namespace DgE
 {
   namespace GUI
   {
-    enum StyleColour
+    namespace Style
     {
-      col_Text,
+      struct Text
+      {
+        enum class HorizontalAlignment
+        {
+          Left,
+          Centre,
+          Right
+        };
 
-      col_ContainerFace,
-      col_ContainerOutline,
-      col_ContainerGrab,
-      col_ContainerGrabHover,
+        enum class VerticalAlignment
+        {
+          Top,
+          Centre
+        };
 
-      col_ButtonFace,
-      col_ButtonText,
-      col_ButtonOutline,
-      col_ButtonFaceHover,
-      col_ButtonTextHover,
-      col_ButtonOutlineHover,
+        Colour colourText;
+        HorizontalAlignment horizontalAlign;
+        VerticalAlignment verticalAlign;
+        float lineSpacing;
+        bool wrapText;
 
-      col_Checkbox,
-      col_CheckboxHover,
-      col_CheckboxTick,
-      col_CheckboxTickHover,
+        uint32_t size; // Internal use for now
+      };
 
-      col_SliderLower,
-      col_SliderLowerHover,
-      col_SliderLowerGrab,
-      col_SliderUpper,
-      col_SliderUpperHover,
-      col_SliderUpperGrab,
-      col_SliderCaret,
-      col_SliderCaretHover,
-      col_SliderCaretGrab,
-      col_SliderOutline,
-      col_SliderOutlineHover,
-      col_SliderOutlineGrab,
+      struct Slider
+      {
+        enum State
+        {
+          s_Default,
+          s_Hover,
+          s_Grab,
+          s_COUNT
+        };
 
-      col_COUNT
-    };
+        enum Component
+        {
+          c_LowerBar,
+          c_UpperBar,
+          c_Caret,
+          c_COUNT
+        };
 
-    struct Style
-    {
-      Colour colours[col_COUNT];
-      float contentMargin;
-      float outlineWidth;
-      float textLineSpacing;
-      bool textWrap;
-      float sliderCaretWidth;
-      float sliderCaretHeight;
-      float sliderBarHeight;
+        struct ComponentData
+        {
+          float height;
+          float borderWidth;
+        };
+
+        struct Colours
+        {
+          Colour face;
+          Colour border;
+        };
+
+        ComponentData components[c_COUNT];
+        Colours colours[c_COUNT][s_COUNT];
+        float caretWidth;
+      };
+
+      struct Container
+      {
+        Colour face;
+        Colour border;
+        Colour grabButton;
+        Colour grabButtonHover;
+        float borderWidth;
+        Slider scrollBars;
+      };
+
+      struct Button
+      {
+        enum State
+        {
+          Default,
+          Hover,
+          COUNT
+        };
+
+        struct Colours
+        {
+          Colour face;
+          Colour border;
+        };
+
+        Colours colours[COUNT];
+        Text text[COUNT];
+        float borderWidth;
+        float contentMargin;
+      };
+
+      struct Checkbox
+      {
+        enum State
+        {
+          Default,
+          Hover,
+          COUNT
+        };
+
+        struct Colours
+        {
+          Colour box;
+          Colour border;
+        };
+
+        Colours colours[COUNT];
+        Colour tick;
+      };
     };
 
     Dg::ErrorCode Init();
     void ShutDown();
-
-    Style & GetStyle();
-    void ResetStyle();
   }
 }
 

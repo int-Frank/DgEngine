@@ -29,7 +29,7 @@ namespace DgE
 
   struct UIAABB
   {
-    vec2 position;
+    vec2 position; // top left
     vec2 size;
   };
 

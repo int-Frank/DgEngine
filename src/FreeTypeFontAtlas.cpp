@@ -191,7 +191,7 @@ namespace DgE
       if (path == s_Fonts[i].path)
       {
         out = FontID(i);
-        DG_ERROR_SET_AND_BREAK(Dg::ErrorCode::None);
+        DG_ERROR_SET_AND_BREAK(Dg::ErrorCode::None); //TODO Should be SET_NO_BREAK
       }
     }
 

@@ -49,6 +49,8 @@ namespace DgE
       // Container
       Resizable,
       Movable,
+      VerticalScroll,
+      HorizontalScroll,
       NoBackground
     };
 

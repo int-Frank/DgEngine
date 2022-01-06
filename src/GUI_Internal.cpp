@@ -263,7 +263,7 @@ namespace DgE
         ::DgE::Renderer::DrawIndexed(s_pRenderContext->va_unitBox, RenderMode::Triangles, 1);
       }
 
-      void DrawBoxOutline(UIAABB const & a_inner, float a_thickness, Colour a_colour)
+      void DrawBoxBorder(UIAABB const & a_inner, float a_thickness, Colour a_colour)
       {
         float verts[16] = 
         {
@@ -290,10 +290,10 @@ namespace DgE
         ::DgE::Renderer::DrawIndexed(s_pRenderContext->va_boxBorder, RenderMode::Triangles, 1);
       }
 
-      void DrawBoxWithOutline(UIAABB const & inner, float thickness, Colour clrInner, Colour clrOutline)
+      void DrawBoxWithBorder(UIAABB const & inner, float thickness, Colour clrInner, Colour clrBorder)
       {
         DrawBox(inner, clrInner);
-        DrawBoxOutline(inner, thickness, clrOutline);
+        DrawBoxBorder(inner, thickness, clrBorder);
       }
 
       void DrawText(uint16_t a_textureID, Colour a_colour, uint32_t a_count, void * a_pVerts)
@@ -316,6 +316,28 @@ namespace DgE
         s_pRenderContext->va_text->Bind();
 
         ::DgE::Renderer::DrawIndexed(s_pRenderContext->va_text, RenderMode::Triangles, a_count);
+      }
+
+      Dg::ErrorCode DrawGlyph(CodePoint cp, uint32_t size, vec2 const &position, Colour colour)
+      {
+        Dg::ErrorCode result;
+        float verts[6] = {};
+        GlyphData * pGlyph = s_pRenderContext->fontAtlas->GetGlyphData(s_pRenderContext->defaultFont, cp, size);
+
+        DG_ERROR_IF(pGlyph == nullptr, Dg::ErrorCode::NotFound);
+
+        verts[0] = position.x();
+        verts[1] = position.y();
+        verts[2] = pGlyph->posX;
+        verts[3] = pGlyph->posY;
+        verts[4] = pGlyph->width;
+        verts[5] = pGlyph->height;
+
+        DrawText(pGlyph->textureID, colour, 1, verts);
+
+        result = Dg::ErrorCode::None;
+      epilogue:
+        return result;
       }
 
       GlyphData * GetGlyphData(CodePoint a_cp, uint32_t a_size)

@@ -5,33 +5,27 @@
 
 #include "Utils.h"
 #include "GUI_Widget.h"
+#include "GUI.h"
 
 namespace DgE
 {
   namespace GUI
   {
-    enum class ContainerElement
-    {
-      Face,
-      Outline,
-      Grab,
-      GrabHover,
-
-      COUNT
-    };
-
     class Container : public Widget
     {
-      Container(Widget * pParent, vec2 const position, vec2 const & size, std::initializer_list<WidgetFlag> flags);
+      Container(Widget * pParent, vec2 const position, vec2 const & size, Style::Container const &style, std::initializer_list<WidgetFlag> flags);
     public:
 
       static vec2 const s_minSize;
 
-      static Container * Create(Widget * pParent, vec2 const position, vec2 const & size, std::initializer_list<WidgetFlag> flags = {WidgetFlag::Movable, WidgetFlag::Resizable});
+      static Container *Create(Widget *pParent, vec2 const position, vec2 const &size, std::initializer_list<WidgetFlag> flags = {WidgetFlag::Movable, WidgetFlag::Resizable});
+      static Container *Create(Widget *pParent, vec2 const position, vec2 const &size, Style::Container const &, std::initializer_list<WidgetFlag> flags = {WidgetFlag::Movable, WidgetFlag::Resizable});
+      
       ~Container();
 
-      void SetContentMargin(float);
-      void SetColour(ContainerElement, Colour);
+      static Style::Container const &GetDefaultStyle();
+      Style::Container const &GetStyle() const;
+      void SetStyle(Style::Container const &);
 
       void Clear();
       void Add(Widget *); // TODO Add check if widget already exists.
@@ -47,13 +41,9 @@ namespace DgE
 
       bool IsContainer() const override;
 
-      class InternalState;
-
     private:
 
       void _HandleMessage(Message *) override;
-
-      void UpdateState(InternalState *);
 
       void _SetLocalPosition(vec2 const &) override;
       void _SetSize(vec2 const &) override;
@@ -62,7 +52,10 @@ namespace DgE
 
     private:
 
-      InternalState * m_pState;
+      static Style::Container const s_style;
+
+      class PIMPL;
+      PIMPL *m_pimpl;
     };
   }
 }

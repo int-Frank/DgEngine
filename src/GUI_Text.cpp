@@ -16,6 +16,23 @@ namespace DgE
 {
   namespace GUI
   {
+    class Text::PIMPL
+    {
+    public:
+
+      PIMPL()
+        : pParent(nullptr)
+        , text()
+        , style{}
+        , aabb{}
+      {}
+
+      Widget *pParent;
+      std::string text;
+      Style::Text style;
+      UIAABB aabb;
+    };
+
     enum class ParseState
     {
       NewLine,
@@ -30,8 +47,8 @@ namespace DgE
       // Constants...
       UIAABB div;
       UIAABB divViewable;
-      HorizontalAlignment horizontalAlign;
-      VerticalAlignment verticalAlign;
+      Style::Text::HorizontalAlignment horizontalAlign;
+      Style::Text::VerticalAlignment verticalAlign;
       int16_t lineSpacing;
       uint32_t cpCount;
       int16_t ascent;
@@ -471,9 +488,9 @@ namespace DgE
           break;
 
         float offsetX = 0.0f;
-        if (context.horizontalAlign == HorizontalAlignment::Right)
+        if (context.horizontalAlign == Style::Text::HorizontalAlignment::Right)
           offsetX = context.div.size.x() - (float)LineLength(context);
-        else if (context.horizontalAlign == HorizontalAlignment::Centre)
+        else if (context.horizontalAlign == Style::Text::HorizontalAlignment::Centre)
           offsetX = (context.div.size.x() - (float)LineLength(context)) / 2.0f;
 
         offsetX = round(offsetX);
@@ -486,7 +503,7 @@ namespace DgE
           break;
       }
 
-      if (context.verticalAlign == VerticalAlignment::Centre)
+      if (context.verticalAlign == Style::Text::VerticalAlignment::Centre)
       {
         float ySize = (float)context.lineSpacing * line;
         if (ySize < context.div.size.y())
@@ -534,33 +551,26 @@ namespace DgE
       return count;
     }
 
-    Text::Text(Widget * pParent, std::string const & text, vec2 const & position, vec2 const & size, TextAttributes const * pAttrs, std::initializer_list<WidgetFlag> flags)
+    Text::Text(Widget * pParent, std::string const & text, vec2 const & position, vec2 const & size, Style::Text const &style, std::initializer_list<WidgetFlag> flags)
       : Widget({WidgetFlag::NotResponsive,
                 WidgetFlag::StretchHeight,
                 WidgetFlag::StretchWidth}, flags)
-      , m_pParent(pParent)
-      , m_text(text)
-      , m_attributes{}
-      , m_aabb{position, size}
+      , m_pimpl(new PIMPL())
     {
-      if (pAttrs != nullptr)
-      {
-        m_attributes = *pAttrs;
-      }
-      else
-      {
-        m_attributes.size = GUI_FONT_SIZE;
-        m_attributes.colourText = GetStyle().colours[col_Text];
-        m_attributes.lineSpacing = GetStyle().textLineSpacing;
-        m_attributes.horizontalAlign = HorizontalAlignment::Left;
-        m_attributes.verticalAlign = VerticalAlignment::Top;
-        m_attributes.wrapText = true;
-      }
+      SetStyle(style);
+      m_pimpl->aabb = {position, size};
+      m_pimpl->pParent = pParent;
+      m_pimpl->text = text;
     }
 
-    Text * Text::Create(Widget * pParent, std::string const & text, vec2 const & position, vec2 const & size, TextAttributes const * pAttrs, std::initializer_list<WidgetFlag> flags)
+    Text *Text::Create(Widget *pParent, std::string const &text, vec2 const &position, vec2 const &size, Style::Text const &style, std::initializer_list<WidgetFlag> flags)
     {
-      return new Text(pParent, text, position, size, pAttrs, flags);
+      return new Text(pParent, text, position, size, style, flags);
+    }
+
+    Text *Text::Create(Widget *pParent, std::string const &text, vec2 const &position, vec2 const &size, std::initializer_list<WidgetFlag> flags)
+    {
+      return new Text(pParent, text, position, size, s_style, flags);
     }
 
     Text::~Text()
@@ -570,12 +580,22 @@ namespace DgE
 
     void Text::SetText(std::string const & a_str)
     {
-      m_text = a_str;
+      m_pimpl->text = a_str;
     }
 
-    void Text::SetColour(Colour a_clr)
+    Style::Text const &Text::GetDefaultStyle()
     {
-      m_attributes.colourText = a_clr;
+      return s_style;
+    }
+
+    Style::Text const &Text::GetStyle() const
+    {
+      return m_pimpl->style;
+    }
+
+    void Text::SetStyle(Style::Text const &style)
+    {
+      m_pimpl->style = style;
     }
 
     void Text::Draw()
@@ -588,14 +608,14 @@ namespace DgE
 
       TextContext context;
       context.div = {GetGlobalPosition(), GetSize()};
-      Renderer::GetCharacterSizeRange(m_attributes.size, context.ascent, context.descent);
+      Renderer::GetCharacterSizeRange(m_pimpl->style.size, context.ascent, context.descent);
 
-      context.wrap = m_attributes.wrapText;
+      context.wrap = m_pimpl->style.wrapText;
       context.divViewable = viewableWindow;
-      context.horizontalAlign = m_attributes.horizontalAlign;
-      context.verticalAlign = m_attributes.verticalAlign;
-      context.lineSpacing = int16_t(m_attributes.lineSpacing * (context.ascent - context.descent));
-      context.cpCount = DecodeText(m_text, textureCount, m_attributes.size);
+      context.horizontalAlign = m_pimpl->style.horizontalAlign;
+      context.verticalAlign = m_pimpl->style.verticalAlign;
+      context.lineSpacing = int16_t(m_pimpl->style.lineSpacing * (context.ascent - context.descent));
+      context.cpCount = DecodeText(m_pimpl->text, textureCount, m_pimpl->style.size);
       
       ::DgE::Renderer::SetSissorBox((int)viewableWindow.position.x(), (int)viewableWindow.position.y(), (int)viewableWindow.size.x(), (int)viewableWindow.size.y());
       
@@ -607,13 +627,13 @@ namespace DgE
 
         WriteText(context);
 
-        Renderer::DrawText(context.currentTextureID, m_attributes.colourText, context.writtenCPs, s_textVertexBuffer);
+        Renderer::DrawText(context.currentTextureID, m_pimpl->style.colourText, context.writtenCPs, s_textVertexBuffer);
       }
     }
     
     void Text::SetGlyphSize(uint32_t a_size)
     {
-      m_attributes.size = a_size;
+      m_pimpl->style.size = a_size;
     }
 
     WidgetState Text::QueryState() const
@@ -623,17 +643,12 @@ namespace DgE
 
     Widget * Text::GetParent() const
     {
-      return m_pParent;
+      return m_pimpl->pParent;
     }
 
     void Text::SetParent(Widget * a_pParent)
     {
-      m_pParent = a_pParent;
-    }
-
-    void Text::SetWrap(bool a_val)
-    {
-      m_attributes.wrapText = a_val;
+      m_pimpl->pParent = a_pParent;
     }
 
     void Text::_HandleMessage(Message * a_pMsg)
@@ -667,22 +682,22 @@ namespace DgE
 
     void Text::_SetLocalPosition(vec2 const & a_pos)
     {
-      m_aabb.position = a_pos;
+      m_pimpl->aabb.position = a_pos;
     }
 
     void Text::_SetSize(vec2 const & a_size)
     {
-      m_aabb.size = a_size;
+      m_pimpl->aabb.size = a_size;
     }
 
     vec2 Text::_GetLocalPosition()
     {
-      return m_aabb.position;
+      return m_pimpl->aabb.position;
     }
 
     vec2 Text::_GetSize()
     {
-      return m_aabb.size;
+      return m_pimpl->aabb.size;
     }
   }
 }

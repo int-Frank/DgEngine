@@ -5,47 +5,27 @@
 
 #include "Utils.h"
 #include "GUI_Widget.h"
+#include "GUI.h"
 
 namespace DgE
 {
   namespace GUI
   {
-    enum class HorizontalAlignment
-    {
-      Left,
-      Centre,
-      Right
-    };
-
-    enum class VerticalAlignment
-    {
-      Top,
-      Centre
-    };
-
-    struct TextAttributes
-    {
-      Colour colourText;
-      HorizontalAlignment horizontalAlign;
-      VerticalAlignment verticalAlign;
-      float lineSpacing;
-      bool wrapText;
-
-      uint32_t size; // Internal use for now
-    };
-
     class Text : public Widget
     {
-      Text(Widget * pParent, std::string const & text, vec2 const & position, vec2 const & size, TextAttributes const * pAttrs, std::initializer_list<WidgetFlag> flags);
+      Text(Widget * pParent, std::string const & text, vec2 const & position, vec2 const & size, Style::Text const &style, std::initializer_list<WidgetFlag> flags);
     public:
 
-      static Text * Create(Widget * pParent, std::string const & text, vec2 const & position, vec2 const & size, TextAttributes const *pAttrs = nullptr, std::initializer_list<WidgetFlag> flags ={});
+      static Text *Create(Widget *pParent, std::string const &text, vec2 const &position, vec2 const &size, std::initializer_list<WidgetFlag> flags = {});
+      static Text *Create(Widget *pParent, std::string const &text, vec2 const &position, vec2 const &size, Style::Text const &style, std::initializer_list<WidgetFlag> flags = {});
 
       ~Text();
 
-      void SetWrap(bool);
       void SetText(std::string const &);
-      void SetColour(Colour);
+
+      static Style::Text const &GetDefaultStyle();
+      Style::Text const &GetStyle() const;
+      void SetStyle(Style::Text const&);
 
       //void SetFont(FontID fontID, uint32_t size);
       void SetGlyphSize(uint32_t size);
@@ -68,10 +48,10 @@ namespace DgE
 
     private:
 
-      Widget * m_pParent;
-      std::string m_text;
-      TextAttributes m_attributes;
-      UIAABB m_aabb;
+      static Style::Text const s_style;
+
+      class PIMPL;
+      PIMPL *m_pimpl;
     };
   }
 }

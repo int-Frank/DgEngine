@@ -9,100 +9,153 @@
 #define SLIDER_MIN_RUN_PIXELS 4.0f
 #define SLIDER_MIN_CARET_WIDTH 2.0f
 
+#define SLIDER_HEIGHT m_pContext->
+
 namespace DgE
 {
   namespace GUI
   {
+    class SliderContext
+    {
+    public:
+
+      SliderContext()
+        : value(0)
+        , length(100.0f)
+        , majorAxis(0)
+        , position{}
+        , style{}
+        , pSlider{}
+        , pParent{}
+        , clbk_HoverOn()
+        , clbk_HoverOff()
+      {
+        if (clbk_HoverOn == nullptr)
+          char t = 0;
+      }
+
+      float value; // normalised between 0 and 1
+      float length;
+      int majorAxis;
+      vec2 position;
+      Style::Slider style;
+      SliderBase *pSlider;
+      Widget *pParent;
+
+      std::function<void()> clbk_HoverOn;
+      std::function<void()> clbk_HoverOff;
+
+      float GetLowerLength();
+      void GetAABBs(UIAABB &lower, UIAABB &upper, UIAABB &caret);
+      void GetInnerAABBs(UIAABB &lower, UIAABB &upper, UIAABB &caret);
+      void SetValFromScreenCoord(vec2 const & point);
+    };
+
+    void SliderContext::GetAABBs(UIAABB &a_lower, UIAABB &a_upper, UIAABB &a_caret)
+    {
+      int const i = majorAxis;
+      int const j = (i + 1) & 1;
+
+      vec2 globalPos = pSlider->GetGlobalPosition();
+      vec2 size = pSlider->GetSize();
+
+      a_lower.position[i] = globalPos[i];
+      a_lower.position[j] = globalPos[j] + (size[j] - style.components[Style::Slider::c_LowerBar].height) / 2.0f;
+      a_lower.size[i] = GetLowerLength();
+      a_lower.size[j] = style.components[Style::Slider::c_LowerBar].height;
+
+      a_upper.position[i] = globalPos[i] + GetLowerLength();
+      a_upper.position[j] = globalPos[j] + (size[j] - style.components[Style::Slider::c_UpperBar].height) / 2.0f;
+      a_upper.size[i] = length - GetLowerLength();
+      a_upper.size[j] = style.components[Style::Slider::c_UpperBar].height;
+
+      a_caret.position[i] = globalPos[i] + GetLowerLength() - style.caretWidth / 2.0f;
+      a_caret.position[j] = globalPos[j] + (size[j] - style.components[Style::Slider::c_Caret].height) / 2.0f;
+      a_caret.size[i] = style.caretWidth;
+      a_caret.size[j] = style.components[Style::Slider::c_Caret].height;
+    }
+
+    void SliderContext::GetInnerAABBs(UIAABB &a_lower, UIAABB &a_upper, UIAABB &a_caret)
+    {
+      GetAABBs(a_lower, a_upper, a_caret);
+
+      vec2 posOffsetLower(style.components[Style::Slider::c_LowerBar].borderWidth, style.components[Style::Slider::c_LowerBar].borderWidth);
+      vec2 posOffsetUpper(style.components[Style::Slider::c_UpperBar].borderWidth, style.components[Style::Slider::c_UpperBar].borderWidth);
+      vec2 posOffsetCaret(style.components[Style::Slider::c_Caret].borderWidth, style.components[Style::Slider::c_Caret].borderWidth);
+
+      a_lower.position += posOffsetLower;
+      a_upper.position += posOffsetUpper;
+      a_caret.position += posOffsetCaret;
+
+      a_lower.size -= 2.0f * posOffsetLower;
+      a_upper.size -= 2.0f * posOffsetUpper;
+      a_caret.size -= 2.0f * posOffsetCaret;
+    }
+
+    void SliderContext::SetValFromScreenCoord(vec2 const &point)
+    {
+      int const i = majorAxis;
+      float start = pSlider->GetGlobalPosition()[i] + style.caretWidth / 2.0f;
+      value = (point[i] - start) / (length - style.caretWidth);
+      if (value < 0.0f)
+        value = 0.0f;
+      else if (value > 1.0f)
+        value = 1.0f;
+    }
+
+    float SliderContext::GetLowerLength()
+    {
+      return style.caretWidth / 2.0f + ((length - style.caretWidth) * value);
+    }
+
     //------------------------------------------------------------------------------------
     // State class declarations
     //------------------------------------------------------------------------------------
-    class SliderBase::InternalState
+
+    class SliderState
     {
     public:
 
-      struct Data
-      {
-        float value; // normalised between 0 and 1
-        float width;
-        float barHeight;
-        float caretWidth;
-        float caretHeight;
-        float outlineWidth;
-        vec2 position;
-        Colour clr[(int)SliderState::COUNT][(int)SliderElement::COUNT];
-        SliderBase * pSlider;
-        Widget * pParent;
+      SliderState(SliderContext * a_pData);
+      virtual ~SliderState() {};
 
-        std::function<void()> m_clbk_HoverOn;
-        std::function<void()> m_clbk_HoverOff;
-      };
-
-      InternalState(Data * a_pData);
-      virtual ~InternalState();
-
-      void Destroy();
-
-      void SetColour(SliderState, SliderElement, Colour);
-      void BindHoverOn(std::function<void()> a_fn);
-      void BindHoverOff(std::function<void()> a_fn);
-
-      virtual void Draw() = 0;
       virtual WidgetState QueryState() const = 0;
-      Widget * GetParent() const;
-      void SetParent(Widget * a_pParent);
-
-      float SetNormalisedValue(float);
-
-      virtual InternalState * HandleMessage(Message *) = 0;
-
-      float GetGlobalBarCentre();
-      void _SetLocalPosition(vec2 const &);
-      void _SetSize(vec2 const &);
-      vec2 _GetLocalPosition();
-      vec2 _GetSize();
+      virtual SliderState * HandleMessage(Message *) = 0;
 
     protected:
 
-      void _Draw(SliderState);
-      void GetAABBs(UIAABB & lower, UIAABB & upper, UIAABB & caret);
-      void GetAABBs(UIAABB & bar, UIAABB & caret);
-      void GetInnerAABBs(UIAABB & lower, UIAABB & upper, UIAABB & caret);
-      void SetValFromScreenCoord(float x);
-
-      Data * m_pData;
+      SliderContext * m_pContext;
     };
 
-    class SliderStaticState : public SliderBase::InternalState
+    class SliderStaticState : public SliderState
     {
     public:
 
-      SliderStaticState(Data * a_pData, WidgetState);
-      ~SliderStaticState();
+      SliderStaticState(SliderContext * a_pData, WidgetState);
+      ~SliderStaticState() {}
 
-      void Draw();
       WidgetState QueryState() const override;
 
-      InternalState * HandleMessage(Message * a_pMsg) override;
-      InternalState * HandleMessage(Message_GUI_PointerDown * a_pMsg);
-      InternalState * HandleMessage(Message_GUI_PointerMove * a_pMsg);
+      SliderState * HandleMessage(Message * a_pMsg) override;
+      SliderState * HandleMessage(Message_GUI_PointerDown * a_pMsg);
+      SliderState * HandleMessage(Message_GUI_PointerMove * a_pMsg);
 
     private:
 
       WidgetState m_state;
     };
 
-    class SliderActiveState : public SliderBase::InternalState
+    class SliderActiveState : public SliderState
     {
     public:
 
-      SliderActiveState(Data * a_pData, float caretOffset);
-      ~SliderActiveState();
+      SliderActiveState(SliderContext * a_pData, float caretOffset);
+      ~SliderActiveState() {}
 
-      void Draw();
       WidgetState QueryState() const override;
 
-      InternalState * HandleMessage(Message * a_pMsg) override;
-      InternalState * HandleMessage(Message_GUI_PointerMove * a_pMsg);
+      SliderState * HandleMessage(Message * a_pMsg) override;
+      SliderState * HandleMessage(Message_GUI_PointerMove * a_pMsg);
 
     private:
 
@@ -110,175 +163,22 @@ namespace DgE
     };
 
     //------------------------------------------------------------------------------------
-    // InternalState
+    // SliderState
     //------------------------------------------------------------------------------------
 
-    SliderBase::InternalState::InternalState(Data * a_pData)
-      : m_pData(a_pData)
+    SliderState::SliderState(SliderContext * a_pData)
+      : m_pContext(a_pData)
     {
 
-    }
-
-    SliderBase::InternalState::~InternalState()
-    {
-
-    }
-
-    void SliderBase::InternalState::Destroy()
-    {
-      delete m_pData;
-      m_pData = nullptr;
-    }
-
-    void SliderBase::InternalState::BindHoverOn(std::function<void()> a_fn)
-    {
-      m_pData->m_clbk_HoverOn = a_fn;
-    }
-
-    void SliderBase::InternalState::BindHoverOff(std::function<void()> a_fn)
-    {
-      m_pData->m_clbk_HoverOff = a_fn;
-    }
-
-    Widget * SliderBase::InternalState::GetParent() const
-    {
-      return m_pData->pParent;
-    }
-
-    void SliderBase::InternalState::SetParent(Widget * a_pParent)
-    {
-      m_pData->pParent = a_pParent;
-    }
-
-    float SliderBase::InternalState::SetNormalisedValue(float a_val)
-    {
-      if (a_val < 0.0f)
-        a_val = 0.0f;
-      else if (a_val > 1.0f)
-        a_val = 1.0f;
-
-      m_pData->value = a_val;
-      return m_pData->value;
-    }
-
-    vec2 SliderBase::InternalState::_GetSize()
-    {
-      float h = m_pData->caretHeight > m_pData->barHeight ? m_pData->caretHeight : m_pData->barHeight;
-      return vec2(m_pData->width, h);
-    }
-
-    void SliderBase::InternalState::SetColour(SliderState a_state, SliderElement a_ele, Colour a_clr)
-    {
-      DG_ASSERT(a_state != SliderState::COUNT);
-      DG_ASSERT(a_ele != SliderElement::COUNT);
-      m_pData->clr[(int)a_state][(int)a_ele] = a_clr;
-    }
-
-    void SliderBase::InternalState::_Draw(SliderState a_state)
-    {
-      UIAABB viewableWindow;
-      if (!m_pData->pSlider->GetGlobalAABB(viewableWindow))
-        return;
-
-      ::DgE::Renderer::SetSissorBox((int)viewableWindow.position.x(), (int)viewableWindow.position.y(), (int)viewableWindow.size.x(), (int)viewableWindow.size.y());
-
-      UIAABB lower, upper, caret;
-      GetInnerAABBs(lower, upper, caret);
-
-      int s = (int)a_state;
-
-      Renderer::DrawBoxWithOutline(lower, m_pData->outlineWidth, m_pData->clr[s][(int)SliderElement::Lower], m_pData->clr[s][(int)SliderElement::Outline]);
-      Renderer::DrawBoxWithOutline(upper, m_pData->outlineWidth, m_pData->clr[s][(int)SliderElement::Upper], m_pData->clr[s][(int)SliderElement::Outline]);
-      Renderer::DrawBoxWithOutline(caret, m_pData->outlineWidth, m_pData->clr[s][(int)SliderElement::Caret], m_pData->clr[s][(int)SliderElement::Outline]);
-    }
-
-    float SliderBase::InternalState::GetGlobalBarCentre()
-    {
-      return m_pData->pSlider->GetGlobalPosition().x() + m_pData->caretWidth / 2.0f + ((m_pData->width - m_pData->caretWidth) * m_pData->value);
-    }
-
-    void SliderBase::InternalState::GetAABBs(UIAABB & a_lower, UIAABB & a_upper, UIAABB & a_caret)
-    {
-      vec2 size = _GetSize();
-      vec2 globalPos = m_pData->pSlider->GetGlobalPosition();
-      float barBeginX = globalPos.x();
-      float barCentreX = GetGlobalBarCentre();
-      float barEndX = globalPos.x() + m_pData->width;
-      float barY = globalPos.y() + (size.y() - m_pData->barHeight) / 2.0f;
-      float caretX = barBeginX + m_pData->value * (m_pData->width - m_pData->caretWidth);
-      float caretY = globalPos.y() + (size.y() - m_pData->caretHeight) / 2.0f;
-
-      a_lower ={vec2(barBeginX, barY), vec2(barCentreX - barBeginX, m_pData->barHeight)};
-      a_upper ={vec2(barCentreX, barY), vec2(barEndX - barCentreX, m_pData->barHeight)};
-      a_caret ={vec2(caretX, caretY), vec2(m_pData->caretWidth, m_pData->caretHeight)};
-    }
-
-    void SliderBase::InternalState::GetAABBs(UIAABB & a_bar, UIAABB & a_caret)
-    {
-      vec2 size = _GetSize();
-      vec2 globalPos = m_pData->pSlider->GetGlobalPosition();
-      float barBeginX = globalPos.x();
-      float barY = globalPos.y() + (size.y() - m_pData->barHeight) / 2.0f;
-      float caretX = barBeginX + m_pData->value * (m_pData->width - m_pData->caretWidth);
-      float caretY = globalPos.y() + (size.y() - m_pData->caretHeight) / 2.0f;
-
-      a_bar = {vec2(barBeginX, barY), vec2(m_pData->width, m_pData->barHeight)};
-      a_caret = {vec2(caretX, caretY), vec2(m_pData->caretWidth, m_pData->caretHeight)};
-    }
-
-    void SliderBase::InternalState::GetInnerAABBs(UIAABB & a_lower, UIAABB & a_upper, UIAABB & a_caret)
-    {
-      GetAABBs(a_lower, a_upper, a_caret);
-
-      vec2 posOffset(m_pData->outlineWidth, m_pData->outlineWidth);
-      a_lower.position += posOffset;
-      a_upper.position += posOffset;
-      a_caret.position += posOffset;
-
-      a_lower.size -= 2.0f * posOffset;
-      a_upper.size -= 2.0f * posOffset;
-      a_caret.size -= 2.0f * posOffset;
-    }
-
-    void SliderBase::InternalState::SetValFromScreenCoord(float a_x)
-    {
-      float xPos = m_pData->pSlider->GetGlobalPosition().x() + m_pData->caretWidth / 2.0f;
-      m_pData->value = (a_x - xPos) / (m_pData->width - m_pData->caretWidth);
-      if (m_pData->value < 0.0f)
-        m_pData->value = 0.0f;
-      else if (m_pData->value > 1.0f)
-        m_pData->value = 1.0f;
-    }
-
-    vec2 SliderBase::InternalState::_GetLocalPosition()
-    {
-      return m_pData->position;
-    }
-
-    void SliderBase::InternalState::_SetLocalPosition(vec2 const & a_position)
-    {
-      m_pData->position;
-    }
-
-    void SliderBase::InternalState::_SetSize(vec2 const & a_size)
-    {
-      m_pData->width = a_size.x();
-      if (m_pData->width < (m_pData->caretWidth + SLIDER_MIN_RUN_PIXELS))
-        m_pData->width = (m_pData->caretWidth + SLIDER_MIN_RUN_PIXELS);
     }
 
     //------------------------------------------------------------------------------------
     // SliderStaticState
     //------------------------------------------------------------------------------------
 
-    SliderStaticState::SliderStaticState(Data * a_pData, WidgetState a_state)
-      : InternalState(a_pData)
+    SliderStaticState::SliderStaticState(SliderContext * a_pData, WidgetState a_state)
+      : SliderState(a_pData)
       , m_state(a_state)
-    {
-
-    }
-
-    SliderStaticState::~SliderStaticState()
     {
 
     }
@@ -288,17 +188,12 @@ namespace DgE
       return m_state;
     }
 
-    void SliderStaticState::Draw()
-    {
-      _Draw(m_state == WidgetState::HoverOn ? SliderState::Hover : SliderState::Normal);
-    }
-
-    SliderBase::InternalState * SliderStaticState::HandleMessage(Message * a_pMsg)
+    SliderState * SliderStaticState::HandleMessage(Message * a_pMsg)
     {
       if (a_pMsg->GetCategory() != MC_GUI)
         return nullptr;
 
-      InternalState * pResult = nullptr;
+      SliderState * pResult = nullptr;
 
       if (a_pMsg->GetID() == Message_GUI_PointerDown::GetStaticID())
         pResult = HandleMessage(dynamic_cast<Message_GUI_PointerDown *>(a_pMsg));
@@ -307,10 +202,10 @@ namespace DgE
       return pResult;
     }
 
-    SliderBase::InternalState * SliderStaticState::HandleMessage(Message_GUI_PointerDown * a_pMsg)
+    SliderState * SliderStaticState::HandleMessage(Message_GUI_PointerDown * a_pMsg)
     {
       UIAABB aabb;
-      if (!m_pData->pSlider->GetGlobalAABB(aabb))
+      if (!m_pContext->pSlider->GetGlobalAABB(aabb))
         return nullptr;
 
       vec2 point((float)a_pMsg->x, (float)a_pMsg->y);
@@ -318,46 +213,54 @@ namespace DgE
       if (!PointInBox(point, aabb))
         return nullptr;
 
-      UIAABB bar, caret;
-      GetAABBs(bar, caret);
+      UIAABB barLower = {};
+      UIAABB barUpper = {};
+      UIAABB caret = {};
+      m_pContext->GetAABBs(barLower, barUpper, caret);
+
+
       if (PointInBox(point, caret))
       {
+        int const i = m_pContext->majorAxis;
         a_pMsg->SetFlag(Message::Flag::Handled, true);
-        float caretOffset = GetGlobalBarCentre() - point.x();
-        return new SliderActiveState(m_pData, caretOffset);
+        float caretOffset = aabb.position[i] + m_pContext->GetLowerLength() - point[i];
+        return new SliderActiveState(m_pContext, caretOffset);
       }
-      else if (PointInBox(point, bar))
+      else if (PointInBox(point, barLower) || PointInBox(point, barUpper))
       {
         a_pMsg->SetFlag(Message::Flag::Handled, true);
-        SetValFromScreenCoord(point.x());
-        m_pData->pSlider->NewValueClbk(m_pData->value);
-        return new SliderActiveState(m_pData, 0.0f);
+        m_pContext->SetValFromScreenCoord(point);
+        m_pContext->pSlider->NewValueClbk(m_pContext->value);
+        return new SliderActiveState(m_pContext, 0.0f);
       }
 
       return nullptr;
     }
 
-    SliderBase::InternalState * SliderStaticState::HandleMessage(Message_GUI_PointerMove * a_pMsg)
+    SliderState * SliderStaticState::HandleMessage(Message_GUI_PointerMove * a_pMsg)
     {
       vec2 point((float)a_pMsg->x, (float)a_pMsg->y);
 
-      UIAABB bar, caret;
-      GetAABBs(bar, caret);
+      UIAABB barLower = {};
+      UIAABB barUpper = {};
+      UIAABB caret = {};
+      m_pContext->GetAABBs(barLower, barUpper, caret);
+
       bool isInside = PointInBox(vec2((float)a_pMsg->x, (float)a_pMsg->y), caret);
       if (isInside)
         a_pMsg->ConsumeHover();
 
-      if (isInside && m_state == WidgetState::None)
+      if (isInside && (m_state == WidgetState::None))
       {
         m_state = WidgetState::HoverOn;
-        if (m_pData->m_clbk_HoverOn != nullptr)
-          m_pData->m_clbk_HoverOn();
+        if (m_pContext->clbk_HoverOn != nullptr)
+          m_pContext->clbk_HoverOn();
       }
-      if (!isInside && m_state == WidgetState::HoverOn)
+      if (!isInside && (m_state == WidgetState::HoverOn))
       {
         m_state = WidgetState::None;
-        if (m_pData->m_clbk_HoverOff != nullptr)
-          m_pData->m_clbk_HoverOff();
+        if (m_pContext->clbk_HoverOff != nullptr)
+          m_pContext->clbk_HoverOff();
       }
       return nullptr;
     }
@@ -366,14 +269,9 @@ namespace DgE
     // SliderActiveState
     //------------------------------------------------------------------------------------
 
-    SliderActiveState::SliderActiveState(Data * a_pData, float a_offset)
-      : InternalState(a_pData)
+    SliderActiveState::SliderActiveState(SliderContext * a_pData, float a_offset)
+      : SliderState(a_pData)
       , m_offset(a_offset)
-    {
-
-    }
-
-    SliderActiveState::~SliderActiveState()
     {
 
     }
@@ -383,12 +281,7 @@ namespace DgE
       return WidgetState::HasFocus;
     }
 
-    void SliderActiveState::Draw()
-    {
-      _Draw(SliderState::Grab);
-    }
-
-    SliderBase::InternalState * SliderActiveState::HandleMessage(Message * a_pMsg)
+    SliderState * SliderActiveState::HandleMessage(Message * a_pMsg)
     {
       if (a_pMsg->GetCategory() != MC_GUI)
         return nullptr;
@@ -396,7 +289,7 @@ namespace DgE
       if (a_pMsg->GetID() == Message_GUI_PointerUp::GetStaticID())
       {
         a_pMsg->SetFlag(Message::Flag::Handled, true);
-        return new SliderStaticState(m_pData, WidgetState::HoverOn);
+        return new SliderStaticState(m_pContext, WidgetState::HoverOn);
       }
 
       if (a_pMsg->GetID() == Message_GUI_PointerMove::GetStaticID())
@@ -405,22 +298,22 @@ namespace DgE
       return nullptr;
     }
 
-    SliderBase::InternalState * SliderActiveState::HandleMessage(Message_GUI_PointerMove * a_pMsg)
+    SliderState * SliderActiveState::HandleMessage(Message_GUI_PointerMove * a_pMsg)
     {
       vec2 point((float)a_pMsg->x, (float)a_pMsg->y);
       bool canMove = true;
 
-      if (m_pData->pParent)
+      if (m_pContext->pParent)
       {
         UIAABB aabb;
-        if (!m_pData->pParent->GetGlobalAABB(aabb) || !PointInBox(point, aabb))
+        if (!m_pContext->pParent->GetGlobalAABB(aabb) || !PointInBox(point, aabb))
             canMove = false;
       }
       
       if (canMove)
       {
-        SetValFromScreenCoord(point.x() + m_offset);
-        m_pData->pSlider->NewValueClbk(m_pData->value);
+        m_pContext->SetValFromScreenCoord(point + vec2(m_offset, m_offset));
+        m_pContext->pSlider->NewValueClbk(m_pContext->value);
       }
 
       a_pMsg->SetFlag(Message::Flag::Handled, true);
@@ -431,130 +324,190 @@ namespace DgE
     // SliderBase
     //------------------------------------------------------------------------------------
 
-    SliderBase::SliderBase(Widget * a_pParent, vec2 const & a_position, float a_width, float a_value, std::initializer_list<WidgetFlag> a_flags)
+    class SliderBase::PIMPL
+    {
+    public:
+
+      PIMPL() : pState(nullptr), context() {}
+      ~PIMPL() { delete pState; }
+
+      SliderState *pState;
+      SliderContext context;
+    };
+
+    SliderBase::SliderBase(Widget * a_pParent, vec2 const & a_position, float length, float a_value, Style::Slider const &style, bool isVertical, std::initializer_list<WidgetFlag> a_flags)
       : Widget({WidgetFlag::NotResponsive,
                 WidgetFlag::StretchWidth
         }, a_flags)
-      , m_pState(nullptr)
+      , m_pimpl(new PIMPL())
     {
-      InternalState::Data * pData = new InternalState::Data();
-      pData->caretWidth = GetStyle().sliderCaretWidth;
-      if (pData->caretWidth < SLIDER_MIN_CARET_WIDTH)
-        pData->caretWidth = SLIDER_MIN_CARET_WIDTH;
+      SetStyle(style);
 
-      pData->width = a_width;
-      if (pData->width < (pData->caretWidth + SLIDER_MIN_RUN_PIXELS))
-        pData->width = pData->caretWidth + SLIDER_MIN_RUN_PIXELS;
+      m_pimpl->context.majorAxis = isVertical ? 1 : 0;
 
-      pData->value = a_value;
-      if (pData->value < 0.0f)
-        pData->value = 0.0f;
-      else if (pData->value > 1.0f)
-        pData->value = 1.0f;
+      if (m_pimpl->context.style.caretWidth < SLIDER_MIN_CARET_WIDTH)
+        m_pimpl->context.style.caretWidth = SLIDER_MIN_CARET_WIDTH;
 
-      pData->barHeight = GetStyle().sliderBarHeight;
-      pData->caretHeight = GetStyle().sliderCaretHeight;
-      pData->outlineWidth = GetStyle().outlineWidth;
-      pData->position = a_position;
-      pData->pSlider = this;
-      pData->pParent = a_pParent;
+      m_pimpl->context.length = length;
+      if (m_pimpl->context.length < (m_pimpl->context.style.caretWidth + SLIDER_MIN_RUN_PIXELS))
+        m_pimpl->context.length = m_pimpl->context.style.caretWidth + SLIDER_MIN_RUN_PIXELS;
 
-      pData->clr[(int)SliderState::Normal][(int)SliderElement::Lower] = GetStyle().colours[col_SliderLower];
-      pData->clr[(int)SliderState::Normal][(int)SliderElement::Upper] = GetStyle().colours[col_SliderUpper];
-      pData->clr[(int)SliderState::Normal][(int)SliderElement::Caret] = GetStyle().colours[col_SliderCaret];
-      pData->clr[(int)SliderState::Normal][(int)SliderElement::Outline] = GetStyle().colours[col_SliderOutline];
+      m_pimpl->context.value = a_value;
+      if (m_pimpl->context.value < 0.0f)
+        m_pimpl->context.value = 0.0f;
+      else if (m_pimpl->context.value > 1.0f)
+        m_pimpl->context.value = 1.0f;
 
-      pData->clr[(int)SliderState::Hover][(int)SliderElement::Lower] = GetStyle().colours[col_SliderLowerHover];
-      pData->clr[(int)SliderState::Hover][(int)SliderElement::Upper] = GetStyle().colours[col_SliderUpperHover];
-      pData->clr[(int)SliderState::Hover][(int)SliderElement::Caret] = GetStyle().colours[col_SliderCaretHover];
-      pData->clr[(int)SliderState::Hover][(int)SliderElement::Outline] = GetStyle().colours[col_SliderOutlineHover];
+      m_pimpl->context.position = a_position;
+      m_pimpl->context.pSlider = this;
+      m_pimpl->context.pParent = a_pParent;
 
-      pData->clr[(int)SliderState::Grab][(int)SliderElement::Lower] = GetStyle().colours[col_SliderLowerGrab];
-      pData->clr[(int)SliderState::Grab][(int)SliderElement::Upper] = GetStyle().colours[col_SliderUpperGrab];
-      pData->clr[(int)SliderState::Grab][(int)SliderElement::Caret] = GetStyle().colours[col_SliderCaretGrab];
-      pData->clr[(int)SliderState::Grab][(int)SliderElement::Outline] = GetStyle().colours[col_SliderOutlineGrab];
-
-      m_pState = new SliderStaticState(pData, WidgetState::None);
+      m_pimpl->pState = new SliderStaticState(&m_pimpl->context, WidgetState::None);
     }
 
     SliderBase::~SliderBase()
     {
-      m_pState->Destroy();
-      delete m_pState;
+      delete m_pimpl;
+    }
+
+    Style::Slider const &SliderBase::GetDefaultStyle()
+    {
+      return s_style;
+    }
+
+    Style::Slider const &SliderBase::GetStyle() const
+    {
+      return m_pimpl->context.style;
+    }
+
+    void SliderBase::SetStyle(Style::Slider const &style)
+    {
+      m_pimpl->context.style = style;
     }
 
     void SliderBase::_HandleMessage(Message * a_pMsg)
     {
-      UpdateState(m_pState->HandleMessage(a_pMsg));
+      SliderState *pNewState = m_pimpl->pState->HandleMessage(a_pMsg);
+      if (pNewState != nullptr)
+      {
+        delete m_pimpl->pState;
+        m_pimpl->pState = pNewState;
+      }
     }
 
     void SliderBase::Draw()
     {
-      m_pState->Draw();
+      int colourIndex = m_pimpl->pState->QueryState() == WidgetState::None ? (int)Style::Slider::s_Default : (int)Style::Slider::s_Hover;
+
+      UIAABB viewableWindow;
+      if (!GetGlobalAABB(viewableWindow))
+        return;
+
+      ::DgE::Renderer::SetSissorBox((int)viewableWindow.position.x(), (int)viewableWindow.position.y(), (int)viewableWindow.size.x(), (int)viewableWindow.size.y());
+
+      UIAABB lower, upper, caret;
+      m_pimpl->context.GetInnerAABBs(lower, upper, caret);
+
+      Colour lb = m_pimpl->context.style.colours[Style::Slider::c_LowerBar][colourIndex].face;
+      Colour ub = m_pimpl->context.style.colours[Style::Slider::c_UpperBar][colourIndex].face;
+      Colour c = m_pimpl->context.style.colours[Style::Slider::c_Caret][colourIndex].face;
+
+      if (m_pimpl->context.style.components[Style::Slider::c_LowerBar].borderWidth == 0.0f)
+        Renderer::DrawBox(lower, m_pimpl->context.style.colours[Style::Slider::c_LowerBar][colourIndex].face);
+      else
+        Renderer::DrawBoxWithBorder(lower,
+          m_pimpl->context.style.components[Style::Slider::c_LowerBar].borderWidth,
+          m_pimpl->context.style.colours[Style::Slider::c_LowerBar][colourIndex].face,
+          m_pimpl->context.style.colours[Style::Slider::c_LowerBar][colourIndex].border);
+
+      if (m_pimpl->context.style.components[Style::Slider::c_UpperBar].borderWidth == 0.0f)
+        Renderer::DrawBox(upper, m_pimpl->context.style.colours[Style::Slider::c_UpperBar][colourIndex].face);
+      else
+        Renderer::DrawBoxWithBorder(upper,
+          m_pimpl->context.style.components[Style::Slider::c_UpperBar].borderWidth,
+          m_pimpl->context.style.colours[Style::Slider::c_UpperBar][colourIndex].face,
+          m_pimpl->context.style.colours[Style::Slider::c_UpperBar][colourIndex].border);
+
+      if (m_pimpl->context.style.components[Style::Slider::c_Caret].borderWidth == 0.0f)
+        Renderer::DrawBox(caret, m_pimpl->context.style.colours[Style::Slider::c_Caret][colourIndex].face);
+      else
+        Renderer::DrawBoxWithBorder(lower,
+          m_pimpl->context.style.components[Style::Slider::c_Caret].borderWidth,
+          m_pimpl->context.style.colours[Style::Slider::c_Caret][colourIndex].face,
+          m_pimpl->context.style.colours[Style::Slider::c_Caret][colourIndex].border);
     }
 
     void SliderBase::BindHoverOn(std::function<void()> a_fn)
     {
-      m_pState->BindHoverOn(a_fn);
+      m_pimpl->context.clbk_HoverOn = a_fn;
     }
 
     void SliderBase::BindHoverOff(std::function<void()> a_fn)
     {
-      m_pState->BindHoverOff(a_fn);
+      m_pimpl->context.clbk_HoverOff = a_fn;
     }
 
     WidgetState SliderBase::QueryState() const
     {
-      return m_pState->QueryState();
+      return m_pimpl->pState->QueryState();
     }
 
     float SliderBase::SetNormalisedValue(float a_val)
     {
-      return m_pState->SetNormalisedValue(a_val);
+      if (a_val < 0.0f)
+        a_val = 0.0f;
+      else if (a_val > 1.0f)
+        a_val = 1.0f;
+
+      m_pimpl->context.value = a_val;
+      return m_pimpl->context.value;
     }
 
     Widget * SliderBase::GetParent() const
     {
-      return m_pState->GetParent();
+      return m_pimpl->context.pParent;
     }
 
     void SliderBase::SetParent(Widget * a_pParent)
     {
-      m_pState->SetParent(a_pParent);
-    }
-
-    void SliderBase::UpdateState(InternalState * a_pState)
-    {
-      if (a_pState != nullptr)
-      {
-        delete m_pState;
-        m_pState = a_pState;
-      }
+      m_pimpl->context.pParent = a_pParent;
     }
 
     void SliderBase::_SetLocalPosition(vec2 const & a_pos)
     {
-      m_pState->_SetLocalPosition(a_pos);
+      m_pimpl->context.position = a_pos;
     }
 
     void SliderBase::_SetSize(vec2 const & a_size)
     {
-      m_pState->_SetSize(a_size);
+      m_pimpl->context.length = a_size.x();
+      if (m_pimpl->context.length < (m_pimpl->context.style.caretWidth + SLIDER_MIN_RUN_PIXELS))
+        m_pimpl->context.length = (m_pimpl->context.style.caretWidth + SLIDER_MIN_RUN_PIXELS);
     }
 
     vec2 SliderBase::_GetLocalPosition()
     {
-      return m_pState->_GetLocalPosition();
+      return m_pimpl->context.position;
     }
 
     vec2 SliderBase::_GetSize()
     {
-      return m_pState->_GetSize();
-    }
+      float c = m_pimpl->context.style.components[Style::Slider::c_Caret].height;
+      float l = m_pimpl->context.style.components[Style::Slider::c_LowerBar].height;
+      float u = m_pimpl->context.style.components[Style::Slider::c_UpperBar].height;
 
-    void SliderBase::SetColour(SliderState a_state, SliderElement a_ele, Colour a_clr)
-    {
-      m_pState->SetColour(a_state, a_ele, a_clr);
+      float h = c;
+      if (l > h) h = l;
+      if (u > h) h = u;
+
+      int const i = m_pimpl->context.majorAxis;
+      int const j = (i + 1) & 1;
+
+      vec2 result;
+      result[i] = m_pimpl->context.length;
+      result[j] = h;
+
+      return result;
     }
   }
 }

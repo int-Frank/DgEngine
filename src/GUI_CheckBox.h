@@ -5,40 +5,27 @@
 
 #include "Utils.h"
 #include "GUI_Widget.h"
+#include "GUI.h"
 
 namespace DgE
 {
   namespace GUI
   {
-    enum class CheckboxState
+    class Checkbox : public Widget
     {
-      Normal,
-      Hover,
-
-      COUNT
-    };
-
-    enum class CheckboxElement
-    {
-      Outline,
-      Tick,
-
-      COUNT
-    };
-
-    class Text;
-
-    class CheckBox : public Widget
-    {
-      CheckBox(Widget * pParent, vec2 const & position, bool checked, std::initializer_list<WidgetFlag> flags);
+      Checkbox(Widget * pParent, vec2 const & position, bool checked, Style::Checkbox const &style, std::initializer_list<WidgetFlag> flags);
     public:
 
-      static CheckBox * Create(Widget * pParent, vec2 const & position, bool checked, std::initializer_list<WidgetFlag> flags ={});
+      static Checkbox *Create(Widget *pParent, vec2 const &position, bool checked, std::initializer_list<WidgetFlag> flags = {});
+      static Checkbox *Create(Widget *pParent, vec2 const &position, bool checked, Style::Checkbox const &, std::initializer_list<WidgetFlag> flags = {});
 
-      ~CheckBox();
+      ~Checkbox();
+
+      static Style::Checkbox const &GetDefaultStyle();
+      Style::Checkbox const &GetStyle() const;
+      void SetStyle(Style::Checkbox const &);
 
       void SetChecked(bool);
-      void SetColour(CheckboxState, CheckboxElement, Colour);
       void BindCheckedChanged(std::function<void(bool)> a_fn);
       void BindHoverOn(std::function<void()> a_fn);
       void BindHoverOff(std::function<void()> a_fn);
@@ -66,16 +53,10 @@ namespace DgE
 
     private:
 
-      bool m_isChecked;
-      Text * m_pTextTick;
-      Colour m_clr[(int)CheckboxState::COUNT][(int)CheckboxElement::COUNT];
-      UIAABB m_aabb;
-      WidgetState m_state;
-      Widget * m_pParent;
+      static Style::Checkbox const s_style;
 
-      std::function<void(bool)> m_clbk_CheckChanged;
-      std::function<void()> m_clbk_HoverOn;
-      std::function<void()> m_clbk_HoverOff;
+      class PIMPL;
+      PIMPL *m_pimpl;
     };
   }
 }
