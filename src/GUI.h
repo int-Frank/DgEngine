@@ -77,7 +77,7 @@ namespace DgE
         float caretWidth;
       };
 
-      struct Container
+      struct Window
       {
         Colour face;
         Colour border;

@@ -43,8 +43,8 @@ namespace DgE
       Widget * GetParent() const override;
       void SetParent(Widget *) override;
 
-      vec2 GetContentDivPosition() override;
-      vec2 GetContentDivSize() override;
+      vec2 GetLocalDivPosition() override;
+      vec2 GetDivSize() override;
 
     private:
 

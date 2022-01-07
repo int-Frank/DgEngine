@@ -601,7 +601,7 @@ namespace DgE
     void Text::Draw()
     {
       UIAABB viewableWindow;
-      if (!GetGlobalAABB(viewableWindow))
+      if (!GetGlobalViewableArea(viewableWindow))
         return;
 
       uint32_t textureCount;
@@ -663,7 +663,7 @@ namespace DgE
     void Text::HandleMessage(Message_GUI_PointerDown * a_pMsg)
     {
       UIAABB aabb;
-      if (!GetGlobalAABB(aabb))
+      if (!GetGlobalViewableArea(aabb))
         return;
 
       if (PointInBox(vec2((float)a_pMsg->x, (float)a_pMsg->y), aabb))
@@ -673,7 +673,7 @@ namespace DgE
     void Text::HandleMessage(Message_GUI_PointerMove * a_pMsg)
     {
       UIAABB aabb;
-      if (!GetGlobalAABB(aabb))
+      if (!GetGlobalViewableArea(aabb))
         return;
 
       if (PointInBox(vec2((float)a_pMsg->x, (float)a_pMsg->y), aabb))

@@ -100,7 +100,7 @@ namespace DgE
     void Checkbox::HandleMessage(Message_GUI_PointerDown * a_pMsg)
     {
       UIAABB aabb;
-      if (!GetGlobalAABB(aabb))
+      if (!GetGlobalViewableArea(aabb))
         return;
 
       if (PointInBox(vec2((float)a_pMsg->x, (float)a_pMsg->y), aabb) && m_pimpl->clbk_CheckChanged != nullptr)
@@ -114,7 +114,7 @@ namespace DgE
     void Checkbox::HandleMessage(Message_GUI_PointerMove * a_pMsg)
     {
       UIAABB aabb;
-      if (!GetGlobalAABB(aabb))
+      if (!GetGlobalViewableArea(aabb))
         return;
 
       bool isInside = PointInBox(vec2((float)a_pMsg->x, (float)a_pMsg->y), aabb);
@@ -143,7 +143,7 @@ namespace DgE
     void Checkbox::Draw()
     {
       UIAABB viewableWindow;
-      if (!GetGlobalAABB(viewableWindow))
+      if (!GetGlobalViewableArea(viewableWindow))
         return;
 
       vec2 size = GetSize() - 2.0f * vec2(CHECKBOX_THICKNESS, CHECKBOX_THICKNESS);
@@ -196,12 +196,12 @@ namespace DgE
       m_pimpl->aabb.size = a_size;
     }
 
-    vec2 Checkbox::GetContentDivPosition()
+    vec2 Checkbox::GetLocalDivPosition()
     {
       return vec2(0.0f, 0.0f);
     }
 
-    vec2 Checkbox::GetContentDivSize()
+    vec2 Checkbox::GetDivSize()
     {
       return CHECKBOX_SIZE;
     }

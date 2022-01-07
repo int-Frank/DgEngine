@@ -3,11 +3,9 @@
 #include "DgDoublyLinkedList.h"
 #include "GUI.h"
 #include "GUI_Internal.h"
-#include "GUI_Container.h"
+#include "GUI_Window.h"
 #include "GUI_Button.h"
 #include "Renderer.h"
-
-#define CONTENT_MARGIN 2.0f
 
 namespace DgE
 {
@@ -45,8 +43,8 @@ namespace DgE
         children.clear();
       }
 
-      Style::Container style;
-      Container *pContainer;
+      Style::Window style;
+      Window *pContainer;
       Widget *pParent;
       Button *pGrab;
       UIAABB aabb;
@@ -182,7 +180,7 @@ namespace DgE
     ContainerState * StaticState::HandleMessage(Message_GUI_PointerDown * a_pMsg)
     {
       UIAABB aabb;
-      if (!m_pContext->pContainer->GetGlobalAABB(aabb))
+      if (!m_pContext->pContainer->GetGlobalViewableArea(aabb))
         return nullptr;
 
       vec2 point((float)a_pMsg->x, (float)a_pMsg->y);
@@ -275,7 +273,7 @@ namespace DgE
       }
 
       UIAABB aabb;
-      if (!m_pContext->pContainer->GetGlobalAABB(aabb))
+      if (!m_pContext->pContainer->GetGlobalViewableArea(aabb))
       {
         vec2 point((float)a_pMsg->x, (float)a_pMsg->y);
 
@@ -329,7 +327,7 @@ namespace DgE
       if (m_pContext->pParent)
       {
         UIAABB aabb;
-        if (!m_pContext->pParent->GetGlobalAABB(aabb))
+        if (!m_pContext->pParent->GetGlobalViewableArea(aabb))
           return nullptr;
 
         if (PointInBox(point, aabb))
@@ -383,11 +381,11 @@ namespace DgE
       vec2 point((float)a_pMsg->x, (float)a_pMsg->y);
       vec2 newSize = m_sizeAnchor + (point - m_controlAnchor);
 
-      if (newSize.x() < Container::s_minSize.x())
-        newSize.x() = Container::s_minSize.x();
+      if (newSize.x() < Window::s_minSize.x())
+        newSize.x() = Window::s_minSize.x();
 
-      if (newSize.y() < Container::s_minSize.y())
-        newSize.y() = Container::s_minSize.y();
+      if (newSize.y() < Window::s_minSize.y())
+        newSize.y() = Window::s_minSize.y();
 
       m_pContext->aabb.size = newSize;
       a_pMsg->SetFlag(Message::Flag::Handled, true);
@@ -399,12 +397,12 @@ namespace DgE
     }
 
     //------------------------------------------------------------------------------------
-    // Container
+    // Window
     //------------------------------------------------------------------------------------
 
-    vec2 const Container::s_minSize = vec2(50.f, 20.f);
+    vec2 const Window::s_minSize = vec2(50.f, 20.f);
 
-    class Container::PIMPL
+    class Window::PIMPL
     {
     public:
 
@@ -419,7 +417,7 @@ namespace DgE
       ContainerContext context;
     };
 
-    Container::Container(Widget * a_pParent, vec2 const a_position, vec2 const & a_size, Style::Container const & style, std::initializer_list<WidgetFlag> a_flags)
+    Window::Window(Widget * a_pParent, vec2 const a_position, vec2 const & a_size, Style::Window const & style, std::initializer_list<WidgetFlag> a_flags)
       : Widget({ WidgetFlag::NotResponsive,
                  WidgetFlag::StretchWidth,
                  WidgetFlag::StretchHeight,
@@ -473,37 +471,37 @@ namespace DgE
       m_pimpl->pState = new StaticState(&m_pimpl->context);
     }
 
-    Container::~Container()
+    Window::~Window()
     {
       delete m_pimpl;
     }
 
-    Container * Container::Create(Widget * a_pParent, vec2 const a_position, vec2 const & a_size, std::initializer_list<WidgetFlag> a_flags)
+    Window * Window::Create(Widget * a_pParent, vec2 const a_position, vec2 const & a_size, std::initializer_list<WidgetFlag> a_flags)
     {
-      return new Container(a_pParent, a_position, a_size, s_style, a_flags);
+      return new Window(a_pParent, a_position, a_size, s_style, a_flags);
     }
 
-    Container *Container::Create(Widget *a_pParent, vec2 const a_position, vec2 const &a_size, Style::Container const & style, std::initializer_list<WidgetFlag> a_flags)
+    Window *Window::Create(Widget *a_pParent, vec2 const a_position, vec2 const &a_size, Style::Window const & style, std::initializer_list<WidgetFlag> a_flags)
     {
-      return new Container(a_pParent, a_position, a_size, style, a_flags);
+      return new Window(a_pParent, a_position, a_size, style, a_flags);
     }
 
-    Style::Container const & Container::GetDefaultStyle()
+    Style::Window const & Window::GetDefaultStyle()
     {
       return s_style;
     }
 
-    Style::Container const &Container::GetStyle() const
+    Style::Window const &Window::GetStyle() const
     {
       return m_pimpl->context.style;
     }
 
-    void Container::SetStyle(Style::Container const &style)
+    void Window::SetStyle(Style::Window const &style)
     {
       m_pimpl->context.style = style;
     }
 
-    void Container::_HandleMessage(Message * a_pMsg)
+    void Window::_HandleMessage(Message * a_pMsg)
     {
       ContainerState *pNewState = m_pimpl->pState->HandleMessage(a_pMsg);
       if (pNewState != nullptr)
@@ -513,12 +511,12 @@ namespace DgE
       }
     }
 
-    void Container::Clear()
+    void Window::Clear()
     {
       m_pimpl->context.Clear();
     }
 
-    void Container::Add(Widget * a_pWgt)
+    void Window::Add(Widget * a_pWgt)
     {
       a_pWgt->SetParent(this);
       if (a_pWgt->IsContainer())
@@ -527,7 +525,7 @@ namespace DgE
         m_pimpl->context.children.push_back(a_pWgt);
     }
 
-    void Container::Remove(Widget * a_pWgt)
+    void Window::Remove(Widget * a_pWgt)
     {
       for (auto it = m_pimpl->context.children.begin(); it != m_pimpl->context.children.end(); it++)
       {
@@ -540,11 +538,11 @@ namespace DgE
       }
     }
 
-    void Container::Draw()
+    void Window::Draw()
     {
       UIAABB viewableWindow;
 
-      if (!GetGlobalAABB(viewableWindow))
+      if (!GetGlobalViewableArea(viewableWindow))
         return;
 
       if (!HasFlag(WidgetFlag::NoBackground))
@@ -575,54 +573,54 @@ namespace DgE
         m_pimpl->context.pGrab->Draw();
     }
 
-    WidgetState Container::QueryState() const
+    WidgetState Window::QueryState() const
     {
       return m_pimpl->pState->QueryState();
     }
 
-    Widget * Container::GetParent() const
+    Widget * Window::GetParent() const
     {
       return m_pimpl->context.pParent;
     }
 
-    void Container::SetParent(Widget * a_pParent)
+    void Window::SetParent(Widget * a_pParent)
     {
       m_pimpl->context.pParent = a_pParent;
     }
 
-    void Container::_SetLocalPosition(vec2 const & a_pos)
+    void Window::_SetLocalPosition(vec2 const & a_pos)
     {
       m_pimpl->context.aabb.position = a_pos;
     }
 
-    void Container::_SetSize(vec2 const & a_size)
+    void Window::_SetSize(vec2 const & a_size)
     {
       m_pimpl->context.aabb.size = a_size;
     }
 
-    vec2 Container::_GetLocalPosition()
+    vec2 Window::_GetLocalPosition()
     {
       return m_pimpl->context.aabb.position;
     }
 
-    vec2 Container::_GetSize()
+    vec2 Window::_GetSize()
     {
       return m_pimpl->context.aabb.size;
     }
 
-    bool Container::IsContainer() const
+    bool Window::IsContainer() const
     {
       return true;
     }
 
-    vec2 Container::GetContentDivPosition()
+    vec2 Window::GetLocalDivPosition()
     {
-      return vec2(CONTENT_MARGIN, CONTENT_MARGIN);
+      return vec2(0.0f, 0.0f);
     }
 
-    vec2 Container::GetContentDivSize()
+    vec2 Window::GetDivSize()
     {
-      vec2 size = GetSize() - vec2(CONTENT_MARGIN * 2.0f, CONTENT_MARGIN * 2.0f);
+      vec2 size = GetSize();
 
       if ((size[0] <= 0.0f) || (size[1] <= 0.0f))
         size.Zero();

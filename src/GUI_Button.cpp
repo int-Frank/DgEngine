@@ -136,7 +136,7 @@ namespace DgE
     void Button::HandleMessage(Message_GUI_PointerDown * a_pMsg)
     {
       UIAABB aabb;
-      if (!GetGlobalAABB(aabb))
+      if (!GetGlobalViewableArea(aabb))
         return;
 
       if (PointInBox(vec2((float)a_pMsg->x, (float)a_pMsg->y), aabb) && m_pimpl->clbk_Select != nullptr)
@@ -149,7 +149,7 @@ namespace DgE
     void Button::HandleMessage(Message_GUI_PointerMove * a_pMsg)
     {
       UIAABB aabb;
-      if (!GetGlobalAABB(aabb))
+      if (!GetGlobalViewableArea(aabb))
         return;
 
       bool isInside = PointInBox(vec2((float)a_pMsg->x, (float)a_pMsg->y), aabb);
@@ -180,7 +180,7 @@ namespace DgE
     void Button::Draw()
     {
       UIAABB viewableWindow;
-      if (!GetGlobalAABB(viewableWindow))
+      if (!GetGlobalViewableArea(viewableWindow))
         return;
 
       vec2 size = GetSize() - 2.0f * vec2(m_pimpl->style.borderWidth, m_pimpl->style.borderWidth);
@@ -246,12 +246,12 @@ namespace DgE
       m_pimpl->aabb.size = a_size;
     }
 
-    vec2 Button::GetContentDivPosition()
+    vec2 Button::GetLocalDivPosition()
     {
       return vec2(m_pimpl->style.contentMargin, m_pimpl->style.contentMargin);
     }
 
-    vec2 Button::GetContentDivSize()
+    vec2 Button::GetDivSize()
     {
       vec2 size = GetSize() - vec2(m_pimpl->style.contentMargin * 2.0f, m_pimpl->style.contentMargin * 2.0f);
 

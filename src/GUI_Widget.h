@@ -46,7 +46,7 @@ namespace DgE
       StretchWidth,
       StretchHeight,
 
-      // Container
+      // Window
       Resizable,
       Movable,
       VerticalScroll,
@@ -70,17 +70,19 @@ namespace DgE
       void SetPosition(vec2 const &);
       void SetSize(vec2 const &);
 
+      // A div is the viewable area inside a widget
+
       // Finds the viewable/interactable portion of the widget.
       // Return of 'false' implies none of the widget can be seen (probably completely clipped by parent widget)
-      bool GetGlobalContentDivAABB(UIAABB &);
-      bool GetGlobalAABB(UIAABB &);
-
-      virtual vec2 GetContentDivPosition();
-      virtual vec2 GetContentDivSize();
-
+      bool GetGlobalViewableArea(UIAABB &);
+      vec2 GetGlobalDivPosition();
       vec2 GetGlobalPosition();
+
       vec2 GetLocalPosition();
       vec2 GetSize();
+
+      virtual vec2 GetLocalDivPosition();
+      virtual vec2 GetDivSize();
       virtual bool IsContainer() const;
 
       // Returns true if flag set, false if flag disallowed

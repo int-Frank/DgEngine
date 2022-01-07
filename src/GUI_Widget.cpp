@@ -30,10 +30,18 @@ namespace DgE
       Widget * pParent = GetParent();
       if (pParent == nullptr)
         return GetLocalPosition();
-      return pParent->GetGlobalPosition() + GetLocalPosition();
+      return pParent->GetGlobalPosition() + pParent->GetLocalDivPosition() + GetLocalPosition();
     }
 
-    bool Widget::GetGlobalAABB(UIAABB & a_out)
+    vec2 Widget::GetGlobalDivPosition()
+    {
+      Widget *pParent = GetParent();
+      if (pParent == nullptr)
+        return GetLocalDivPosition();
+      return pParent->GetGlobalPosition() + GetLocalDivPosition();
+    }
+
+    bool Widget::GetGlobalViewableArea(UIAABB & a_out)
     {
       Widget * pParent = GetParent();
       if (pParent == nullptr)
@@ -44,39 +52,20 @@ namespace DgE
       }
 
       UIAABB aabb ={};
-      if (pParent->GetGlobalAABB(aabb) == false)
+      if (pParent->GetGlobalViewableArea(aabb) == false)
         return false;
 
-      if (!Intersection(aabb, {pParent->GetGlobalPosition() + GetLocalPosition(), GetSize()}, a_out))
-        return false;
-      return true;
-    }
-
-    bool Widget::GetGlobalContentDivAABB(UIAABB & a_out)
-    {
-      Widget * pParent = GetParent();
-      if (pParent == nullptr)
-      {
-        a_out.position = GetLocalPosition() + GetContentDivPosition();
-        a_out.size = GetContentDivSize();
-        return true;
-      }
-
-      UIAABB aabb ={};
-      if (pParent->GetGlobalAABB(aabb) == false)
-        return false;
-
-      if (!Intersection(aabb, {pParent->GetGlobalPosition() + GetLocalPosition(), GetContentDivSize()}, a_out))
+      if (!Intersection(aabb, {GetGlobalPosition(), GetSize()}, a_out))
         return false;
       return true;
     }
 
-    vec2 Widget::GetContentDivPosition()
+    vec2 Widget::GetLocalDivPosition()
     {
       return Zeros2f();
     }
 
-    vec2 Widget::GetContentDivSize()
+    vec2 Widget::GetDivSize()
     {
       return Zeros2f();
     }
@@ -112,13 +101,12 @@ namespace DgE
       {
         if (HasFlag(WidgetFlag::StretchWidth) || HasFlag(WidgetFlag::StretchHeight))
         {
-          vec2 contentPos = pParent->GetContentDivPosition();
           vec2 position = _GetLocalPosition();
 
           if (HasFlag(WidgetFlag::StretchWidth))
-            position[0] = contentPos[0];
+            position[0] = 0.0f;
           if (HasFlag(WidgetFlag::StretchHeight))
-            position[1] = contentPos[1];
+            position[1] = 0.0f;
 
           _SetLocalPosition(position);
         }
@@ -134,7 +122,7 @@ namespace DgE
       {
         if (HasFlag(WidgetFlag::StretchWidth) || HasFlag(WidgetFlag::StretchHeight))
         {
-          vec2 contentSize = pParent->GetContentDivSize();
+          vec2 contentSize = pParent->GetDivSize();
           vec2 size = _GetSize();
 
           if (HasFlag(WidgetFlag::StretchWidth))

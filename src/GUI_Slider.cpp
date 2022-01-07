@@ -230,7 +230,7 @@ namespace DgE
     SliderState * SliderStaticState::HandleMessage(Message_GUI_PointerDown * a_pMsg)
     {
       UIAABB aabb;
-      if (!m_pContext->pSlider->GetGlobalAABB(aabb))
+      if (!m_pContext->pSlider->GetGlobalViewableArea(aabb))
         return nullptr;
 
       vec2 point((float)a_pMsg->x, (float)a_pMsg->y);
@@ -336,7 +336,7 @@ namespace DgE
       if (m_pContext->pParent)
       {
         UIAABB aabb;
-        if (!m_pContext->pParent->GetGlobalAABB(aabb) || !PointInBox(point, aabb))
+        if (!m_pContext->pParent->GetGlobalViewableArea(aabb) || !PointInBox(point, aabb))
             canMove = false;
       }
       
@@ -430,7 +430,7 @@ namespace DgE
       int colourIndex = m_pimpl->pState->QueryState() == WidgetState::None ? (int)Style::Slider::s_Default : (int)Style::Slider::s_Hover;
 
       UIAABB viewableWindow;
-      if (!GetGlobalAABB(viewableWindow))
+      if (!GetGlobalViewableArea(viewableWindow))
         return;
 
       ::DgE::Renderer::SetSissorBox((int)viewableWindow.position.x(), (int)viewableWindow.position.y(), (int)viewableWindow.size.x(), (int)viewableWindow.size.y());

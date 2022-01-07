@@ -5,7 +5,7 @@
 
 #include "EngineMessages.h"
 #include "System.h"
-#include "GUI_Container.h"
+#include "GUI_Window.h"
 
 namespace DgE
 {
@@ -32,7 +32,7 @@ namespace DgE
 
   private:
 
-    GUI::Container * m_pScreen;
+    GUI::Window * m_pScreen;
     float m_dt;
   };
 }

@@ -5,7 +5,7 @@
 #include "GUI_Text.h"
 #include "GUI_Button.h"
 #include "GUI_Slider.h"
-#include "GUI_Container.h"
+#include "GUI_Window.h"
 #include "GUI_Checkbox.h"
 
 #define BORDER_WIDTH 1.0f
@@ -59,7 +59,7 @@
 #define CLR_SLIDER_GRAB_CARET_BORDER      CLR_NONE
 
 //--------------------------------------------------------------
-// Container
+// Window
 //--------------------------------------------------------------
 
 #define CLR_CONTAINER_FACE              CLR_BACKGROUND
@@ -147,7 +147,7 @@ namespace DgE
       12.0f
     };
 
-    Style::Container const Container::s_style =
+    Style::Window const Window::s_style =
     {
       CLR_CONTAINER_FACE, 
       CLR_CONTAINER_BORDER,
