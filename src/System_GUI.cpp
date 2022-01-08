@@ -16,8 +16,7 @@ namespace DgE
     : m_dt(1.0f / 60.0f)
     , m_pScreen(nullptr)
   {
-    GUI::Style::Window style{};
-    m_pScreen = GUI::Window::Create(nullptr, {0.f, 0.f}, {(float)a_windowW, (float)a_windowH}, style, {GUI::WidgetFlag::NoBackground});
+    m_pScreen = GUI::Container::Create({0.f, 0.f}, {(float)a_windowW, (float)a_windowH});
   }
 
   System_GUI::~System_GUI()

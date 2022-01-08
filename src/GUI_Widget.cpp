@@ -27,18 +27,12 @@ namespace DgE
 
     vec2 Widget::GetGlobalPosition()
     {
-      Widget * pParent = GetParent();
-      if (pParent == nullptr)
-        return GetLocalPosition();
-      return pParent->GetGlobalPosition() + pParent->GetLocalDivPosition() + GetLocalPosition();
-    }
+      vec2 result = GetLocalPosition();
 
-    vec2 Widget::GetGlobalDivPosition()
-    {
-      Widget *pParent = GetParent();
-      if (pParent == nullptr)
-        return GetLocalDivPosition();
-      return pParent->GetGlobalPosition() + GetLocalDivPosition();
+      Widget * pParent = GetParent();
+      if (pParent != nullptr)
+        result += pParent->GetGlobalPosition();
+      return result;
     }
 
     bool Widget::GetGlobalViewableArea(UIAABB & a_out)
@@ -58,16 +52,6 @@ namespace DgE
       if (!Intersection(aabb, {GetGlobalPosition(), GetSize()}, a_out))
         return false;
       return true;
-    }
-
-    vec2 Widget::GetLocalDivPosition()
-    {
-      return Zeros2f();
-    }
-
-    vec2 Widget::GetDivSize()
-    {
-      return Zeros2f();
     }
 
     bool Widget::IsContainer() const
@@ -122,7 +106,7 @@ namespace DgE
       {
         if (HasFlag(WidgetFlag::StretchWidth) || HasFlag(WidgetFlag::StretchHeight))
         {
-          vec2 contentSize = pParent->GetDivSize();
+          vec2 contentSize = pParent->GetSize();
           vec2 size = _GetSize();
 
           if (HasFlag(WidgetFlag::StretchWidth))

@@ -30,6 +30,9 @@ namespace DgE
 
       ~PIMPL() { delete pText; }
 
+      void HandleMessage(Message_GUI_PointerDown *, Button *pButton);
+      void HandleMessage(Message_GUI_PointerMove *, Button *pButton);
+
       Text *pText;
       CodePoint codePoint;
       UIAABB aabb;
@@ -43,12 +46,51 @@ namespace DgE
       std::function<void()> clbk_Select;
     };
 
+
+    void Button::PIMPL::HandleMessage(Message_GUI_PointerDown *a_pMsg, Button *pButton)
+    {
+      UIAABB aabb;
+      if (!pButton->GetGlobalViewableArea(aabb))
+        return;
+
+      if (PointInBox(vec2((float)a_pMsg->x, (float)a_pMsg->y), aabb) && clbk_Select != nullptr)
+      {
+        clbk_Select();
+        a_pMsg->SetFlag(DgE::Message::Flag::Handled, true);
+      }
+    }
+
+    void Button::PIMPL::HandleMessage(Message_GUI_PointerMove *a_pMsg, Button *pButton)
+    {
+      UIAABB aabb;
+      if (!pButton->GetGlobalViewableArea(aabb))
+        return;
+
+      bool isInside = PointInBox(vec2((float)a_pMsg->x, (float)a_pMsg->y), aabb);
+      if (isInside)
+        a_pMsg->ConsumeHover();
+
+      if (isInside && state == WidgetState::None)
+      {
+        state = WidgetState::HoverOn;
+        if (clbk_HoverOn != nullptr)
+          clbk_HoverOn();
+      }
+      if (!isInside && state == WidgetState::HoverOn)
+      {
+        state = WidgetState::None;
+        if (clbk_HoverOff != nullptr)
+          clbk_HoverOff();
+      }
+    }
+
+
     Style::Button const & Button::GetDefaultStyle()
     {
       return s_style;
     }
 
-    Button::Button(Widget * a_pParent, std::string const & a_text, bool isGlyph, vec2 const & a_position, vec2 const & a_size, Style::Button const &style, std::initializer_list<WidgetFlag> flags)
+    Button::Button(std::string const & a_text, bool isGlyph, vec2 const & a_position, vec2 const & a_size, Style::Button const &style, std::initializer_list<WidgetFlag> flags)
       : Widget({WidgetFlag::NotResponsive,
                 WidgetFlag::StretchWidth,
                 WidgetFlag::StretchHeight}, flags)
@@ -56,7 +98,6 @@ namespace DgE
     {
       SetStyle(style);
       m_pimpl->aabb = {a_position, a_size};
-      m_pimpl->pParent = a_pParent;
 
       if (isGlyph)
       {
@@ -67,8 +108,9 @@ namespace DgE
       }
       else
       {
-        m_pimpl->pText = Text::Create(this, a_text, {0.f, 0.f}, a_size, m_pimpl->style.text[Style::Button::Default],
+        m_pimpl->pText = Text::Create(a_text, {0.f, 0.f}, a_size, m_pimpl->style.text[Style::Button::Default],
           {WidgetFlag::NotResponsive, WidgetFlag::StretchHeight, WidgetFlag::StretchWidth});
+        m_pimpl->pText->SetParent(this);
       }
     }
 
@@ -77,24 +119,24 @@ namespace DgE
       delete m_pimpl;
     }
 
-    Button *Button::Create(Widget *pParent, std::string const &text, vec2 const &position, vec2 const &size, std::initializer_list<WidgetFlag> flags)
+    Button *Button::Create(std::string const &text, vec2 const &position, vec2 const &size, std::initializer_list<WidgetFlag> flags)
     {
-      return new Button(pParent, text, false, position, size, s_style, flags);
+      return new Button(text, false, position, size, s_style, flags);
     }
 
-    Button *Button::Create(Widget *pParent, std::string const &text, vec2 const &position, vec2 const &size, Style::Button const &style, std::initializer_list<WidgetFlag> flags)
+    Button *Button::Create(std::string const &text, vec2 const &position, vec2 const &size, Style::Button const &style, std::initializer_list<WidgetFlag> flags)
     {
-      return new Button(pParent, text, false, position, size, style, flags);
+      return new Button(text, false, position, size, style, flags);
     }
 
-    Button *Button::CreateWithGlyph(Widget *pParent, std::string const &text, vec2 const &position, vec2 const &size, std::initializer_list<WidgetFlag> flags)
+    Button *Button::CreateWithGlyph(std::string const &text, vec2 const &position, vec2 const &size, std::initializer_list<WidgetFlag> flags)
     {
-      return new Button(pParent, text, true, position, size, s_style, flags);
+      return new Button(text, true, position, size, s_style, flags);
     }
 
-    Button *Button::CreateWithGlyph(Widget *pParent, std::string const &text, vec2 const &position, vec2 const &size, Style::Button const &style, std::initializer_list<WidgetFlag> flags)
+    Button *Button::CreateWithGlyph(std::string const &text, vec2 const &position, vec2 const &size, Style::Button const &style, std::initializer_list<WidgetFlag> flags)
     {
-      return new Button(pParent, text, true, position, size, style, flags);
+      return new Button(text, true, position, size, style, flags);
     }
 
     Style::Button const &Button::GetStyle() const
@@ -129,45 +171,10 @@ namespace DgE
       if (a_pMsg->GetCategory() != MC_GUI)
         return;
 
-      DISPATCH_MESSAGE(Message_GUI_PointerMove);
-      DISPATCH_MESSAGE(Message_GUI_PointerDown);
-    }
-
-    void Button::HandleMessage(Message_GUI_PointerDown * a_pMsg)
-    {
-      UIAABB aabb;
-      if (!GetGlobalViewableArea(aabb))
-        return;
-
-      if (PointInBox(vec2((float)a_pMsg->x, (float)a_pMsg->y), aabb) && m_pimpl->clbk_Select != nullptr)
-      {
-        m_pimpl->clbk_Select();
-        a_pMsg->SetFlag(DgE::Message::Flag::Handled, true);
-      }
-    }
-
-    void Button::HandleMessage(Message_GUI_PointerMove * a_pMsg)
-    {
-      UIAABB aabb;
-      if (!GetGlobalViewableArea(aabb))
-        return;
-
-      bool isInside = PointInBox(vec2((float)a_pMsg->x, (float)a_pMsg->y), aabb);
-      if (isInside)
-        a_pMsg->ConsumeHover();
-
-      if (isInside && m_pimpl->state == WidgetState::None)
-      {
-        m_pimpl->state = WidgetState::HoverOn;
-        if (m_pimpl->clbk_HoverOn != nullptr)
-          m_pimpl->clbk_HoverOn();
-      }
-      if (!isInside && m_pimpl->state == WidgetState::HoverOn)
-      {
-        m_pimpl->state = WidgetState::None;
-        if (m_pimpl->clbk_HoverOff != nullptr)
-          m_pimpl->clbk_HoverOff();
-      }
+      if (a_pMsg->GetID() == Message_GUI_PointerMove::GetStaticID())
+        m_pimpl->HandleMessage(dynamic_cast<Message_GUI_PointerMove *>(a_pMsg), this);
+      else if (a_pMsg->GetID() == Message_GUI_PointerDown::GetStaticID())
+        m_pimpl->HandleMessage(dynamic_cast<Message_GUI_PointerDown *>(a_pMsg), this);
     }
 
     void Button::ClearBindings()
@@ -244,21 +251,6 @@ namespace DgE
     void Button::_SetSize(vec2 const & a_size)
     {
       m_pimpl->aabb.size = a_size;
-    }
-
-    vec2 Button::GetLocalDivPosition()
-    {
-      return vec2(m_pimpl->style.contentMargin, m_pimpl->style.contentMargin);
-    }
-
-    vec2 Button::GetDivSize()
-    {
-      vec2 size = GetSize() - vec2(m_pimpl->style.contentMargin * 2.0f, m_pimpl->style.contentMargin * 2.0f);
-
-      if ((size[0] <= 0.0f) || (size[1] <= 0.0f))
-        size.Zero();
-
-      return size;
     }
 
     void Button::SetText(std::string const & a_str)

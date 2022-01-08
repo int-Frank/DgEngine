@@ -35,7 +35,7 @@ namespace DgE
 
       static Style::Slider const s_style;
 
-      SliderBase(Widget *pParent, vec2 const &position, float length, float value, Style::Slider const &style, bool vertical, std::initializer_list<WidgetFlag> flags);
+      SliderBase(vec2 const &position, float length, float value, Style::Slider const &style, bool vertical, std::initializer_list<WidgetFlag> flags);
       float SetNormalisedValue(float); // Set value between 0 and 1
 
     private:
@@ -56,11 +56,11 @@ namespace DgE
     template<typename T>
     class Slider : public SliderBase
     {
-      Slider(Widget * pParent, vec2 const & position, float width, T minVal, T maxVal, T initialVal, bool vertical, Style::Slider const &, std::initializer_list<WidgetFlag> flags);
+      Slider(vec2 const & position, float width, T minVal, T maxVal, T initialVal, bool vertical, Style::Slider const &, std::initializer_list<WidgetFlag> flags);
     public:
 
-      static Slider *Create(Widget *pParent, vec2 const &position, float width, T minVal, T maxVal, T initialVal, bool vertical, std::initializer_list<WidgetFlag> flags = {});
-      static Slider *Create(Widget *pParent, vec2 const &position, float width, T minVal, T maxVal, T initialVal, bool vertical, Style::Slider const &, std::initializer_list<WidgetFlag> flags = {});
+      static Slider *Create(vec2 const &position, float width, T minVal, T maxVal, T initialVal, bool vertical, std::initializer_list<WidgetFlag> flags = {});
+      static Slider *Create(vec2 const &position, float width, T minVal, T maxVal, T initialVal, bool vertical, Style::Slider const &, std::initializer_list<WidgetFlag> flags = {});
 
       void BindNewValue(std::function<void(T)> a_fn);
       void SetValue(T);
@@ -79,10 +79,10 @@ namespace DgE
     using SliderInt = Slider<int32_t>;
 
     template<typename T>
-    Slider<T>::Slider(Widget * a_pParent, vec2 const & a_position, float a_width,
+    Slider<T>::Slider(vec2 const & a_position, float a_width,
                       T a_minVal, T a_maxVal, T a_initialVal, bool vertical, Style::Slider const & style,
                       std::initializer_list<WidgetFlag> a_flags)
-      : SliderBase(a_pParent, a_position, a_width, 0.0f, style, vertical, a_flags)
+      : SliderBase(a_position, a_width, 0.0f, style, vertical, a_flags)
       , m_minVal(a_minVal)
       , m_maxVal(a_maxVal)
       , m_lastValue(T(0))
@@ -101,7 +101,7 @@ namespace DgE
     }
 
     template<typename T>
-    Slider<T> *Slider<T>::Create(Widget *a_pParent, vec2 const &a_position, float a_width,
+    Slider<T> *Slider<T>::Create(vec2 const &a_position, float a_width,
                                  T a_minVal, T a_maxVal, T a_initialVal, bool vertical, Style::Slider const &style,
                                  std::initializer_list<WidgetFlag> a_flags)
     {
@@ -109,11 +109,11 @@ namespace DgE
     }
 
     template<typename T>
-    Slider<T> *Slider<T>::Create(Widget *a_pParent, vec2 const &a_position, float a_width,
+    Slider<T> *Slider<T>::Create(vec2 const &a_position, float a_width,
                                  T a_minVal, T a_maxVal, T a_initialVal, bool vertical,
                                  std::initializer_list<WidgetFlag> a_flags)
     {
-      return new Slider(a_pParent, a_position, a_width, a_minVal, a_maxVal, a_initialVal, vertical, s_style, a_flags);
+      return new Slider(a_position, a_width, a_minVal, a_maxVal, a_initialVal, vertical, s_style, a_flags);
     }
 
     template<typename T>

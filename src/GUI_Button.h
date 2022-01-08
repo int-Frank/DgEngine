@@ -13,14 +13,14 @@ namespace DgE
   {
     class Button : public Widget
     {
-      Button(Widget * pParent, std::string const & text, bool isGlyph, vec2 const & position, vec2 const & size, Style::Button const &style, std::initializer_list<WidgetFlag> flags);
+      Button(std::string const & text, bool isGlyph, vec2 const & position, vec2 const & size, Style::Button const &style, std::initializer_list<WidgetFlag> flags);
     public:
 
-      static Button *Create(Widget *pParent, std::string const &text, vec2 const &position, vec2 const &size, std::initializer_list<WidgetFlag> flags = {});
-      static Button *Create(Widget *pParent, std::string const &text, vec2 const &position, vec2 const &size, Style::Button const &style, std::initializer_list<WidgetFlag> flags = {});
+      static Button *Create(std::string const &text, vec2 const &position, vec2 const &size, std::initializer_list<WidgetFlag> flags = {});
+      static Button *Create(std::string const &text, vec2 const &position, vec2 const &size, Style::Button const &style, std::initializer_list<WidgetFlag> flags = {});
 
-      static Button *CreateWithGlyph(Widget *pParent, std::string const &text, vec2 const &position, vec2 const &size, std::initializer_list<WidgetFlag> flags = {});
-      static Button *CreateWithGlyph(Widget *pParent, std::string const &text, vec2 const &position, vec2 const &size, Style::Button const &style, std::initializer_list<WidgetFlag> flags = {});
+      static Button *CreateWithGlyph(std::string const &text, vec2 const &position, vec2 const &size, std::initializer_list<WidgetFlag> flags = {});
+      static Button *CreateWithGlyph(std::string const &text, vec2 const &position, vec2 const &size, Style::Button const &style, std::initializer_list<WidgetFlag> flags = {});
 
       ~Button();
 
@@ -43,15 +43,9 @@ namespace DgE
       Widget * GetParent() const override;
       void SetParent(Widget *) override;
 
-      vec2 GetLocalDivPosition() override;
-      vec2 GetDivSize() override;
-
     private:
 
       void _HandleMessage(Message *) override;
-
-      void HandleMessage(Message_GUI_PointerDown *);
-      void HandleMessage(Message_GUI_PointerMove *);
 
       void _SetLocalPosition(vec2 const &) override;
       void _SetSize(vec2 const &) override;

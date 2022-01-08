@@ -28,6 +28,9 @@ namespace DgE
         , clbk_HoverOff(nullptr)
       {}
 
+      void HandleMessage(Message_GUI_PointerDown *, Checkbox *pCheckbox);
+      void HandleMessage(Message_GUI_PointerMove *, Checkbox *pCheckbox);
+
       bool isChecked;
       Style::Checkbox style;
       UIAABB aabb;
@@ -39,13 +42,12 @@ namespace DgE
       std::function<void()> clbk_HoverOff;
     };
 
-    Checkbox::Checkbox(Widget * a_pParent, vec2 const & a_position, bool a_checked, Style::Checkbox const &style, std::initializer_list<WidgetFlag> flags)
+    Checkbox::Checkbox(vec2 const & a_position, bool a_checked, Style::Checkbox const &style, std::initializer_list<WidgetFlag> flags)
       : Widget({WidgetFlag::NotResponsive}, flags)
       , m_pimpl(new PIMPL())
     {
       SetStyle(style);
       m_pimpl->aabb = {a_position, CHECKBOX_SIZE};
-      m_pimpl->pParent = a_pParent;
     }
 
     Checkbox::~Checkbox()
@@ -53,14 +55,14 @@ namespace DgE
       delete m_pimpl;
     }
 
-    Checkbox *Checkbox::Create(Widget *pParent, vec2 const &position, bool a_checked, std::initializer_list<WidgetFlag> flags)
+    Checkbox *Checkbox::Create(vec2 const &position, bool a_checked, std::initializer_list<WidgetFlag> flags)
     {
-      return new Checkbox(pParent, position, a_checked, s_style, flags);
+      return new Checkbox(position, a_checked, s_style, flags);
     }
 
-    Checkbox *Checkbox::Create(Widget *pParent, vec2 const &position, bool a_checked, Style::Checkbox const &style, std::initializer_list<WidgetFlag> flags)
+    Checkbox *Checkbox::Create(vec2 const &position, bool a_checked, Style::Checkbox const &style, std::initializer_list<WidgetFlag> flags)
     {
-      return new Checkbox(pParent, position, a_checked, style, flags);
+      return new Checkbox(position, a_checked, style, flags);
     }
 
     Style::Checkbox const &Checkbox::GetStyle() const
@@ -93,45 +95,47 @@ namespace DgE
       if (a_pMsg->GetCategory() != MC_GUI)
         return;
 
-      DISPATCH_MESSAGE(Message_GUI_PointerMove);
-      DISPATCH_MESSAGE(Message_GUI_PointerDown);
+      if (a_pMsg->GetID() == Message_GUI_PointerMove::GetStaticID())
+        m_pimpl->HandleMessage(dynamic_cast<Message_GUI_PointerMove *>(a_pMsg), this);
+      else if (a_pMsg->GetID() == Message_GUI_PointerDown::GetStaticID())
+        m_pimpl->HandleMessage(dynamic_cast<Message_GUI_PointerDown *>(a_pMsg), this);
     }
 
-    void Checkbox::HandleMessage(Message_GUI_PointerDown * a_pMsg)
+    void Checkbox::PIMPL::HandleMessage(Message_GUI_PointerDown * a_pMsg, Checkbox *pCheckbox)
     {
       UIAABB aabb;
-      if (!GetGlobalViewableArea(aabb))
+      if (!pCheckbox->GetGlobalViewableArea(aabb))
         return;
 
-      if (PointInBox(vec2((float)a_pMsg->x, (float)a_pMsg->y), aabb) && m_pimpl->clbk_CheckChanged != nullptr)
+      if (PointInBox(vec2((float)a_pMsg->x, (float)a_pMsg->y), aabb) && clbk_CheckChanged != nullptr)
       {
-        m_pimpl->isChecked = !m_pimpl->isChecked;
-        m_pimpl->clbk_CheckChanged(m_pimpl->isChecked);
+        isChecked = !isChecked;
+        clbk_CheckChanged(isChecked);
         a_pMsg->SetFlag(DgE::Message::Flag::Handled, true);
       }
     }
 
-    void Checkbox::HandleMessage(Message_GUI_PointerMove * a_pMsg)
+    void Checkbox::PIMPL::HandleMessage(Message_GUI_PointerMove * a_pMsg, Checkbox *pCheckbox)
     {
       UIAABB aabb;
-      if (!GetGlobalViewableArea(aabb))
+      if (!pCheckbox->GetGlobalViewableArea(aabb))
         return;
 
       bool isInside = PointInBox(vec2((float)a_pMsg->x, (float)a_pMsg->y), aabb);
       if (isInside)
         a_pMsg->ConsumeHover();
 
-      if (isInside && m_pimpl->state == WidgetState::None)
+      if (isInside && state == WidgetState::None)
       {
-        m_pimpl->state = WidgetState::HoverOn;
-        if (m_pimpl->clbk_HoverOn != nullptr)
-          m_pimpl->clbk_HoverOn();
+        state = WidgetState::HoverOn;
+        if (clbk_HoverOn != nullptr)
+          clbk_HoverOn();
       }
-      if (!isInside && m_pimpl->state == WidgetState::HoverOn)
+      if (!isInside && state == WidgetState::HoverOn)
       {
-        m_pimpl->state = WidgetState::None;
-        if (m_pimpl->clbk_HoverOff != nullptr)
-          m_pimpl->clbk_HoverOff();
+        state = WidgetState::None;
+        if (clbk_HoverOff != nullptr)
+          clbk_HoverOff();
       }
     }
 
@@ -194,16 +198,6 @@ namespace DgE
     void Checkbox::_SetSize(vec2 const & a_size)
     {
       m_pimpl->aabb.size = a_size;
-    }
-
-    vec2 Checkbox::GetLocalDivPosition()
-    {
-      return vec2(0.0f, 0.0f);
-    }
-
-    vec2 Checkbox::GetDivSize()
-    {
-      return CHECKBOX_SIZE;
     }
 
     void Checkbox::SetChecked(bool a_val)

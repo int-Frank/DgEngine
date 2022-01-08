@@ -27,6 +27,9 @@ namespace DgE
         , aabb{}
       {}
 
+      void HandleMessage(Message_GUI_PointerDown *, Text *pText);
+      void HandleMessage(Message_GUI_PointerMove *, Text *pText);
+
       Widget *pParent;
       std::string text;
       Style::Text style;
@@ -551,7 +554,7 @@ namespace DgE
       return count;
     }
 
-    Text::Text(Widget * pParent, std::string const & text, vec2 const & position, vec2 const & size, Style::Text const &style, std::initializer_list<WidgetFlag> flags)
+    Text::Text(std::string const & text, vec2 const & position, vec2 const & size, Style::Text const &style, std::initializer_list<WidgetFlag> flags)
       : Widget({WidgetFlag::NotResponsive,
                 WidgetFlag::StretchHeight,
                 WidgetFlag::StretchWidth}, flags)
@@ -559,18 +562,17 @@ namespace DgE
     {
       SetStyle(style);
       m_pimpl->aabb = {position, size};
-      m_pimpl->pParent = pParent;
       m_pimpl->text = text;
     }
 
-    Text *Text::Create(Widget *pParent, std::string const &text, vec2 const &position, vec2 const &size, Style::Text const &style, std::initializer_list<WidgetFlag> flags)
+    Text *Text::Create(std::string const &text, vec2 const &position, vec2 const &size, Style::Text const &style, std::initializer_list<WidgetFlag> flags)
     {
-      return new Text(pParent, text, position, size, style, flags);
+      return new Text(text, position, size, style, flags);
     }
 
-    Text *Text::Create(Widget *pParent, std::string const &text, vec2 const &position, vec2 const &size, std::initializer_list<WidgetFlag> flags)
+    Text *Text::Create(std::string const &text, vec2 const &position, vec2 const &size, std::initializer_list<WidgetFlag> flags)
     {
-      return new Text(pParent, text, position, size, s_style, flags);
+      return new Text(text, position, size, s_style, flags);
     }
 
     Text::~Text()
@@ -656,24 +658,26 @@ namespace DgE
       if (a_pMsg->GetCategory() != MC_GUI)
         return;
 
-      DISPATCH_MESSAGE(Message_GUI_PointerMove);
-      DISPATCH_MESSAGE(Message_GUI_PointerDown);
+      if (a_pMsg->GetID() == Message_GUI_PointerMove::GetStaticID())
+        m_pimpl->HandleMessage(dynamic_cast<Message_GUI_PointerMove *>(a_pMsg), this);
+      else if (a_pMsg->GetID() == Message_GUI_PointerDown::GetStaticID())
+        m_pimpl->HandleMessage(dynamic_cast<Message_GUI_PointerDown *>(a_pMsg), this);
     }
 
-    void Text::HandleMessage(Message_GUI_PointerDown * a_pMsg)
+    void Text::PIMPL::HandleMessage(Message_GUI_PointerDown * a_pMsg, Text *pText)
     {
       UIAABB aabb;
-      if (!GetGlobalViewableArea(aabb))
+      if (!pText->GetGlobalViewableArea(aabb))
         return;
 
       if (PointInBox(vec2((float)a_pMsg->x, (float)a_pMsg->y), aabb))
         a_pMsg->SetFlag(DgE::Message::Flag::Handled, true);
     }
 
-    void Text::HandleMessage(Message_GUI_PointerMove * a_pMsg)
+    void Text::PIMPL::HandleMessage(Message_GUI_PointerMove * a_pMsg, Text *pText)
     {
       UIAABB aabb;
-      if (!GetGlobalViewableArea(aabb))
+      if (!pText->GetGlobalViewableArea(aabb))
         return;
 
       if (PointInBox(vec2((float)a_pMsg->x, (float)a_pMsg->y), aabb))

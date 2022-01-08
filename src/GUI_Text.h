@@ -13,11 +13,11 @@ namespace DgE
   {
     class Text : public Widget
     {
-      Text(Widget * pParent, std::string const & text, vec2 const & position, vec2 const & size, Style::Text const &style, std::initializer_list<WidgetFlag> flags);
+      Text(std::string const & text, vec2 const & position, vec2 const & size, Style::Text const &style, std::initializer_list<WidgetFlag> flags);
     public:
 
-      static Text *Create(Widget *pParent, std::string const &text, vec2 const &position, vec2 const &size, std::initializer_list<WidgetFlag> flags = {});
-      static Text *Create(Widget *pParent, std::string const &text, vec2 const &position, vec2 const &size, Style::Text const &style, std::initializer_list<WidgetFlag> flags = {});
+      static Text *Create(std::string const &text, vec2 const &position, vec2 const &size, std::initializer_list<WidgetFlag> flags = {});
+      static Text *Create(std::string const &text, vec2 const &position, vec2 const &size, Style::Text const &style, std::initializer_list<WidgetFlag> flags = {});
 
       ~Text();
 
@@ -37,9 +37,6 @@ namespace DgE
     private:
 
       void _HandleMessage(Message *) override;
-
-      void HandleMessage(Message_GUI_PointerDown *);
-      void HandleMessage(Message_GUI_PointerMove *);
 
       void _SetLocalPosition(vec2 const &) override;
       void _SetSize(vec2 const &) override;

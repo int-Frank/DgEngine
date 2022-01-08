@@ -5,7 +5,11 @@
 #include "GUI_Internal.h"
 #include "GUI_Window.h"
 #include "GUI_Button.h"
+#include "GUI_Container.h"
+#include "GUI_Slider.h"
 #include "Renderer.h"
+
+#define INNER_MARGIN 2.0f
 
 namespace DgE
 {
@@ -15,41 +19,71 @@ namespace DgE
     // Contaier context
     //------------------------------------------------------------------------------------
 
-    class ContainerContext
+    class WindowContext
     {
     public:
 
-      ContainerContext()
+      WindowContext()
         : style{}
+        , pWindow(nullptr)
         , pParent(nullptr)
+        , pViewable(nullptr)
+        , pContainer(nullptr)
         , pGrab(nullptr)
+        , pSliderVertical(nullptr)
+        , pSliderHorizontal(nullptr)
         , aabb{}
         , grabPressed(false)
-        , children()
       {
 
       }
 
-      ~ContainerContext()
+      ~WindowContext()
       {
-        Clear();
         delete pGrab;
+        delete pSliderVertical;
+        delete pSliderHorizontal;
+        delete pContainer;
       }
 
       void Clear()
       {
-        for (auto pWgt : children)
-          delete pWgt;
-        children.clear();
+        pContainer->Clear();
+      }
+
+      UIAABB GetInnerAABB()
+      {
+        float x = 0.0f;
+        float y = 0.0f;
+
+        if (pGrab != nullptr)
+        {
+          x = pGrab->GetSize().x();
+          y = pGrab->GetSize().y();
+        }
+
+        if (pSliderVertical != nullptr && pSliderVertical->GetSize().x() > x)
+          x = pSliderVertical->GetSize().x();
+
+        if (pSliderHorizontal != nullptr && pSliderHorizontal->GetSize().y() > y)
+          y = pSliderVertical->GetSize().y();
+
+        UIAABB aabb = {
+          vec2(INNER_MARGIN, INNER_MARGIN),
+          pWindow->GetSize() - vec2(x + INNER_MARGIN, y + INNER_MARGIN)};
+        return aabb;
       }
 
       Style::Window style;
-      Window *pContainer;
+      Window *pWindow;
       Widget *pParent;
+      Container *pViewable;
+      Container *pContainer;
       Button *pGrab;
+      SliderFloat *pSliderVertical;
+      SliderFloat *pSliderHorizontal;
       UIAABB aabb;
       bool grabPressed;
-      Dg::DoublyLinkedList<Widget *> children;
     };
 
     //------------------------------------------------------------------------------------
@@ -60,7 +94,7 @@ namespace DgE
     {
     public:
 
-      ContainerState(ContainerContext * a_pContext) : m_pContext(a_pContext) {}
+      ContainerState(WindowContext * a_pContext) : m_pContext(a_pContext) {}
       virtual ~ContainerState() {}
 
       virtual WidgetState QueryState() const = 0;
@@ -68,14 +102,14 @@ namespace DgE
 
     protected:
 
-      ContainerContext * m_pContext;
+      WindowContext * m_pContext;
     };
 
     class StaticState : public ContainerState
     {
     public:
 
-      StaticState(ContainerContext * a_pContext);
+      StaticState(WindowContext * a_pContext);
       ~StaticState() {}
 
       WidgetState QueryState() const override;
@@ -95,7 +129,7 @@ namespace DgE
     {
     public:
 
-      MoveState(ContainerContext * a_pContext, vec2 const & a_controlAnchor);
+      MoveState(WindowContext * a_pContext, vec2 const & a_controlAnchor);
       ~MoveState() {}
 
       WidgetState QueryState() const override;
@@ -113,7 +147,7 @@ namespace DgE
     {
     public:
 
-      ResizeState(ContainerContext * a_pContext, vec2 const & a_controlAnchor);
+      ResizeState(WindowContext * a_pContext, vec2 const & a_controlAnchor);
       ~ResizeState() {}
 
       WidgetState QueryState() const override;
@@ -131,7 +165,7 @@ namespace DgE
     // StaticState
     //------------------------------------------------------------------------------------
 
-    StaticState::StaticState(ContainerContext * a_pContext)
+    StaticState::StaticState(WindowContext * a_pContext)
       : ContainerState(a_pContext)
       , m_pFocus(nullptr)
       , m_state(WidgetState::None)
@@ -151,18 +185,11 @@ namespace DgE
 
       ContainerState * pResult = nullptr;
 
-      if (m_pFocus != nullptr)
-      {
-        m_pFocus->HandleMessage(a_pMsg);
-        if (m_pFocus->QueryState() == WidgetState::None)
-        {
-          m_pFocus = nullptr;
-          m_state = WidgetState::None;
-        }
-        if (a_pMsg->QueryFlag(DgE::Message::Flag::Handled))
-          pResult = nullptr;
-      }
-      else if (a_pMsg->GetID() == Message_GUI_PointerDown::GetStaticID())
+      m_pContext->pContainer->HandleMessage(a_pMsg);
+      if (a_pMsg->QueryFlag(Message::Flag::Handled))
+        return nullptr;
+
+      if (a_pMsg->GetID() == Message_GUI_PointerDown::GetStaticID())
       {
         pResult = HandleMessage(dynamic_cast<Message_GUI_PointerDown *>(a_pMsg));
       }
@@ -180,7 +207,7 @@ namespace DgE
     ContainerState * StaticState::HandleMessage(Message_GUI_PointerDown * a_pMsg)
     {
       UIAABB aabb;
-      if (!m_pContext->pContainer->GetGlobalViewableArea(aabb))
+      if (!m_pContext->pWindow->GetGlobalViewableArea(aabb))
         return nullptr;
 
       vec2 point((float)a_pMsg->x, (float)a_pMsg->y);
@@ -201,27 +228,7 @@ namespace DgE
         }
       }
 
-      for (auto it = m_pContext->children.begin(); it != m_pContext->children.end(); it++)
-      {
-        (*it)->HandleMessage(a_pMsg);
-        if (a_pMsg->QueryFlag(DgE::Message::Flag::Handled))
-        {
-          if ((*it)->QueryState() == WidgetState::HasFocus)
-          {
-            m_pFocus = (*it);
-            m_state = WidgetState::HasFocus;
-          }
-          if ((*it)->IsContainer())
-          {
-            Widget * pWgt = (*it);
-            m_pContext->children.erase(it);
-            m_pContext->children.push_front(pWgt); // We do this to render the container on top
-          }
-          return nullptr;
-        }
-      }
-
-      if (m_pContext->pContainer->HasFlag(WidgetFlag::Movable) && PointInBox(point, aabb))
+      if (m_pContext->pWindow->HasFlag(WidgetFlag::Movable) && PointInBox(point, aabb))
       {
         a_pMsg->SetFlag(Message::Flag::Handled, true);
         return new MoveState(m_pContext, point);
@@ -232,19 +239,6 @@ namespace DgE
 
     ContainerState * StaticState::HandleMessage(Message_GUI_PointerUp * a_pMsg)
     {
-      for (Widget * pWidget : m_pContext->children)
-      {
-        pWidget->HandleMessage(a_pMsg);
-        if (a_pMsg->QueryFlag(DgE::Message::Flag::Handled))
-        {
-          if (pWidget->QueryState() == WidgetState::HasFocus)
-          {
-            m_pFocus = pWidget;
-            m_state = WidgetState::HasFocus;
-          }
-          break;
-        }
-      }
       return nullptr;
     }
 
@@ -258,30 +252,13 @@ namespace DgE
         pWgt->HandleMessage(a_pMsg);
       }
 
-      for (Widget * pWidget : m_pContext->children)
-      {
-        pWidget->HandleMessage(a_pMsg);
-        if (a_pMsg->QueryFlag(DgE::Message::Flag::Handled))
-        {
-          if (pWidget->QueryState() == WidgetState::HasFocus)
-          {
-            m_pFocus = pWidget;
-            m_state = WidgetState::HasFocus;
-          }
-          break;
-        }
-      }
-
       UIAABB aabb;
-      if (!m_pContext->pContainer->GetGlobalViewableArea(aabb))
+      if (!m_pContext->pWindow->GetGlobalViewableArea(aabb))
       {
         vec2 point((float)a_pMsg->x, (float)a_pMsg->y);
 
         if (PointInBox(point, aabb))
-        {
-
           a_pMsg->ConsumeHover();
-        }
       }
       return nullptr;
     }
@@ -290,7 +267,7 @@ namespace DgE
     // MoveState
     //------------------------------------------------------------------------------------
 
-    MoveState::MoveState(ContainerContext * a_pContext, vec2 const & a_controlAnchor)
+    MoveState::MoveState(WindowContext * a_pContext, vec2 const & a_controlAnchor)
       : ContainerState(a_pContext)
       , m_controlAnchor(a_controlAnchor)
       , m_positionAnchor(a_pContext->aabb.position)
@@ -346,7 +323,7 @@ namespace DgE
     // ResizeState
     //------------------------------------------------------------------------------------
 
-    ResizeState::ResizeState(ContainerContext * a_pContext, vec2 const & a_controlAnchor)
+    ResizeState::ResizeState(WindowContext * a_pContext, vec2 const & a_controlAnchor)
       : ContainerState(a_pContext)
       , m_controlAnchor(a_controlAnchor)
       , m_sizeAnchor(a_pContext->aabb.size)
@@ -393,6 +370,9 @@ namespace DgE
       if (m_pContext->pGrab != nullptr)
         m_pContext->pGrab->SetPosition(m_pContext->aabb.size - m_pContext->pGrab->GetSize());
 
+      UIAABB innerAABB = m_pContext->GetInnerAABB();
+      m_pContext->pViewable->SetSize(innerAABB.size);
+
       return nullptr;
     }
 
@@ -414,23 +394,34 @@ namespace DgE
       ~PIMPL() { delete pState; }
 
       ContainerState *pState;
-      ContainerContext context;
+      WindowContext context;
     };
 
-    Window::Window(Widget * a_pParent, vec2 const a_position, vec2 const & a_size, Style::Window const & style, std::initializer_list<WidgetFlag> a_flags)
+    Window::Window(vec2 const a_position, vec2 const & a_size, Style::Window const & style, std::initializer_list<WidgetFlag> a_flags)
       : Widget({ WidgetFlag::NotResponsive,
                  WidgetFlag::StretchWidth,
                  WidgetFlag::StretchHeight,
                  WidgetFlag::Resizable,
-                 WidgetFlag::Movable,
-                 WidgetFlag::NoBackground
+                 WidgetFlag::VerticalScroll,
+                 WidgetFlag::HorizontalScroll,
+                 WidgetFlag::Movable
                }, a_flags)
       , m_pimpl(new PIMPL())
     {
-      m_pimpl->context.pContainer = this;
-      m_pimpl->context.pParent = a_pParent;
+      m_pimpl->context.pWindow = this;
       m_pimpl->context.grabPressed = false;
       m_pimpl->context.pGrab = nullptr;
+
+      if (HasFlag(WidgetFlag::VerticalScroll))
+      {
+        //Add slider
+      }
+
+      if (HasFlag(WidgetFlag::HorizontalScroll))
+      {
+        //Add slider
+      }
+
       SetStyle(style);
 
       m_pimpl->context.aabb = {a_position, a_size};
@@ -464,11 +455,18 @@ namespace DgE
           2.0f
         };
 
-        m_pimpl->context.pGrab = Button::CreateWithGlyph(this, "\xEE\x80\x80", a_size - grabSize, grabSize, grabStyle);
+        m_pimpl->context.pGrab = Button::CreateWithGlyph("\xEE\x80\x80", a_size - grabSize, grabSize, grabStyle);
+        m_pimpl->context.pGrab->SetParent(this);
         m_pimpl->context.pGrab->BindSelect([pBool = &m_pimpl->context.grabPressed](){*pBool = true; });
       }
 
       m_pimpl->pState = new StaticState(&m_pimpl->context);
+
+      UIAABB innerAABB = m_pimpl->context.GetInnerAABB();
+      m_pimpl->context.pViewable = Container::Create(innerAABB.position, innerAABB.size);
+      m_pimpl->context.pContainer = Container::Create(vec2(0.0f, 0.0f), m_pimpl->context.aabb.size);
+      m_pimpl->context.pViewable->SetParent(this);
+      m_pimpl->context.pViewable->Add(m_pimpl->context.pContainer);
     }
 
     Window::~Window()
@@ -476,14 +474,14 @@ namespace DgE
       delete m_pimpl;
     }
 
-    Window * Window::Create(Widget * a_pParent, vec2 const a_position, vec2 const & a_size, std::initializer_list<WidgetFlag> a_flags)
+    Window * Window::Create(vec2 const a_position, vec2 const & a_size, std::initializer_list<WidgetFlag> a_flags)
     {
-      return new Window(a_pParent, a_position, a_size, s_style, a_flags);
+      return new Window(a_position, a_size, s_style, a_flags);
     }
 
-    Window *Window::Create(Widget *a_pParent, vec2 const a_position, vec2 const &a_size, Style::Window const & style, std::initializer_list<WidgetFlag> a_flags)
+    Window *Window::Create(vec2 const a_position, vec2 const &a_size, Style::Window const & style, std::initializer_list<WidgetFlag> a_flags)
     {
-      return new Window(a_pParent, a_position, a_size, style, a_flags);
+      return new Window(a_position, a_size, style, a_flags);
     }
 
     Style::Window const & Window::GetDefaultStyle()
@@ -518,24 +516,12 @@ namespace DgE
 
     void Window::Add(Widget * a_pWgt)
     {
-      a_pWgt->SetParent(this);
-      if (a_pWgt->IsContainer())
-        m_pimpl->context.children.push_front(a_pWgt);
-      else
-        m_pimpl->context.children.push_back(a_pWgt);
+      m_pimpl->context.pContainer->Add(a_pWgt);
     }
 
     void Window::Remove(Widget * a_pWgt)
     {
-      for (auto it = m_pimpl->context.children.begin(); it != m_pimpl->context.children.end(); it++)
-      {
-        if (*it == a_pWgt)
-        {
-          delete *it;
-          m_pimpl->context.children.erase(it);
-          break;
-        }
-      }
+      m_pimpl->context.pContainer->Remove(a_pWgt);
     }
 
     void Window::Draw()
@@ -545,29 +531,22 @@ namespace DgE
       if (!GetGlobalViewableArea(viewableWindow))
         return;
 
-      if (!HasFlag(WidgetFlag::NoBackground))
-      {
-        vec2 size = GetSize() - 2.0f * vec2(m_pimpl->context.style.borderWidth, m_pimpl->context.style.borderWidth);
-        if (size.x() < 0.0f)
-          size.x() = 0.0f;
-        if (size.y() < 0.0f)
-          size.y() = 0.0f;
+      vec2 size = GetSize() - 2.0f * vec2(m_pimpl->context.style.borderWidth, m_pimpl->context.style.borderWidth);
+      if (size.x() < 0.0f)
+        size.x() = 0.0f;
+      if (size.y() < 0.0f)
+        size.y() = 0.0f;
 
-        vec2 pos = GetGlobalPosition() + vec2(m_pimpl->context.style.borderWidth, m_pimpl->context.style.borderWidth);
+      vec2 pos = GetGlobalPosition() + vec2(m_pimpl->context.style.borderWidth, m_pimpl->context.style.borderWidth);
 
-        ::DgE::Renderer::SetSissorBox((int)viewableWindow.position.x(), (int)viewableWindow.position.y(), (int)viewableWindow.size.x(), (int)viewableWindow.size.y());
+      ::DgE::Renderer::SetSissorBox((int)viewableWindow.position.x(), (int)viewableWindow.position.y(), (int)viewableWindow.size.x(), (int)viewableWindow.size.y());
 
-        if (m_pimpl->context.style.borderWidth == 0.0f)
-          Renderer::DrawBox({pos, size}, m_pimpl->context.style.face);
-        else
-          Renderer::DrawBoxWithBorder({pos, size}, m_pimpl->context.style.borderWidth, m_pimpl->context.style.face, m_pimpl->context.style.border);
-      }
-
-      for (auto it = m_pimpl->context.children.end(); it != m_pimpl->context.children.begin();)
-      {
-        it--;
-        (*it)->Draw();
-      }
+      if (m_pimpl->context.style.borderWidth == 0.0f)
+        Renderer::DrawBox({pos, size}, m_pimpl->context.style.face);
+      else
+        Renderer::DrawBoxWithBorder({pos, size}, m_pimpl->context.style.borderWidth, m_pimpl->context.style.face, m_pimpl->context.style.border);
+      
+      m_pimpl->context.pContainer->Draw();
 
       if (m_pimpl->context.pGrab != nullptr)
         m_pimpl->context.pGrab->Draw();
@@ -611,21 +590,6 @@ namespace DgE
     bool Window::IsContainer() const
     {
       return true;
-    }
-
-    vec2 Window::GetLocalDivPosition()
-    {
-      return vec2(0.0f, 0.0f);
-    }
-
-    vec2 Window::GetDivSize()
-    {
-      vec2 size = GetSize();
-
-      if ((size[0] <= 0.0f) || (size[1] <= 0.0f))
-        size.Zero();
-
-      return size;
     }
   }
 }

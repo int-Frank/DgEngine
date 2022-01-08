@@ -13,11 +13,11 @@ namespace DgE
   {
     class Checkbox : public Widget
     {
-      Checkbox(Widget * pParent, vec2 const & position, bool checked, Style::Checkbox const &style, std::initializer_list<WidgetFlag> flags);
+      Checkbox(vec2 const & position, bool checked, Style::Checkbox const &style, std::initializer_list<WidgetFlag> flags);
     public:
 
-      static Checkbox *Create(Widget *pParent, vec2 const &position, bool checked, std::initializer_list<WidgetFlag> flags = {});
-      static Checkbox *Create(Widget *pParent, vec2 const &position, bool checked, Style::Checkbox const &, std::initializer_list<WidgetFlag> flags = {});
+      static Checkbox *Create(vec2 const &position, bool checked, std::initializer_list<WidgetFlag> flags = {});
+      static Checkbox *Create(vec2 const &position, bool checked, Style::Checkbox const &, std::initializer_list<WidgetFlag> flags = {});
 
       ~Checkbox();
 
@@ -36,15 +36,9 @@ namespace DgE
       Widget * GetParent() const override;
       void SetParent(Widget *) override;
 
-      vec2 GetLocalDivPosition() override;
-      vec2 GetDivSize() override;
-
     private:
 
       void _HandleMessage(Message *) override;
-
-      void HandleMessage(Message_GUI_PointerDown *);
-      void HandleMessage(Message_GUI_PointerMove *);
 
       void _SetLocalPosition(vec2 const &) override;
       void _SetSize(vec2 const &) override;

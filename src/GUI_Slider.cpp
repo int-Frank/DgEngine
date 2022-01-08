@@ -365,7 +365,7 @@ namespace DgE
       SliderContext context;
     };
 
-    SliderBase::SliderBase(Widget * a_pParent, vec2 const & a_position, float length, float a_value, Style::Slider const &style, bool isVertical, std::initializer_list<WidgetFlag> a_flags)
+    SliderBase::SliderBase(vec2 const & a_position, float length, float a_value, Style::Slider const &style, bool isVertical, std::initializer_list<WidgetFlag> a_flags)
       : Widget({WidgetFlag::NotResponsive,
                 WidgetFlag::StretchWidth
         }, a_flags)
@@ -390,7 +390,6 @@ namespace DgE
 
       m_pimpl->context.position = a_position;
       m_pimpl->context.pSlider = this;
-      m_pimpl->context.pParent = a_pParent;
 
       m_pimpl->pState = new SliderStaticState(&m_pimpl->context, WidgetState::None);
     }

@@ -14,13 +14,13 @@ namespace DgE
     // Should be called Window
     class Window : public Widget
     {
-      Window(Widget * pParent, vec2 const position, vec2 const & size, Style::Window const &style, std::initializer_list<WidgetFlag> flags);
+      Window(vec2 const position, vec2 const & size, Style::Window const &style, std::initializer_list<WidgetFlag> flags);
     public:
 
       static vec2 const s_minSize;
 
-      static Window *Create(Widget *pParent, vec2 const position, vec2 const &size, std::initializer_list<WidgetFlag> flags = {WidgetFlag::Movable, WidgetFlag::Resizable});
-      static Window *Create(Widget *pParent, vec2 const position, vec2 const &size, Style::Window const &, std::initializer_list<WidgetFlag> flags = {WidgetFlag::Movable, WidgetFlag::Resizable});
+      static Window *Create(vec2 const position, vec2 const &size, std::initializer_list<WidgetFlag> flags = {WidgetFlag::Movable, WidgetFlag::Resizable});
+      static Window *Create(vec2 const position, vec2 const &size, Style::Window const &, std::initializer_list<WidgetFlag> flags = {WidgetFlag::Movable, WidgetFlag::Resizable});
       
       ~Window();
 
@@ -37,8 +37,6 @@ namespace DgE
       WidgetState QueryState() const override;
       Widget * GetParent() const override;
       void SetParent(Widget *) override;
-      vec2 GetLocalDivPosition() override;
-      vec2 GetDivSize() override;
 
       bool IsContainer() const override;
 
