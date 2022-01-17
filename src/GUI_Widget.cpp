@@ -25,6 +25,29 @@ namespace DgE
 
     }
 
+    void Widget::UpdateSize()
+    {
+      Widget* pParent = GetParent();
+      if (pParent)
+      {
+        vec2 parentSize = pParent->GetSize();
+        vec2 thisSize = GetSize();
+        bool dirty = false;
+        if (HasFlag(WidgetFlag::StretchWidth))
+        {
+          dirty = true;
+          thisSize.x() = parentSize.x();
+        }
+        if (HasFlag(WidgetFlag::StretchHeight))
+        {
+          dirty = true;
+          thisSize.y() = parentSize.y();
+        }
+        if (dirty)
+          SetSize(thisSize);
+      }
+    }
+
     vec2 Widget::GetGlobalPosition()
     {
       vec2 result = GetLocalPosition();
@@ -76,65 +99,6 @@ namespace DgE
         return true;
       }
       return false;
-    }
-
-    vec2 Widget::GetLocalPosition()
-    {
-      Widget *pParent = GetParent();
-      if (pParent != nullptr)
-      {
-        if (HasFlag(WidgetFlag::StretchWidth) || HasFlag(WidgetFlag::StretchHeight))
-        {
-          vec2 position = _GetLocalPosition();
-
-          if (HasFlag(WidgetFlag::StretchWidth))
-            position[0] = 0.0f;
-          if (HasFlag(WidgetFlag::StretchHeight))
-            position[1] = 0.0f;
-
-          _SetLocalPosition(position);
-        }
-      }
-
-      return _GetLocalPosition();
-    }
-
-    vec2 Widget::GetSize()
-    {
-      Widget * pParent = GetParent();
-      if (pParent != nullptr)
-      {
-        if (HasFlag(WidgetFlag::StretchWidth) || HasFlag(WidgetFlag::StretchHeight))
-        {
-          vec2 contentSize = pParent->GetSize();
-          vec2 size = _GetSize();
-
-          if (HasFlag(WidgetFlag::StretchWidth))
-            size[0] = contentSize[0];
-          if (HasFlag(WidgetFlag::StretchHeight))
-            size[1] = contentSize[1];
-
-          _SetSize(size);
-        }
-      }
-
-      return _GetSize();
-    }
-
-    void Widget::SetPosition(vec2 const & a_pos)
-    {
-      if (HasFlag(WidgetFlag::StretchHeight) || HasFlag(WidgetFlag::StretchWidth))
-        return;
-
-      _SetLocalPosition(a_pos);
-    }
-
-    void Widget::SetSize(vec2 const & a_size)
-    {
-      if (HasFlag(WidgetFlag::StretchHeight) || HasFlag(WidgetFlag::StretchWidth))
-        return;
-
-      _SetSize(a_size);
     }
 
     void Widget::HandleMessage(Message * a_pMsg)

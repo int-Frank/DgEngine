@@ -17,10 +17,8 @@ namespace DgE
       Window(vec2 const position, vec2 const & size, Style::Window const &style, std::initializer_list<WidgetFlag> flags);
     public:
 
-      static vec2 const s_minSize;
-
-      static Window *Create(vec2 const position, vec2 const &size, std::initializer_list<WidgetFlag> flags = {WidgetFlag::Movable, WidgetFlag::Resizable});
-      static Window *Create(vec2 const position, vec2 const &size, Style::Window const &, std::initializer_list<WidgetFlag> flags = {WidgetFlag::Movable, WidgetFlag::Resizable});
+      static Window *Create(vec2 const position, vec2 const &size, std::initializer_list<WidgetFlag> flags = {WidgetFlag::Movable, WidgetFlag::Resizable, WidgetFlag::VerticalScroll, WidgetFlag::HorizontalScroll});
+      static Window *Create(vec2 const position, vec2 const &size, Style::Window const &, std::initializer_list<WidgetFlag> flags = {WidgetFlag::Movable, WidgetFlag::Resizable, WidgetFlag::VerticalScroll, WidgetFlag::HorizontalScroll});
       
       ~Window();
 
@@ -40,14 +38,14 @@ namespace DgE
 
       bool IsContainer() const override;
 
+      void SetLocalPosition(vec2 const&) override;
+      void SetSize(vec2 const&) override;
+      vec2 GetLocalPosition() override;
+      vec2 GetSize() override;
+
     private:
 
       void _HandleMessage(Message *) override;
-
-      void _SetLocalPosition(vec2 const &) override;
-      void _SetSize(vec2 const &) override;
-      vec2 _GetLocalPosition() override;
-      vec2 _GetSize() override;
 
     private:
 

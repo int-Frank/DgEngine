@@ -180,22 +180,22 @@ namespace DgE
       m_pimpl->pParent = a_pParent;
     }
 
-    vec2 Checkbox::_GetLocalPosition()
+    vec2 Checkbox::GetLocalPosition()
     {
       return m_pimpl->aabb.position;
     }
 
-    vec2 Checkbox::_GetSize()
+    vec2 Checkbox::GetSize()
     {
       return m_pimpl->aabb.size;
     }
 
-    void Checkbox::_SetLocalPosition(vec2 const & a_pos)
+    void Checkbox::SetLocalPosition(vec2 const & a_pos)
     {
       m_pimpl->aabb.position = a_pos;
     }
 
-    void Checkbox::_SetSize(vec2 const & a_size)
+    void Checkbox::SetSize(vec2 const & a_size)
     {
       m_pimpl->aabb.size = a_size;
     }

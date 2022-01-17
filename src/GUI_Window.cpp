@@ -9,7 +9,13 @@
 #include "GUI_Slider.h"
 #include "Renderer.h"
 
-#define INNER_MARGIN 2.0f
+#define MIN_DIMENSION_X 40.0f
+#define MIN_DIMENSION_Y 10.0f
+#define WINDOW_CONTROLLER_BORDER 16.0f
+#define GRAB_SIZE 12.0f
+#define INNER_MARGIN 1.0f
+#define SLIDER_MARGIN_FRONT 0.0f
+#define SLIDER_MARGIN_END 5.0f
 
 namespace DgE
 {
@@ -27,8 +33,9 @@ namespace DgE
         : style{}
         , pWindow(nullptr)
         , pParent(nullptr)
-        , pViewable(nullptr)
-        , pContainer(nullptr)
+        , pWindowContainer(nullptr)
+        , pViewableContainer(nullptr)
+        , pUserContainer(nullptr)
         , pGrab(nullptr)
         , pSliderVertical(nullptr)
         , pSliderHorizontal(nullptr)
@@ -41,44 +48,82 @@ namespace DgE
       ~WindowContext()
       {
         delete pGrab;
-        delete pSliderVertical;
-        delete pSliderHorizontal;
-        delete pContainer;
+        delete pWindowContainer;
       }
 
       void Clear()
       {
-        pContainer->Clear();
+        pUserContainer->Clear();
       }
 
-      UIAABB GetInnerAABB()
+      // Returns true if slider added
+      bool SetVerticalSlider()
       {
-        float x = 0.0f;
-        float y = 0.0f;
+        bool result = false;
+        if (pUserContainer->Empty())
+          return result;
+
+        vec2 userContainerSize = pUserContainer->GetSize();
+        bool yOverflow = pUserContainer->GetSize().y() > pViewableContainer->GetSize().y();
+        vec2 viewSize = pViewableContainer->GetSize();
+
+        if (yOverflow && pWindow->HasFlag(WidgetFlag::VerticalScroll))
+        {
+          float sliderLength = pWindowContainer->GetSize().y() - SLIDER_MARGIN_FRONT - SLIDER_MARGIN_END - GRAB_SIZE;
+
+          if (pSliderVertical == nullptr)
+          {
+            result = true;
+            pSliderVertical = SliderFloat::Create(vec2(0.0f, 0.0f), sliderLength, 0.0f, 1.0f, 0.5f, true, style.scrollBars);
+            pWindowContainer->Add(pSliderVertical);
+          }
+          else
+          {
+            pSliderVertical->SetSize(vec2(sliderLength, 0.0f));
+          }
+          vec2 sliderPosition(pWindowContainer->GetSize().x() - pSliderVertical->GetSize().x(), SLIDER_MARGIN_FRONT);
+          pWindowContainer->Move(pSliderVertical, sliderPosition);
+          viewSize.x() -= (pSliderVertical->GetSize().x() + INNER_MARGIN);
+        }
+        else if (pSliderVertical != nullptr && !yOverflow)
+        {
+          pWindowContainer->Remove(pSliderVertical);
+          pSliderVertical = nullptr;
+        }
+        
+        pViewableContainer->SetSize(viewSize);
+
+        return result;
+      }
+
+      // Returns true if slider added
+      bool SetHorizontalSlider()
+      {
+        return false;
+      }
+
+      void SetupWindow()
+      {
+        vec2 border(INNER_MARGIN, INNER_MARGIN);
+        pWindowContainer->SetSize(aabb.size - 2.0f * (vec2(style.borderWidth, style.borderWidth) + border));
+        pViewableContainer->SetSize(pWindowContainer->GetSize());
 
         if (pGrab != nullptr)
-        {
-          x = pGrab->GetSize().x();
-          y = pGrab->GetSize().y();
-        }
+          pWindowContainer->Move(pGrab, pWindowContainer->GetSize() - pGrab->GetSize());
 
-        if (pSliderVertical != nullptr && pSliderVertical->GetSize().x() > x)
-          x = pSliderVertical->GetSize().x();
+        pUserContainer->FitSizeToContent(pViewableContainer->GetSize());
 
-        if (pSliderHorizontal != nullptr && pSliderHorizontal->GetSize().y() > y)
-          y = pSliderVertical->GetSize().y();
-
-        UIAABB aabb = {
-          vec2(INNER_MARGIN, INNER_MARGIN),
-          pWindow->GetSize() - vec2(x + INNER_MARGIN, y + INNER_MARGIN)};
-        return aabb;
+        SetVerticalSlider();
+        if (SetHorizontalSlider())
+          SetVerticalSlider();
       }
 
       Style::Window style;
       Window *pWindow;
       Widget *pParent;
-      Container *pViewable;
-      Container *pContainer;
+      Container *pWindowContainer;
+      Container *pViewableContainer;
+      Container *pUserContainer;
       Button *pGrab;
       SliderFloat *pSliderVertical;
       SliderFloat *pSliderHorizontal;
@@ -185,9 +230,18 @@ namespace DgE
 
       ContainerState * pResult = nullptr;
 
-      m_pContext->pContainer->HandleMessage(a_pMsg);
+      m_pContext->pWindowContainer->HandleMessage(a_pMsg);
       if (a_pMsg->QueryFlag(Message::Flag::Handled))
+      {
+        if (m_pContext->grabPressed)
+        {
+          m_pContext->grabPressed = false;
+          Message_GUI_PointerDown* pMsg = dynamic_cast<Message_GUI_PointerDown*>(a_pMsg);
+          vec2 point((float)pMsg->x, (float)pMsg->y);
+          return new ResizeState(m_pContext, point);
+        }
         return nullptr;
+      }
 
       if (a_pMsg->GetID() == Message_GUI_PointerDown::GetStaticID())
       {
@@ -215,19 +269,6 @@ namespace DgE
       if (!PointInBox(point, aabb))
         return nullptr;
 
-      if (m_pContext->pGrab != nullptr)
-      {
-        Widget * pWgt(m_pContext->pGrab);
-        pWgt->HandleMessage(a_pMsg);
-
-        if (m_pContext->grabPressed)
-        {
-          m_pContext->grabPressed = false;
-          a_pMsg->SetFlag(Message::Flag::Handled, true);
-          return new ResizeState(m_pContext, point);
-        }
-      }
-
       if (m_pContext->pWindow->HasFlag(WidgetFlag::Movable) && PointInBox(point, aabb))
       {
         a_pMsg->SetFlag(Message::Flag::Handled, true);
@@ -245,12 +286,6 @@ namespace DgE
     ContainerState * StaticState::HandleMessage(Message_GUI_PointerMove * a_pMsg)
     {
       vec2 point((float)a_pMsg->x, (float)a_pMsg->y);
-
-      if (m_pContext->pGrab != nullptr)
-      {
-        Widget * pWgt(m_pContext->pGrab);
-        pWgt->HandleMessage(a_pMsg);
-      }
 
       UIAABB aabb;
       if (!m_pContext->pWindow->GetGlobalViewableArea(aabb))
@@ -358,20 +393,16 @@ namespace DgE
       vec2 point((float)a_pMsg->x, (float)a_pMsg->y);
       vec2 newSize = m_sizeAnchor + (point - m_controlAnchor);
 
-      if (newSize.x() < Window::s_minSize.x())
-        newSize.x() = Window::s_minSize.x();
+      if (newSize.x() < MIN_DIMENSION_X)
+        newSize.x() = MIN_DIMENSION_X;
 
-      if (newSize.y() < Window::s_minSize.y())
-        newSize.y() = Window::s_minSize.y();
+      if (newSize.y() < MIN_DIMENSION_Y)
+        newSize.y() = MIN_DIMENSION_Y;
 
       m_pContext->aabb.size = newSize;
       a_pMsg->SetFlag(Message::Flag::Handled, true);
 
-      if (m_pContext->pGrab != nullptr)
-        m_pContext->pGrab->SetPosition(m_pContext->aabb.size - m_pContext->pGrab->GetSize());
-
-      UIAABB innerAABB = m_pContext->GetInnerAABB();
-      m_pContext->pViewable->SetSize(innerAABB.size);
+      m_pContext->SetupWindow();
 
       return nullptr;
     }
@@ -379,8 +410,6 @@ namespace DgE
     //------------------------------------------------------------------------------------
     // Window
     //------------------------------------------------------------------------------------
-
-    vec2 const Window::s_minSize = vec2(50.f, 20.f);
 
     class Window::PIMPL
     {
@@ -409,26 +438,16 @@ namespace DgE
       , m_pimpl(new PIMPL())
     {
       m_pimpl->context.pWindow = this;
-      m_pimpl->context.grabPressed = false;
-      m_pimpl->context.pGrab = nullptr;
-
-      if (HasFlag(WidgetFlag::VerticalScroll))
-      {
-        //Add slider
-      }
-
-      if (HasFlag(WidgetFlag::HorizontalScroll))
-      {
-        //Add slider
-      }
 
       SetStyle(style);
-
+      vec2 border(style.borderWidth + INNER_MARGIN, style.borderWidth + INNER_MARGIN);
       m_pimpl->context.aabb = {a_position, a_size};
+      m_pimpl->context.pWindowContainer = Container::Create(border, a_size - 2.0f * border);
+      m_pimpl->context.pWindowContainer->SetParent(this);
 
       if (HasFlag(WidgetFlag::Resizable))
       {
-        vec2 grabSize(12.0f, 12.0f);
+        vec2 grabSize(GRAB_SIZE, GRAB_SIZE);
         Style::Button grabStyle = 
         {
           {
@@ -438,35 +457,35 @@ namespace DgE
           {
             {
               style.grabButton,
-              Style::Text::HorizontalAlignment::Centre,
+              Style::Text::HorizontalAlignment::Left,
               Style::Text::VerticalAlignment::Top,
               1.0f,
               true
             },
             {
               style.grabButtonHover,
-              Style::Text::HorizontalAlignment::Centre,
+              Style::Text::HorizontalAlignment::Left,
               Style::Text::VerticalAlignment::Top,
               1.0f,
               true
             }
           },
           0.0f,
-          2.0f
+          { 0.0f, 0.0f }
         };
 
-        m_pimpl->context.pGrab = Button::CreateWithGlyph("\xEE\x80\x80", a_size - grabSize, grabSize, grabStyle);
-        m_pimpl->context.pGrab->SetParent(this);
+        m_pimpl->context.pGrab = Button::CreateWithGlyph("\xEE\x80\x81", a_size - grabSize - border, grabSize, grabStyle);
         m_pimpl->context.pGrab->BindSelect([pBool = &m_pimpl->context.grabPressed](){*pBool = true; });
+        m_pimpl->context.pWindowContainer->Add(m_pimpl->context.pGrab);
       }
 
       m_pimpl->pState = new StaticState(&m_pimpl->context);
 
-      UIAABB innerAABB = m_pimpl->context.GetInnerAABB();
-      m_pimpl->context.pViewable = Container::Create(innerAABB.position, innerAABB.size);
-      m_pimpl->context.pContainer = Container::Create(vec2(0.0f, 0.0f), m_pimpl->context.aabb.size);
-      m_pimpl->context.pViewable->SetParent(this);
-      m_pimpl->context.pViewable->Add(m_pimpl->context.pContainer);
+      m_pimpl->context.pViewableContainer = Container::Create(vec2(0.0f, 0.0f), vec2(0.0f, 0.0f));
+      m_pimpl->context.pUserContainer = Container::Create(vec2(0.0f, 0.0f), vec2(0.0f, 0.0f));
+      m_pimpl->context.pViewableContainer->Add(m_pimpl->context.pUserContainer);
+      m_pimpl->context.pWindowContainer->Add(m_pimpl->context.pViewableContainer);
+      m_pimpl->context.SetupWindow();
     }
 
     Window::~Window()
@@ -512,16 +531,19 @@ namespace DgE
     void Window::Clear()
     {
       m_pimpl->context.Clear();
+      m_pimpl->context.SetupWindow();
     }
 
     void Window::Add(Widget * a_pWgt)
     {
-      m_pimpl->context.pContainer->Add(a_pWgt);
+      m_pimpl->context.pUserContainer->Add(a_pWgt);
+      m_pimpl->context.SetupWindow();
     }
 
     void Window::Remove(Widget * a_pWgt)
     {
-      m_pimpl->context.pContainer->Remove(a_pWgt);
+      m_pimpl->context.pUserContainer->Remove(a_pWgt);
+      m_pimpl->context.SetupWindow();
     }
 
     void Window::Draw()
@@ -546,10 +568,7 @@ namespace DgE
       else
         Renderer::DrawBoxWithBorder({pos, size}, m_pimpl->context.style.borderWidth, m_pimpl->context.style.face, m_pimpl->context.style.border);
       
-      m_pimpl->context.pContainer->Draw();
-
-      if (m_pimpl->context.pGrab != nullptr)
-        m_pimpl->context.pGrab->Draw();
+      m_pimpl->context.pWindowContainer->Draw();
     }
 
     WidgetState Window::QueryState() const
@@ -567,22 +586,23 @@ namespace DgE
       m_pimpl->context.pParent = a_pParent;
     }
 
-    void Window::_SetLocalPosition(vec2 const & a_pos)
+    void Window::SetLocalPosition(vec2 const & a_pos)
     {
       m_pimpl->context.aabb.position = a_pos;
     }
 
-    void Window::_SetSize(vec2 const & a_size)
+    void Window::SetSize(vec2 const & a_size)
     {
       m_pimpl->context.aabb.size = a_size;
+      m_pimpl->context.SetupWindow();
     }
 
-    vec2 Window::_GetLocalPosition()
+    vec2 Window::GetLocalPosition()
     {
       return m_pimpl->context.aabb.position;
     }
 
-    vec2 Window::_GetSize()
+    vec2 Window::GetSize()
     {
       return m_pimpl->context.aabb.size;
     }

@@ -43,14 +43,14 @@ namespace DgE
       Widget * GetParent() const override;
       void SetParent(Widget *) override;
 
+      void SetLocalPosition(vec2 const&) override;
+      void SetSize(vec2 const&) override;
+      vec2 GetLocalPosition() override;
+      vec2 GetSize() override;
+
     private:
 
       void _HandleMessage(Message *) override;
-
-      void _SetLocalPosition(vec2 const &) override;
-      void _SetSize(vec2 const &) override;
-      vec2 _GetLocalPosition() override;
-      vec2 _GetSize() override;
 
     private:
 

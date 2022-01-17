@@ -26,20 +26,25 @@ namespace DgE
       void SetParent(Widget *) override;
       WidgetState QueryState() const override;
 
+      //bool GetContentBounds(UIAABB &result) const;
+
       void Clear();
       void Add(Widget *); // TODO Add check if widget already exists.
       void Remove(Widget *);
+      void Move(Widget* pWgt, vec2 const&); // Will expand the container to accomodate the new position.
+      bool Empty() const;
 
-      virtual bool IsContainer() const;
+      bool IsContainer() const;
+
+      void FitSizeToContent(vec2 const & defaultSize);
+      void SetLocalPosition(vec2 const&) override;
+      void SetSize(vec2 const&) override;
+      vec2 GetLocalPosition() override;
+      vec2 GetSize() override;
 
     protected:
 
       void _HandleMessage(Message *) override;
-
-      void _SetLocalPosition(vec2 const &) override;
-      void _SetSize(vec2 const &) override;
-      vec2 _GetLocalPosition() override;
-      vec2 _GetSize() override;
 
     private:
 

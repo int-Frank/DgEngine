@@ -396,5 +396,21 @@ namespace DgE
 
       return true;
     }
+
+    UIAABB Merge(UIAABB const &A, UIAABB const &B)
+    {
+      UIAABB result = A;
+
+      if (B.position.x() < result.position.x()) result.position.x() = B.position.x();
+      if (B.position.y() < result.position.y()) result.position.y() = B.position.y();
+
+      vec2 maxA = A.position + A.size;
+      vec2 maxB = B.position + B.size;
+
+      if (maxB.x() > maxA.x()) result.size.x() = maxB.x();
+      if (maxB.y() > maxA.y()) result.size.y() = maxB.y();
+
+      return result;
+    }
   }
 }

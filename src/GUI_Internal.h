@@ -29,6 +29,7 @@ namespace DgE
 
     bool Intersection(UIAABB const & A, UIAABB const & B,  UIAABB & out);
     bool PointInBox(vec2 const & point, UIAABB const & box);
+    UIAABB Merge(UIAABB const &A, UIAABB const &B);
   }
 }
 

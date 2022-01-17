@@ -213,8 +213,8 @@ namespace DgE
       }
       else if (m_pimpl->codePoint != INVALID_CHAR)
       {
-        vec2 grabPos = pos + vec2(m_pimpl->style.contentMargin, m_pimpl->style.contentMargin);
-        Renderer::DrawGlyph(m_pimpl->codePoint, GUI_FONT_SIZE, grabPos, m_pimpl->style.text[s].colourText);
+        vec2 glyphPos = pos + m_pimpl->style.contentMargin;
+        Renderer::DrawGlyph(m_pimpl->codePoint, GUI_FONT_SIZE, glyphPos, m_pimpl->style.text[s].colourText);
       }
     }
 
@@ -233,22 +233,22 @@ namespace DgE
       m_pimpl->pParent = a_pParent;
     }
 
-    vec2 Button::_GetLocalPosition()
+    vec2 Button::GetLocalPosition()
     {
       return m_pimpl->aabb.position;
     }
 
-    vec2 Button::_GetSize()
+    vec2 Button::GetSize()
     {
       return m_pimpl->aabb.size;
     }
 
-    void Button::_SetLocalPosition(vec2 const & a_pos)
+    void Button::SetLocalPosition(vec2 const & a_pos)
     {
       m_pimpl->aabb.position = a_pos;
     }
 
-    void Button::_SetSize(vec2 const & a_size)
+    void Button::SetSize(vec2 const & a_size)
     {
       m_pimpl->aabb.size = a_size;
     }

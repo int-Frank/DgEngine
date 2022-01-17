@@ -66,15 +66,17 @@ namespace DgE
       virtual Widget * GetParent() const = 0;
       virtual void SetParent(Widget *) = 0;
 
-      void SetPosition(vec2 const &);
-      void SetSize(vec2 const &);
+      virtual vec2 GetLocalPosition() = 0;
+      virtual void SetLocalPosition(vec2 const &) = 0;
+      virtual vec2 GetSize() = 0;
+      virtual void SetSize(vec2 const &) = 0;
+
+      void UpdateSize();
 
       // Finds the viewable/interactable portion of the widget.
       // Return of 'false' implies none of the widget can be seen (probably completely clipped by parent widget)
       bool GetGlobalViewableArea(UIAABB &);
       vec2 GetGlobalPosition();
-      vec2 GetLocalPosition();
-      vec2 GetSize();
 
       virtual bool IsContainer() const;
 
@@ -85,12 +87,6 @@ namespace DgE
     protected:
 
       virtual void _HandleMessage(Message *) = 0;
-
-      // All these will do is get/set the raw vec2.
-      virtual void _SetLocalPosition(vec2 const &) = 0;
-      virtual void _SetSize(vec2 const &) = 0;
-      virtual vec2 _GetLocalPosition() = 0;
-      virtual vec2 _GetSize() = 0;
 
     private:
 

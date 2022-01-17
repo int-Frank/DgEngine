@@ -331,21 +331,8 @@ namespace DgE
     SliderState * SliderActiveState::HandleMessage(Message_GUI_PointerMove * a_pMsg)
     {
       vec2 point((float)a_pMsg->x, (float)a_pMsg->y);
-      bool canMove = true;
-
-      if (m_pContext->pParent)
-      {
-        UIAABB aabb;
-        if (!m_pContext->pParent->GetGlobalViewableArea(aabb) || !PointInBox(point, aabb))
-            canMove = false;
-      }
-      
-      if (canMove)
-      {
-        m_pContext->SetValFromScreenCoord(point + vec2(m_offset, m_offset));
-        m_pContext->pSlider->NewValueClbk(m_pContext->value);
-      }
-
+      m_pContext->SetValFromScreenCoord(point + vec2(m_offset, m_offset));
+      m_pContext->pSlider->NewValueClbk(m_pContext->value);
       a_pMsg->SetFlag(Message::Flag::Handled, true);
       return nullptr;
     }
@@ -502,24 +489,24 @@ namespace DgE
       m_pimpl->context.pParent = a_pParent;
     }
 
-    void SliderBase::_SetLocalPosition(vec2 const & a_pos)
+    void SliderBase::SetLocalPosition(vec2 const & a_pos)
     {
       m_pimpl->context.position = a_pos;
     }
 
-    void SliderBase::_SetSize(vec2 const & a_size)
+    void SliderBase::SetSize(vec2 const & a_size)
     {
       m_pimpl->context.length = a_size.x();
       if (m_pimpl->context.length < (m_pimpl->context.style.caretWidth + SLIDER_MIN_RUN_PIXELS))
         m_pimpl->context.length = (m_pimpl->context.style.caretWidth + SLIDER_MIN_RUN_PIXELS);
     }
 
-    vec2 SliderBase::_GetLocalPosition()
+    vec2 SliderBase::GetLocalPosition()
     {
       return m_pimpl->context.position;
     }
 
-    vec2 SliderBase::_GetSize()
+    vec2 SliderBase::GetSize()
     {
       float c = m_pimpl->context.style.components[Style::Slider::c_Caret].height;
       float l = m_pimpl->context.style.components[Style::Slider::c_LowerBar].height;

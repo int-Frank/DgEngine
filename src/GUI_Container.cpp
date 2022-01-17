@@ -43,12 +43,101 @@ namespace DgE
       void HandleMessage(Message_GUI_PointerDown *, Container *pContainer);
       void HandleMessage(Message_GUI_PointerMove *, Container *pContainer);
 
+      // Default size is needed for containers where all content is stretch
+      void FitSizeToContent(vec2 const& defaultSize);
+      UIAABB GetContentAABB(vec2 const& defaultSize) const;
+      void SetAABB(UIAABB const& newAABB);
+
       Widget *pParent;
       Widget *pFocus;
       UIAABB aabb;
       WidgetState state;
       Dg::DoublyLinkedList<Widget *> children;
     };
+
+    //------------------------------------------------------------------------------------
+    // PIMPL
+    //------------------------------------------------------------------------------------
+
+    UIAABB Container::PIMPL::GetContentAABB(vec2 const& defaultSize) const
+    {
+      int const x = 0;
+      int const y = 1;
+      bool hasStretch[2] = { false, false };
+      vec2 minPoint(FLT_MAX, FLT_MAX);
+      vec2 maxPoint(-FLT_MAX, -FLT_MAX);
+      UIAABB result = {};
+
+      for (auto it = children.cbegin(); it != children.cend(); it++)
+      {
+        for (int i = 0; i < 2; i++)
+        {
+          if ((*it)->HasFlag(WidgetFlag::StretchWidth))
+          {
+            hasStretch[i] = true;
+          }
+          else
+          {
+            float s = (*it)->GetSize()[i];
+            float p = (*it)->GetLocalPosition()[i];
+
+            if (p < minPoint[i])
+              minPoint[i] = p;
+            if (p + s > maxPoint[i])
+              maxPoint[i] = p + s;
+          }
+        }
+      }
+
+      for (int i = 0; i < 2; i++)
+      {
+        if (minPoint[i] == FLT_MAX)
+        {
+          result.position[i] = 0.0f;
+          if (hasStretch[i])
+            result.size[i] = defaultSize[i];
+          else
+            result.size[i] = 0.0f;
+        }
+        else
+        {
+          result.position[i] = minPoint[i];
+          result.size[i] = maxPoint[i] - minPoint[i];
+        }
+      }
+
+      return result;
+    }
+
+    void Container::PIMPL::FitSizeToContent(vec2 const &defaultSize)
+    {
+      UIAABB contentAABB = GetContentAABB(defaultSize);
+
+      vec2 offset(0.0f, 0.0f);
+      if (contentAABB.position.x() < 0.0f)
+        offset.x() = -contentAABB.position.x();
+
+      if (contentAABB.position.y() < 0.0f)
+        offset.y() = -contentAABB.position.y();
+
+      aabb.size = offset + contentAABB.position + contentAABB.size;
+
+      // Move offset to origin if negative
+      for (auto it = children.begin(); it != children.end(); it++)
+      {
+        (*it)->SetLocalPosition((*it)->GetLocalPosition() + offset);
+        (*it)->UpdateSize();
+      }
+    }
+
+    void Container::PIMPL::SetAABB(UIAABB const& newAABB)
+    {
+      aabb = newAABB;
+
+      // Move offset to origin if negative
+      for (auto it = children.begin(); it != children.end(); it++)
+        (*it)->UpdateSize();
+    }
 
     //------------------------------------------------------------------------------------
     // Contaier
@@ -107,8 +196,10 @@ namespace DgE
       if (!PointInBox(point, aabb))
         return;
 
-      for (auto it = children.begin(); it != children.end(); it++)
+      // We pass messages to other containers last.
+      for (auto it = children.end(); it != children.begin();)
       {
+        it--;
         (*it)->HandleMessage(a_pMsg);
         if (a_pMsg->QueryFlag(DgE::Message::Flag::Handled))
         {
@@ -129,14 +220,15 @@ namespace DgE
 
     void Container::PIMPL::HandleMessage(Message_GUI_PointerUp *a_pMsg, Container *pContainer)
     {
-      for (Widget *pWidget : children)
+      for (auto it = children.end(); it != children.begin();)
       {
-        pWidget->HandleMessage(a_pMsg);
+        it--;
+        (*it)->HandleMessage(a_pMsg);
         if (a_pMsg->QueryFlag(DgE::Message::Flag::Handled))
         {
-          state = pWidget->QueryState();
-          if (pWidget->QueryState() == WidgetState::HasFocus)
-            pFocus = pWidget;
+          state = (*it)->QueryState();
+          if ((*it)->QueryState() == WidgetState::HasFocus)
+            pFocus = (*it);
           break;
         }
       }
@@ -146,14 +238,15 @@ namespace DgE
     {
       vec2 point((float)a_pMsg->x, (float)a_pMsg->y);
 
-      for (Widget *pWidget : children)
+      for (auto it = children.end(); it != children.begin();)
       {
-        pWidget->HandleMessage(a_pMsg);
+        it--;
+        (*it)->HandleMessage(a_pMsg);
         if (a_pMsg->QueryFlag(DgE::Message::Flag::Handled))
         {
-          state = pWidget->QueryState();
-          if (pWidget->QueryState() == WidgetState::HasFocus)
-            pFocus = pWidget;
+          state = (*it)->QueryState();
+          if ((*it)->QueryState() == WidgetState::HasFocus)
+            pFocus = (*it);
           break;
         }
       }
@@ -175,9 +268,8 @@ namespace DgE
       if (!GetGlobalViewableArea(viewableWindow))
         return;
 
-      for (auto it = m_pimpl->children.end(); it != m_pimpl->children.begin();)
+      for (auto it = m_pimpl->children.begin(); it != m_pimpl->children.end(); it++)
       {
-        it--;
         (*it)->Draw();
       }
     }
@@ -197,6 +289,11 @@ namespace DgE
       return m_pimpl->state;
     }
 
+    bool Container::Empty() const
+    {
+      return m_pimpl->children.size() == 0;
+    }
+
     void Container::Clear()
     {
       m_pimpl->Clear();
@@ -209,6 +306,18 @@ namespace DgE
         m_pimpl->children.push_front(a_pWgt);
       else
         m_pimpl->children.push_back(a_pWgt);
+    }
+
+    void Container::Move(Widget* a_pWgt, vec2 const& a_pos)
+    {
+      for (auto it = m_pimpl->children.begin(); it != m_pimpl->children.end(); it++)
+      {
+        if (*it == a_pWgt)
+        {
+          (*it)->SetLocalPosition(a_pos);
+          break;
+        }
+      }
     }
 
     void Container::Remove(Widget *a_pWgt)
@@ -229,22 +338,27 @@ namespace DgE
       return true;
     }
 
-    void Container::_SetLocalPosition(vec2 const &position)
+    void Container::FitSizeToContent(vec2 const& defaultSize)
+    {
+      m_pimpl->FitSizeToContent(defaultSize);
+    }
+
+    void Container::SetLocalPosition(vec2 const &position)
     {
       m_pimpl->aabb.position = position;
     }
 
-    void Container::_SetSize(vec2 const &size)
+    void Container::SetSize(vec2 const &size)
     {
       m_pimpl->aabb.size = size;
     }
 
-    vec2 Container::_GetLocalPosition()
+    vec2 Container::GetLocalPosition()
     {
       return m_pimpl->aabb.position;
     }
 
-    vec2 Container::_GetSize()
+    vec2 Container::GetSize()
     {
       return m_pimpl->aabb.size;
     }

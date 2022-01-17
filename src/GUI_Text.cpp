@@ -684,22 +684,22 @@ namespace DgE
         a_pMsg->ConsumeHover();
     }
 
-    void Text::_SetLocalPosition(vec2 const & a_pos)
+    void Text::SetLocalPosition(vec2 const & a_pos)
     {
       m_pimpl->aabb.position = a_pos;
     }
 
-    void Text::_SetSize(vec2 const & a_size)
+    void Text::SetSize(vec2 const & a_size)
     {
       m_pimpl->aabb.size = a_size;
     }
 
-    vec2 Text::_GetLocalPosition()
+    vec2 Text::GetLocalPosition()
     {
       return m_pimpl->aabb.position;
     }
 
-    vec2 Text::_GetSize()
+    vec2 Text::GetSize()
     {
       return m_pimpl->aabb.size;
     }

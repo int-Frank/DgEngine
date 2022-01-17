@@ -105,7 +105,7 @@ namespace DgE
         Colours colours[COUNT];
         Text text[COUNT];
         float borderWidth;
-        float contentMargin;
+        vec2 contentMargin; // Only for glyphs
       };
 
       struct Checkbox
