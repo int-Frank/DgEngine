@@ -6,7 +6,7 @@
 #include "GUI_Slider.h"
 #include "Renderer.h"
 
-#define SLIDER_MIN_RUN_PIXELS 4.0f
+#define SLIDER_MIN_RUN_PIXELS 0.0f
 #define SLIDER_MIN_CARET_WIDTH 2.0f
 
 #define SLIDER_HEIGHT m_pContext->

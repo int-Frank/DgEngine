@@ -9,13 +9,14 @@
 #include "GUI_Slider.h"
 #include "Renderer.h"
 
-#define MIN_DIMENSION_X 40.0f
-#define MIN_DIMENSION_Y 10.0f
+#define MIN_DIMENSION_X 32.0f
+#define MIN_DIMENSION_Y 32.0f
+#define MIN_CARET_SIZE 8.0f
 #define WINDOW_CONTROLLER_BORDER 16.0f
-#define GRAB_SIZE 12.0f
+#define GRAB_SIZE 14.0f
 #define INNER_MARGIN 1.0f
 #define SLIDER_MARGIN_FRONT 0.0f
-#define SLIDER_MARGIN_END 5.0f
+#define SLIDER_MARGIN_END 0.0f
 
 namespace DgE
 {
@@ -56,6 +57,35 @@ namespace DgE
         pUserContainer->Clear();
       }
 
+      Style::Slider GetSliderStyle() const
+      {
+        return {
+          {
+            {GRAB_SIZE, 0},
+            {GRAB_SIZE, 0},
+            {GRAB_SIZE - 2, 0},
+          },
+          {
+            {
+              {Window::s_style.sliderBack, 0},
+              {Window::s_style.sliderBack, 0},
+              {Window::s_style.sliderBack, 0},
+            },
+            {
+              {Window::s_style.sliderBack, 0},
+              {Window::s_style.sliderBack, 0},
+              {Window::s_style.sliderBack, 0},
+            },
+            {
+              {Window::s_style.sliderCaret, 0},
+              {Window::s_style.sliderCaret, 0},
+              {Window::s_style.sliderCaret, 0},
+            }
+          },
+          1.0f
+        };
+      }
+
       // Returns true if slider added
       bool SetVerticalSlider()
       {
@@ -69,26 +99,42 @@ namespace DgE
 
         if (yOverflow && pWindow->HasFlag(WidgetFlag::VerticalScroll))
         {
-          float sliderLength = pWindowContainer->GetSize().y() - SLIDER_MARGIN_FRONT - SLIDER_MARGIN_END - GRAB_SIZE;
+          float sliderLength = pWindowContainer->GetSize().y() - SLIDER_MARGIN_FRONT - SLIDER_MARGIN_END;
+          if (pGrab != nullptr || pWindow->HasFlag(WidgetFlag::HorizontalScroll))
+            sliderLength -= GRAB_SIZE;
 
           if (pSliderVertical == nullptr)
           {
             result = true;
-            pSliderVertical = SliderFloat::Create(vec2(0.0f, 0.0f), sliderLength, 0.0f, 1.0f, 0.5f, true, style.scrollBars);
+            pSliderVertical = SliderFloat::Create(vec2(0.0f, 0.0f), sliderLength, 0.0f, 1.0f, 1.0f, true, GetSliderStyle());
+            pSliderVertical->BindNewValue([pContext = this](float val) {pContext->VerticalSliderCallback(val); });
             pWindowContainer->Add(pSliderVertical);
           }
           else
           {
             pSliderVertical->SetSize(vec2(sliderLength, 0.0f));
+            pSliderVertical->SetValue(pSliderVertical->GetValue());
           }
           vec2 sliderPosition(pWindowContainer->GetSize().x() - pSliderVertical->GetSize().x(), SLIDER_MARGIN_FRONT);
           pWindowContainer->Move(pSliderVertical, sliderPosition);
           viewSize.x() -= (pSliderVertical->GetSize().x() + INNER_MARGIN);
+
+          Style::Slider style = GetSliderStyle();
+          style.caretWidth = pViewableContainer->GetSize().y() / pUserContainer->GetSize().y() * sliderLength;
+
+          if (style.caretWidth < MIN_CARET_SIZE)
+            style.caretWidth = MIN_CARET_SIZE;
+
+          pSliderVertical->SetStyle(style);
         }
         else if (pSliderVertical != nullptr && !yOverflow)
         {
           pWindowContainer->Remove(pSliderVertical);
           pSliderVertical = nullptr;
+
+          vec2 pos = pUserContainer->GetLocalPosition();
+          pos.y() = 0.0f;
+          pUserContainer->SetLocalPosition(pos);
         }
         
         pViewableContainer->SetSize(viewSize);
@@ -99,7 +145,57 @@ namespace DgE
       // Returns true if slider added
       bool SetHorizontalSlider()
       {
-        return false;
+        bool result = false;
+        if (pUserContainer->Empty())
+          return result;
+
+        vec2 userContainerSize = pUserContainer->GetSize();
+        bool xOverflow = pUserContainer->GetSize().x() > pViewableContainer->GetSize().x();
+        vec2 viewSize = pViewableContainer->GetSize();
+
+        if (xOverflow && pWindow->HasFlag(WidgetFlag::HorizontalScroll))
+        {
+          float sliderLength = pWindowContainer->GetSize().x() - SLIDER_MARGIN_FRONT - SLIDER_MARGIN_END;
+          if (pGrab != nullptr || pWindow->HasFlag(WidgetFlag::VerticalScroll))
+            sliderLength -= GRAB_SIZE;
+
+          if (pSliderHorizontal == nullptr)
+          {
+            result = true;
+            pSliderHorizontal = SliderFloat::Create(vec2(0.0f, 0.0f), sliderLength, 0.0f, 1.0f, 0.0f, false, GetSliderStyle());
+            pSliderHorizontal->BindNewValue([pContext = this](float val) {pContext->HorizontalSliderCallback(val); });
+            pWindowContainer->Add(pSliderHorizontal);
+          }
+          else
+          {
+            pSliderHorizontal->SetSize(vec2(sliderLength, 0.0f));
+            pSliderHorizontal->SetValue(pSliderHorizontal->GetValue());
+          }
+          vec2 sliderPosition(SLIDER_MARGIN_FRONT, pWindowContainer->GetSize().y() - pSliderHorizontal->GetSize().y());
+          pWindowContainer->Move(pSliderHorizontal, sliderPosition);
+          viewSize.y() -= (pSliderHorizontal->GetSize().y() + INNER_MARGIN);
+
+          Style::Slider style = GetSliderStyle();
+          style.caretWidth = pViewableContainer->GetSize().x() / pUserContainer->GetSize().x() * sliderLength;
+
+          if (style.caretWidth < MIN_CARET_SIZE)
+            style.caretWidth = MIN_CARET_SIZE;
+
+          pSliderHorizontal->SetStyle(style);
+        }
+        else if (pSliderHorizontal != nullptr && !xOverflow)
+        {
+          pWindowContainer->Remove(pSliderHorizontal);
+          pSliderHorizontal = nullptr;
+
+          vec2 pos = pUserContainer->GetLocalPosition();
+          pos.x() = 0.0f;
+          pUserContainer->SetLocalPosition(pos);
+        }
+
+        pViewableContainer->SetSize(viewSize);
+
+        return result;
       }
 
       void SetupWindow()
@@ -116,6 +212,43 @@ namespace DgE
         SetVerticalSlider();
         if (SetHorizontalSlider())
           SetVerticalSlider();
+
+        if (pGrab != nullptr)
+        {
+          Style::Button grabStyle = pGrab->GetStyle();
+          Colour clr = 0;
+          if (pSliderHorizontal != nullptr || pSliderVertical != nullptr)
+            clr = Window::s_style.sliderBack;
+          grabStyle.colours[Style::Button::Default].face = clr;
+          grabStyle.colours[Style::Button::Hover].face = clr;
+          pGrab->SetStyle(grabStyle);
+        }
+      }
+
+      void VerticalSliderCallback(float val)
+      {
+        float userY = pUserContainer->GetSize().y();
+        float viewY = pViewableContainer->GetSize().y();
+        if (userY <= viewY)
+          return;
+
+        float offset = (userY - viewY) * (1.0f - val);
+        vec2 pos = pUserContainer->GetLocalPosition();
+        pos.y() = -offset;
+        pUserContainer->SetLocalPosition(pos);
+      }
+
+      void HorizontalSliderCallback(float val)
+      {
+        float userX = pUserContainer->GetSize().x();
+        float viewX = pViewableContainer->GetSize().x();
+        if (userX <= viewX)
+          return;
+
+        float offset = (userX - viewX) * val;
+        vec2 pos = pUserContainer->GetLocalPosition();
+        pos.x() = -offset;
+        pUserContainer->SetLocalPosition(pos);
       }
 
       Style::Window style;
@@ -451,8 +584,8 @@ namespace DgE
         Style::Button grabStyle = 
         {
           {
-            {0, 0},
-            {0, 0}
+            {0xFF535250, 0},
+            {0xFF535250, 0}
           },
           {
             {
@@ -471,7 +604,7 @@ namespace DgE
             }
           },
           0.0f,
-          { 0.0f, 0.0f }
+          { 2.0f, 2.0f }
         };
 
         m_pimpl->context.pGrab = Button::CreateWithGlyph("\xEE\x80\x81", a_size - grabSize - border, grabSize, grabStyle);

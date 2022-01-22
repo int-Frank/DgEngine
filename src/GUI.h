@@ -84,7 +84,8 @@ namespace DgE
         Colour grabButton;
         Colour grabButtonHover;
         float borderWidth;
-        Slider scrollBars;
+        Colour sliderBack;
+        Colour sliderCaret;
       };
 
       struct Button

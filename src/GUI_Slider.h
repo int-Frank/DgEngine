@@ -64,6 +64,7 @@ namespace DgE
 
       void BindNewValue(std::function<void(T)> a_fn);
       void SetValue(T);
+      T GetValue() const;
 
     private:
 
@@ -133,12 +134,18 @@ namespace DgE
     }
 
     template<typename T>
+    T Slider<T>::GetValue() const
+    {
+      return m_lastValue;
+    }
+
+    template<typename T>
     void Slider<T>::NewValueClbk(float a_val)
     {
       if (m_clbk_NewValue != nullptr)
       {
         T val = T(a_val * (m_maxVal - m_minVal) + m_minVal);
-        if (val != m_lastValue)
+        //if (val != m_lastValue)
         {
           m_clbk_NewValue(val);
           m_lastValue = val;
