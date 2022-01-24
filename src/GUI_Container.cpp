@@ -345,7 +345,8 @@ namespace DgE
 
     void Container::SetLocalPosition(vec2 const &position)
     {
-      m_pimpl->aabb.position = position;
+      m_pimpl->aabb.position.x() = round(position.x());
+      m_pimpl->aabb.position.y() = round(position.y());
     }
 
     void Container::SetSize(vec2 const &size)
