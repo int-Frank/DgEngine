@@ -98,69 +98,71 @@ namespace DgE
         pUserContainer->SetLocalPosition(pos);
       }
 
-      // Returns true if slider added
-      bool SetSlider(int i)
+      vec2 GetUserContainerSize(bool hasSlider[2])
       {
-        bool result = false;
-        if (pUserContainer->Empty())
-        {
-          RemoveSlider(0);
-          RemoveSlider(1);
-          return result;
-        }
-
-        int j = (i + 1) & 1;
-        WidgetFlag flags[2] = { WidgetFlag::HorizontalScroll, WidgetFlag::VerticalScroll };
-
-        vec2 userContainerSize = pUserContainer->GetSize();
-        bool overflow = pUserContainer->GetSize()[i] > pViewableContainer->GetSize()[i];
+        WidgetFlag const flags[2] = { WidgetFlag::HorizontalScroll, WidgetFlag::VerticalScroll };
         vec2 viewSize = pViewableContainer->GetSize();
 
-        if (overflow && pWindow->HasFlag(flags[i]))
+        int i = 0;
+        hasSlider[0] = false;
+        hasSlider[1] = false;
+        while (i < 2)
         {
-          float sliderLength = pWindowContainer->GetSize()[i] - SLIDER_MARGIN_FRONT - SLIDER_MARGIN_END;
-          if (pGrab != nullptr || pWindow->HasFlag(flags[j]))
-            sliderLength -= GRAB_SIZE;
+          int j = (i + 1) & 1;
 
-          if (pSliders[i] == nullptr)
+          bool overflow = pUserContainer->GetSize()[i] > viewSize[i];
+
+          if (overflow && pWindow->HasFlag(flags[i]) && !hasSlider[i])
           {
-            result = true;
-            pSliders[i] = SliderFloat::Create(vec2(0.0f, 0.0f), sliderLength, 0.0f, 1.0f, i == 0 ? 0.0f : 1.0f, i == 1, GetSliderStyle());
-            pSliders[i]->BindNewValue([i, pContext = this](float val) {pContext->SliderCallback(i, val); });
-            pWindowContainer->Add(pSliders[i]);
-          }
-          else
-          {
-            pSliders[i]->SetSize(vec2(sliderLength, 0.0f));
-            pSliders[i]->SetValue(pSliders[i]->GetValue());
+            viewSize[j] -= (GRAB_SIZE + INNER_MARGIN);
+            hasSlider[i] = true;
+            i = j;
+            continue;
           }
 
-          vec2 sliderPosition;
-          sliderPosition[i] = SLIDER_MARGIN_FRONT;
-          sliderPosition[j] = pWindowContainer->GetSize()[j] - GRAB_SIZE;
-
-          pWindowContainer->Move(pSliders[i], sliderPosition);
-          viewSize[j] -= (pSliders[i]->GetSize()[j] + INNER_MARGIN);
-
-          Style::Slider style = GetSliderStyle();
-          style.caretWidth = pViewableContainer->GetSize()[i] / pUserContainer->GetSize()[i] * sliderLength;
-
-          if (style.caretWidth < MIN_CARET_SIZE)
-            style.caretWidth = MIN_CARET_SIZE;
-
-          pSliders[i]->SetStyle(style);
+          i++;
         }
-        else if (pSliders[i] != nullptr && !overflow)
-        {
-          RemoveSlider(i);
-        }
-        
-        pViewableContainer->SetSize(viewSize);
-
-        return result;
+        return viewSize;
       }
 
-      void SetupWindow()
+      // Returns true if slider added
+      void AddSlider(int i)
+      {
+        WidgetFlag const flags[2] = { WidgetFlag::HorizontalScroll, WidgetFlag::VerticalScroll };
+        int j = (i + 1) & 1;
+
+        float sliderLength = pWindowContainer->GetSize()[i] - SLIDER_MARGIN_FRONT - SLIDER_MARGIN_END;
+        if (pGrab != nullptr || pWindow->HasFlag(flags[j]))
+          sliderLength -= GRAB_SIZE;
+
+        if (pSliders[i] == nullptr)
+        {
+          pSliders[i] = SliderFloat::Create(vec2(0.0f, 0.0f), sliderLength, 0.0f, 1.0f, i == 0 ? 0.0f : 1.0f, i == 1, GetSliderStyle());
+          pSliders[i]->BindNewValue([i, pContext = this](float val) {pContext->SliderCallback(i, val); });
+          pWindowContainer->Add(pSliders[i]);
+        }
+        else
+        {
+          pSliders[i]->SetSize(vec2(sliderLength, 0.0f));
+          pSliders[i]->SetValue(pSliders[i]->GetValue());
+        }
+
+        vec2 sliderPosition;
+        sliderPosition[i] = SLIDER_MARGIN_FRONT;
+        sliderPosition[j] = pWindowContainer->GetSize()[j] - GRAB_SIZE;
+
+        pWindowContainer->Move(pSliders[i], sliderPosition);
+
+        Style::Slider style = GetSliderStyle();
+        style.caretWidth = pViewableContainer->GetSize()[i] / pUserContainer->GetSize()[i] * sliderLength;
+
+        if (style.caretWidth < MIN_CARET_SIZE)
+          style.caretWidth = MIN_CARET_SIZE;
+
+        pSliders[i]->SetStyle(style);
+      }
+
+      void BuildWindow()
       {
         vec2 border(INNER_MARGIN, INNER_MARGIN);
         pWindowContainer->SetSize(aabb.size - 2.0f * (vec2(style.borderWidth, style.borderWidth) + border));
@@ -171,8 +173,17 @@ namespace DgE
 
         pUserContainer->FitSizeToContent(pViewableContainer->GetSize());
 
-        SetSlider(0);
-        SetSlider(1);
+        bool hasSlider[2] = {false, false};
+        pViewableContainer->SetSize(GetUserContainerSize(hasSlider));
+
+        for (int i = 0; i < 2; i++)
+        {
+          int j = (i + 1) & 1;
+          if (hasSlider[i])
+            AddSlider(i);
+          else
+            RemoveSlider(i);
+        }
 
         if (pGrab != nullptr)
         {
@@ -483,7 +494,7 @@ namespace DgE
       m_pContext->aabb.size = newSize;
       a_pMsg->SetFlag(Message::Flag::Handled, true);
 
-      m_pContext->SetupWindow();
+      m_pContext->BuildWindow();
 
       return nullptr;
     }
@@ -566,7 +577,7 @@ namespace DgE
       m_pimpl->context.pUserContainer = Container::Create(vec2(0.0f, 0.0f), vec2(0.0f, 0.0f));
       m_pimpl->context.pViewableContainer->Add(m_pimpl->context.pUserContainer);
       m_pimpl->context.pWindowContainer->Add(m_pimpl->context.pViewableContainer);
-      m_pimpl->context.SetupWindow();
+      m_pimpl->context.BuildWindow();
     }
 
     Window::~Window()
@@ -612,19 +623,19 @@ namespace DgE
     void Window::Clear()
     {
       m_pimpl->context.Clear();
-      m_pimpl->context.SetupWindow();
+      m_pimpl->context.BuildWindow();
     }
 
     void Window::Add(Widget * a_pWgt)
     {
       m_pimpl->context.pUserContainer->Add(a_pWgt);
-      m_pimpl->context.SetupWindow();
+      m_pimpl->context.BuildWindow();
     }
 
     void Window::Remove(Widget * a_pWgt)
     {
       m_pimpl->context.pUserContainer->Remove(a_pWgt);
-      m_pimpl->context.SetupWindow();
+      m_pimpl->context.BuildWindow();
     }
 
     void Window::Draw()
@@ -675,7 +686,7 @@ namespace DgE
     void Window::SetSize(vec2 const & a_size)
     {
       m_pimpl->context.aabb.size = a_size;
-      m_pimpl->context.SetupWindow();
+      m_pimpl->context.BuildWindow();
     }
 
     vec2 Window::GetLocalPosition()
