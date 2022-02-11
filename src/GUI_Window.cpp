@@ -143,7 +143,9 @@ namespace DgE
         }
         else
         {
-          pSliders[i]->SetSize(vec2(sliderLength, 0.0f));
+          vec2 sliderSize(0.0f, 0.0f);
+          sliderSize[i] = sliderLength;
+          pSliders[i]->SetSize(sliderSize);
           pSliders[i]->SetValue(pSliders[i]->GetValue());
         }
 

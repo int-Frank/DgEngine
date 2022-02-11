@@ -32,19 +32,25 @@ namespace DgE
       {
         vec2 parentSize = pParent->GetSize();
         vec2 thisSize = GetSize();
+        vec2 position = GetLocalPosition();
         bool dirty = false;
         if (HasFlag(WidgetFlag::StretchWidth))
         {
           dirty = true;
           thisSize.x() = parentSize.x();
+          position.x() = 0.0f;
         }
         if (HasFlag(WidgetFlag::StretchHeight))
         {
           dirty = true;
           thisSize.y() = parentSize.y();
+          position.y() = 0.0f;
         }
         if (dirty)
+        {
           SetSize(thisSize);
+          SetLocalPosition(position);
+        }
       }
     }
 

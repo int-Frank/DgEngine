@@ -243,16 +243,15 @@ namespace DgE
       UIAABB caret = {};
       m_pContext->GetAABBs(barLower, barUpper, caret);
 
-
       if (PointInBox(point, caret))
       {
         a_pMsg->SetFlag(Message::Flag::Handled, true);
 
         float caretOffset;
         if (!m_pContext->isVertical)
-          caretOffset = aabb.position.x() + m_pContext->GetLowerLength() - point.x();
+          caretOffset = m_pContext->pSlider->GetGlobalPosition().x() + m_pContext->GetLowerLength() - point.x();
         else
-          caretOffset = aabb.position.y() + m_pContext->length - m_pContext->GetLowerLength() - point.y();
+          caretOffset = m_pContext->pSlider->GetGlobalPosition().y() + m_pContext->length - m_pContext->GetLowerLength() - point.y();
 
         return new SliderActiveState(m_pContext, caretOffset);
       }
@@ -354,7 +353,8 @@ namespace DgE
 
     SliderBase::SliderBase(vec2 const & a_position, float length, float a_value, Style::Slider const &style, bool isVertical, std::initializer_list<WidgetFlag> a_flags)
       : Widget({WidgetFlag::NotResponsive,
-                WidgetFlag::StretchWidth
+                WidgetFlag::StretchWidth,
+                WidgetFlag::StretchHeight
         }, a_flags)
       , m_pimpl(new PIMPL())
     {
@@ -496,7 +496,7 @@ namespace DgE
 
     void SliderBase::SetSize(vec2 const & a_size)
     {
-      m_pimpl->context.length = a_size.x();
+      m_pimpl->context.length = m_pimpl->context.isVertical ? a_size.y() : a_size.x();
       if (m_pimpl->context.length < (m_pimpl->context.style.caretWidth + SLIDER_MIN_RUN_PIXELS))
         m_pimpl->context.length = (m_pimpl->context.style.caretWidth + SLIDER_MIN_RUN_PIXELS);
     }
