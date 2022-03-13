@@ -15,14 +15,12 @@
   - Radio button
   - Slider
   - Drop down list
-  - Scroll list
   - Image
     - Text (maybe derives from image)
   - Text Input
   - Text display
   - Text window (logging window)
   - Image display
-  - Interactive area, overlays on top of say an Image Display, and captues events
 */
 
 // ContentDiv: Some widgets allow content to be drawn on itself

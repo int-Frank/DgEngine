@@ -43,13 +43,13 @@ namespace DgE
       vec2 GetLocalPosition() override;
       vec2 GetSize() override;
 
-      static Style::Window const s_style;
-
     private:
 
       void _HandleMessage(Message *) override;
 
     private:
+
+      static Style::Window const s_style;
 
       class PIMPL;
       PIMPL *m_pimpl;

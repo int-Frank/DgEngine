@@ -66,19 +66,19 @@ namespace DgE
           },
           {
             {
-              {Window::s_style.sliderBack, 0},
-              {Window::s_style.sliderBack, 0},
-              {Window::s_style.sliderBack, 0},
+              {Window::GetDefaultStyle().sliderBack, 0},
+              {Window::GetDefaultStyle().sliderBack, 0},
+              {Window::GetDefaultStyle().sliderBack, 0},
             },
             {
-              {Window::s_style.sliderBack, 0},
-              {Window::s_style.sliderBack, 0},
-              {Window::s_style.sliderBack, 0},
+              {Window::GetDefaultStyle().sliderBack, 0},
+              {Window::GetDefaultStyle().sliderBack, 0},
+              {Window::GetDefaultStyle().sliderBack, 0},
             },
             {
-              {Window::s_style.sliderCaret, 0},
-              {Window::s_style.sliderCaret, 0},
-              {Window::s_style.sliderCaret, 0},
+              {Window::GetDefaultStyle().sliderCaret, 0},
+              {Window::GetDefaultStyle().sliderCaret, 0},
+              {Window::GetDefaultStyle().sliderCaret, 0},
             }
           },
           1.0f
@@ -192,7 +192,7 @@ namespace DgE
           Style::Button grabStyle = pGrab->GetStyle();
           Colour clr = 0;
           if (pSliders[0] != nullptr || pSliders[1] != nullptr)
-            clr = Window::s_style.sliderBack;
+            clr = Window::GetDefaultStyle().sliderBack;
           grabStyle.colours[Style::Button::Default].face = clr;
           grabStyle.colours[Style::Button::Hover].face = clr;
           pGrab->SetStyle(grabStyle);
