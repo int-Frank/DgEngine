@@ -60,9 +60,8 @@ namespace DgE
   //------------------------------------------------------------------------------------------------
   // ShaderSourceElement
   //------------------------------------------------------------------------------------------------
-  ShaderSourceElement::ShaderSourceElement(ShaderDomain a_domain, StrType a_type, std::string const& a_str)
+  ShaderSourceElement::ShaderSourceElement(ShaderDomain a_domain, std::string const& a_str)
     : domain(a_domain)
-    , strType(a_type)
     , str(a_str)
   {
 
@@ -70,7 +69,6 @@ namespace DgE
 
   ShaderSourceElement::ShaderSourceElement()
     : domain(ShaderDomain::Vertex)
-    , strType(StrType::Source)
   {
 
   }
@@ -90,21 +88,7 @@ namespace DgE
 
     for (auto const& ele : a_list)
     {
-      if (ele.strType == StrType::Source)
-        m_src[static_cast<uint32_t>(ele.domain)] = RemoveComments(ele.str);
-      else
-      {
-        std::ifstream ifs(ele.str);
-        if (!ifs.good())
-        {
-          LOG_WARN("ShaderSource::ShaderSource() failed to open file '{}'", ele.str.c_str());
-          continue;
-        }
-
-        std::string content((std::istreambuf_iterator<char>(ifs)),
-          (std::istreambuf_iterator<char>()));
-        m_src[static_cast<uint32_t>(ele.domain)] = RemoveComments(content);
-      }
+      m_src[static_cast<uint32_t>(ele.domain)] = RemoveComments(ele.str);
     }
   }
 

@@ -8,19 +8,12 @@
 
 namespace DgE
 {
-  enum class StrType
-  {
-    Source,
-    Path
-  };
-
   struct ShaderSourceElement
   {
     ShaderDomain  domain;
-    StrType       strType;
     std::string   str;
 
-    ShaderSourceElement(ShaderDomain, StrType, std::string const&);
+    ShaderSourceElement(ShaderDomain, std::string const&);
     ShaderSourceElement();
   };
 

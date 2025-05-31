@@ -137,8 +137,8 @@ namespace DgE
         s_pRenderContext->va_unitBox->SetIndexBuffer(s_pRenderContext->ib_unitBox);
 
         DgE::ShaderData * pSD = new ShaderData({
-            { DgE::ShaderDomain::Vertex, DgE::StrType::Source, g_flatShader_vs },
-            { DgE::ShaderDomain::Fragment, DgE::StrType::Source, g_flatShader_fs }
+            { DgE::ShaderDomain::Vertex, g_flatShader_vs },
+            { DgE::ShaderDomain::Fragment, g_flatShader_fs }
           });
 
         ResourceManager::Instance()->RegisterResource(ir_GUIBoxShader, pSD);
@@ -162,8 +162,8 @@ namespace DgE
         s_pRenderContext->va_boxBorder->SetIndexBuffer(s_pRenderContext->ib_boxBorder);
 
         DgE::ShaderData * pSD = new ShaderData({
-            { DgE::ShaderDomain::Vertex, DgE::StrType::Source, g_boxBorderShader_vs },
-            { DgE::ShaderDomain::Fragment, DgE::StrType::Source, g_flatShader_fs }
+            { DgE::ShaderDomain::Vertex, g_boxBorderShader_vs },
+            { DgE::ShaderDomain::Fragment, g_flatShader_fs }
           });
 
         ResourceManager::Instance()->RegisterResource(ir_GUIBoxBorderShader, pSD);
@@ -192,8 +192,8 @@ namespace DgE
         s_pRenderContext->va_text->SetVertexAttributeDivisor(3, 1);
 
         DgE::ShaderData * pSD = new ShaderData({
-            { DgE::ShaderDomain::Vertex, DgE::StrType::Source, g_textShader_vs },
-            { DgE::ShaderDomain::Fragment, DgE::StrType::Source, g_textShader_fs }
+            { DgE::ShaderDomain::Vertex, g_textShader_vs },
+            { DgE::ShaderDomain::Fragment, g_textShader_fs }
           });
       
         ResourceManager::Instance()->RegisterResource(ir_GUITextShader, pSD);
